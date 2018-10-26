@@ -38,10 +38,10 @@ interface IRegistry {
 
     // MAINTENANCE
 
-    function canUpdateStatus(bytes32 _listingHash) public view returns (bool);
+    function can_update_status(bytes32 _listingHash) public view returns (bool);
 
     // finish current operation
-    function updateStatus(bytes32 _listingHash) public; // only if canUpdateStatus
+    function update_status(bytes32 _listingHash) public; // only if can_update_status(_listingHash)
 
 
     // CHALLENGES
@@ -54,10 +54,10 @@ interface IRegistry {
         (uint challenge_id, bool is_commit, bool is_reveal, uint votesFor /* 0 for commit phase */,
         uint votesAgainst /* 0 for commit phase */);    // only for challenged
 
-    function commitVote(bytes32 _listingHash, bytes32 _secretHash) public;  // only for challenged
+    function commit_vote(bytes32 _listingHash, bytes32 _secretHash) public;  // only for challenged
 
-    function revealVote(bytes32 _listingHash, uint _voteOption /* 1: for, other: against */, uint _voteStake, uint _salt) public;  // only for challenged
+    function reveal_vote(bytes32 _listingHash, uint _voteOption /* 1: for, other: against */, uint _voteStake, uint _salt) public;  // only for challenged
 
     // claim challenge reward
-    function claimReward(uint challenge_id) public;
+    function claim_reward(uint challenge_id) public;
 }
