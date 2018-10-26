@@ -1,0 +1,12 @@
+{
+  "name": "dapp-tcr",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "test": "embark test"
+  },
+  "author": "",
+  "license": "GPL-2",
+  "homepage": "",
+  "devDependencies": {}
+}
