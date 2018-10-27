@@ -25,6 +25,7 @@ contract Registry is IRegistry {
     event _ChallengeSucceeded(bytes32 indexed listingHash, uint indexed challengeID, uint rewardPool, uint totalTokens);
     event _RewardClaimed(uint indexed challengeID, uint reward, address indexed voter);
     event _ExitInitialized(bytes32 indexed listingHash, uint exitTime, uint exitDelayEndDate, address indexed owner);
+    event _StateChanged(bytes32 indexed listing_id, DAppState new_state);
 
     // ============
     // DATA STRUCTURES:
@@ -54,8 +55,9 @@ contract Registry is IRegistry {
         address owner;          // Owner of Listing
         uint unstakedDeposit;   // Number of tokens in the listing not locked in a challenge
 
+        DAppState state;
+
         uint applicationExpiry; // Expiration date of apply stage
-        bool whitelisted;       // Indicates registry status
 
         uint challengeID;       // Corresponds to a PollID in Voting
 
@@ -136,10 +138,11 @@ contract Registry is IRegistry {
     }
 
     function edit(bytes32 listing_id, bytes new_ipfs_hash) public {
-
+        checkDAppInvariant(listing_id);
     }
 
     function init_exit(bytes32 listing_id) public {
+        checkDAppInvariant(listing_id);
 /*        Listing storage listing = listings[_listingHash];
 
         require(msg.sender == listing.owner);
@@ -187,6 +190,7 @@ contract Registry is IRegistry {
             (uint state, bool is_challenged /* many states can be challenged */,
             bool status_can_be_updated /* if update_status should be called */,
             bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */) {
+        checkDAppInvariant(listing_id);
         edit_ipfs_hash = new bytes(0);
     }
 
@@ -195,6 +199,7 @@ contract Registry is IRegistry {
     // -----------------------
 
     function can_update_status(bytes32 listing_id) public view returns (bool) {
+        checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
 
@@ -210,6 +215,7 @@ contract Registry is IRegistry {
 
     // finish current operation
     function update_status(bytes32 listing_id) public {
+        checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
 
@@ -227,6 +233,7 @@ contract Registry is IRegistry {
     // -----------------------
 
     function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) public {
+        checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
 
@@ -272,14 +279,17 @@ contract Registry is IRegistry {
     function challenge_status(bytes32 listing_id) public view returns
             (uint challenge_id, bool is_commit, bool is_reveal, uint votesFor /* 0 for commit phase */,
             uint votesAgainst /* 0 for commit phase */) {
+        checkDAppInvariant(listing_id);
 
     }
 
     function commit_vote(bytes32 listing_id, bytes32 secret_hash) public {
+        checkDAppInvariant(listing_id);
 
     }
 
     function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt) public {
+        checkDAppInvariant(listing_id);
 
     }
 
@@ -327,35 +337,6 @@ contract Registry is IRegistry {
         uint rewardPool = challenges[_challengeID].rewardPool;
         uint voterTokens = voting.getNumTokens(_voter, _challengeID);
         return voterTokens.mul(rewardPool).div(totalTokens);
-    }
-
-    /**
-    @dev                Determines whether the given listingHash be whitelisted.
-    @param _listingHash The listingHash whose status is to be examined
-    */
-    function canBeWhitelisted(bytes32 _listingHash) view public returns (bool) {
-        uint challengeID = listings[_listingHash].challengeID;
-
-        // Ensures that the application was made,
-        // the application period has ended,
-        // the listingHash can be whitelisted,
-        // and either: the challengeID == 0, or the challenge has been resolved.
-        if (
-            appWasMade(_listingHash) &&
-            listings[_listingHash].applicationExpiry < now &&
-            !isWhitelisted(_listingHash) &&
-            (challengeID == 0 || challenges[challengeID].resolved == true)
-        ) { return true; }
-
-        return false;
-    }
-
-    /**
-    @dev                Returns true if the provided listingHash is whitelisted
-    @param _listingHash The listingHash whose status is to be examined
-    */
-    function isWhitelisted(bytes32 _listingHash) view public returns (bool whitelisted) {
-        return listings[_listingHash].whitelisted;
     }
 
     /**
@@ -461,9 +442,9 @@ contract Registry is IRegistry {
     @param _listingHash The listingHash of an application/listingHash to be whitelisted
     */
     function whitelistApplication(bytes32 _listingHash) private {
-        if (!listings[_listingHash].whitelisted) { emit _ApplicationWhitelisted(_listingHash); }
-        listings[_listingHash].whitelisted = true;
         listings[_listingHash].applicationExpiry = 0;
+        changeState(_listingHash, DAppState.EXISTS);
+        emit _ApplicationWhitelisted(_listingHash);
     }
 
     /**
@@ -472,35 +453,51 @@ contract Registry is IRegistry {
     */
     function resetListing(bytes32 _listingHash) private {
         Listing storage listing = listings[_listingHash];
-
-        // Emit events before deleting listing to check whether is whitelisted
-        if (listing.whitelisted) {
-            emit _ListingRemoved(_listingHash);
-        } else {
-            emit _ApplicationRemoved(_listingHash);
-        }
+        DAppState state_was = dappState(_listingHash);
 
         // Deleting listing to prevent reentry
         address owner = listing.owner;
         uint unstakedDeposit = listing.unstakedDeposit;
+        listing.owner = address(0);
+        changeState(_listingHash, DAppState.NOT_EXISTS);
         delete listings[_listingHash];
         
         // Transfers any remaining balance back to the owner
         if (unstakedDeposit > 0){
             require(token.transfer(owner, unstakedDeposit));
         }
+
+        if (DAppState.EXISTS == state_was) {
+            emit _ListingRemoved(_listingHash);
+        } else {
+            emit _ApplicationRemoved(_listingHash);
+        }
     }
 
     function dappState(bytes32 _listingHash) internal view returns (Registry.DAppState) {
+        return listings[_listingHash].state;
+    }
+
+    function checkDAppInvariant(bytes32 _listingHash) internal view {
         Listing storage listing = listings[_listingHash];
 
-        if (address(0) == listing.owner)
-            return DAppState.NOT_EXISTS;
+        assert((listing.state == DAppState.NOT_EXISTS) == (listing.owner == address(0)));
+        assert((listing.state == DAppState.APPLICATION) == (listing.applicationExpiry != 0));
+    }
 
-        if (appWasMade(_listingHash))
-            return DAppState.APPLICATION;
+    function changeState(bytes32 listing_id, DAppState new_state) internal {
+        DAppState state = dappState(listing_id);
+        assert(state != new_state);
 
-        assert(isWhitelisted(_listingHash));
-        return DAppState.EXISTS;
+        if (DAppState.NOT_EXISTS == state) {    assert(DAppState.APPLICATION == new_state); }
+        else if (DAppState.APPLICATION == state) {    assert(DAppState.EXISTS == new_state || DAppState.NOT_EXISTS == new_state); }
+        else if (DAppState.EXISTS == state) {   assert(DAppState.EDIT == new_state || DAppState.DELETING == new_state || DAppState.NOT_EXISTS == new_state); }
+        else if (DAppState.EDIT == state) {     assert(DAppState.EXISTS == new_state); }
+        else if (DAppState.DELETING == state) { assert(DAppState.NOT_EXISTS == new_state); }
+        else assert(false);
+
+        listings[listing_id].state = new_state;
+        StateChanged(listing_id, new_state);
+        checkDAppInvariant(listing_id);
     }
 }
