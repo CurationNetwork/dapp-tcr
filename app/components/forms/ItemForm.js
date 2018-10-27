@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import Form from "react-jsonschema-form";
-import { spec } from './spec.js';
 import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
 
