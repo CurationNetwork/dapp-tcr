@@ -1,7 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import ModalContainer from '../modals/ModalContainer';
 import ModalDapp from '../modals/ModalDapp';
 
 import './ButtonAddDapp.scss';

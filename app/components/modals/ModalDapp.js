@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import ModalContainer from './ModalContainer';
 import ItemForm from '../forms/ItemForm';
@@ -12,7 +13,7 @@ class ModalDapp extends React.Component {
         isOpen={this.props.isOpen}
         onClose={this.props.onClose}>
         <div className="modal-dapp">
-          <div class="modal-h">Submit a Dapp</div>
+          <div class="modal-h"><FontAwesomeIcon icon="plus-square"/> Submit a Dapp</div>
           <ItemForm/>
         </div>
       </ModalContainer>
