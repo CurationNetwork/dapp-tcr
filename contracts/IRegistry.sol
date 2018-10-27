@@ -32,7 +32,7 @@ interface IRegistry {
 
     function get_info(bytes32 listing_id) public view returns
         (uint state, bool is_challenged /* many states can be challenged */,
-        bool status_can_be_updated /* if updateStatus should be called */,
+        bool status_can_be_updated /* if update_status should be called */,
         bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */);
 
 
@@ -47,7 +47,7 @@ interface IRegistry {
     // CHALLENGES
 
     // open challenge for a dapp
-    function challenge(bytes32 listing_id, uint state_check /* to prevent race condition */) public;    // STATES:
+    function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) public;    // STATES:
 
     // status of a challenge
     function challenge_status(bytes32 listing_id) public view returns
