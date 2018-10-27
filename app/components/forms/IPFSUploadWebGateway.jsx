@@ -10,7 +10,6 @@ export default class IPFSUploadWebGatewayWidget extends PureComponent {
       url: null,
 	  uploadEndpoint: 'https://ipfs.dapplist-hackathon.curation.network',
     }
-	
 	this.onChange = this.onChange.bind(this);
   }
 
@@ -42,8 +41,10 @@ export default class IPFSUploadWebGatewayWidget extends PureComponent {
           return this.uploadIpfs(data)
         })
         .then(resp => {
+		  //this.inputRef.type="text";
+		  this.setState({ipfs_hash: resp.headers['ipfs-hash']});
           let url = this.state.uploadEndpoint + resp.headers.location;
-          this.setState({ msg: url });
+          this.setState({ msg: url }, onChange(this.state.ipfs_hash));
         });
     }
   };
@@ -54,9 +55,8 @@ export default class IPFSUploadWebGatewayWidget extends PureComponent {
       <div>
         <p>
           <input
-            ref={ref => (this.inputRef = ref)}
+            ref={ ref => { this.inputRef = ref }}
             type="file"
-            defaultValue=""
             multiple={false}
             className={"form-control"}
             onChange={this.onChange}

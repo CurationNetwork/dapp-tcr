@@ -1,14 +1,13 @@
 import React from 'react';
 import axios from 'axios';
 import Form from "react-jsonschema-form";
-import { spec } from './spec.js';
 import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
 
 let module_schemas = {};
-//module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.json');
-//module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
-//module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
+module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.json');
+module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
+module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
 
 
 
@@ -33,11 +32,8 @@ class ItemForm extends React.Component {
 	}
 
     const onSubmit = ({formData}) => {
-		const upload_endpoint = 'https://ipfs.dapplist-hackathon.curation.network';
-		let resp = axios.post(upload_endpoint + '/ipfs/', JSON.stringify(formData)).then(resp => {
-			let url = upload_endpoint + resp.headers.location;
-			console.log("IPFS file uploaded to: " + url);
-		});
+		console.log("FORM SUBMIT!");
+		console.log(formData);
 	}
 
 	const widgets = {
