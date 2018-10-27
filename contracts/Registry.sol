@@ -1,10 +1,10 @@
-pragma solidity 0.4.25;
+pragma solidity ^0.4.24;
 
 import "./IRegistry.sol";
-import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
 import "./Parameterizer.sol";
 import "./IVoting.sol";
-import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract Registry is IRegistry {
 
@@ -51,6 +51,7 @@ contract Registry is IRegistry {
     using SafeMath for uint;
 
     struct Listing {
+        uint ids_position;
         bytes ipfs_hash;
         address owner;          // Owner of Listing
         uint unstakedDeposit;   // Number of tokens in the listing not locked in a challenge
@@ -93,8 +94,10 @@ contract Registry is IRegistry {
     // Maps listingHashes to associated listingHash data
     mapping(bytes32 => Listing) public listings;
 
+    bytes32[] public ids;
+
     // Global Variables
-    EIP20Interface public token;
+    ERC20 public token;
     IVoting public voting;
     Parameterizer public parameterizer;
 
@@ -106,7 +109,7 @@ contract Registry is IRegistry {
         require(_voting != 0 && address(voting) == 0);
         require(_parameterizer != 0 && address(parameterizer) == 0);
 
-        token = EIP20Interface(_token);
+        token = ERC20(_token);
         voting = IVoting(_voting);
         parameterizer = Parameterizer(_parameterizer);
     }
@@ -132,6 +135,10 @@ contract Registry is IRegistry {
 
         // Transfers tokens from user to Registry contract
         require(token.transferFrom(listing.owner, this, token_amount));
+
+        // ids <-> listings linkage
+        listing.ids_position = ids.length;
+        ids.push(listing_id);
 
         changeState(listing_id, DAppState.APPLICATION);
         emit _Application(listing_id, token_amount, listing.applicationExpiry, ipfs_hash, msg.sender);
@@ -163,8 +170,8 @@ contract Registry is IRegistry {
     // VIEW:
     // -----------------------
 
-    function list() public view returns (bytes32[] ids) {
-        return new bytes32[](0);
+    function list() public view returns (bytes32[]) {
+        return ids;
     }
 
     function get_info(bytes32 listing_id) public view returns
@@ -172,6 +179,13 @@ contract Registry is IRegistry {
             bool status_can_be_updated /* if update_status should be called */,
             bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */) {
         checkDAppInvariant(listing_id);
+
+        state = uint(dappState(listing_id));
+        is_challenged = challengeExists(listing_id);
+        status_can_be_updated = can_update_status(listing_id);
+        ipfs_hash = listings[listing_id].ipfs_hash;
+
+        // FIXME FIXME
         edit_ipfs_hash = new bytes(0);
     }
 
@@ -456,6 +470,17 @@ contract Registry is IRegistry {
         address owner = listing.owner;
         uint unstakedDeposit = listing.unstakedDeposit;
         listing.owner = address(0);
+
+        // ids <-> listings linkage
+        uint removed_position = listings[listing_id].ids_position;
+        assert(removed_position < ids.length);
+        if (removed_position != ids.length - 1) {
+            listings[ids[ids.length - 1]].ids_position = removed_position;
+            ids[removed_position] = ids[ids.length - 1];
+        }
+        ids[ids.length - 1] = bytes32(0);
+        ids.length--;
+
         changeState(listing_id, DAppState.NOT_EXISTS);
         delete listings[listing_id];
         
@@ -471,6 +496,10 @@ contract Registry is IRegistry {
         }
     }
 
+    // ----------------
+    // STATE & INVARIANTS:
+    // ----------------
+
     function dappState(bytes32 listing_id) internal view returns (Registry.DAppState) {
         return listings[listing_id].state;
     }
@@ -485,6 +514,9 @@ contract Registry is IRegistry {
 
         if (listing.state == DAppState.DELETING || listing.state == DAppState.NOT_EXISTS)
             assert(!challengeExists(listing_id));
+
+        assert(listing.ids_position < ids.length);
+        assert(ids[listing.ids_position] == listing_id);
     }
 
     function changeState(bytes32 listing_id, DAppState new_state) internal {
@@ -503,6 +535,9 @@ contract Registry is IRegistry {
         checkDAppInvariant(listing_id);
     }
 
+    // ----------------
+    // FOR UNIT TESTING:
+    // ----------------
 
     function time() internal view returns (uint) {
         return now;
