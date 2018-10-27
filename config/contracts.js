@@ -46,6 +46,10 @@ module.exports = {
         "deploy": false
       },
 
+      RegistryTestHelper: {
+        "deploy": false
+      },
+
       Token: {
         args: []
       },

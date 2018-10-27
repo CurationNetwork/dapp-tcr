@@ -1,8 +1,9 @@
 /build/
-/node_modules/
+node_modules/
 /installed_contracts/
-/.idea/
+.idea/
 /.embark/
 /dist/
 /config/production/password
 /config/livenet/password
+.env
