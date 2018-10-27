@@ -1,7 +1,6 @@
 import React from 'react';
 import axios from 'axios';
 import Form from "react-jsonschema-form";
-import Registry from 'Embark/contracts/Registry';
 
 import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
@@ -43,14 +42,14 @@ class ItemForm extends React.Component {
 		axios.post(uploadEndpoint + '/ipfs/', JSON.stringify(formData)).then(resp => {
 			uploadedIPFSHash = resp.headers['ipfs-hash'];
 			let bytesHash = Buffer.from(uploadedIPFSHash).toString('hex');
-			Registry.methods.apply("0x" + bytesHash).send().then(res => {
-				console.log(res);
-			}).catch(err => {
-				console.log("ERROR: " + err);
-			});
+			// Registry.methods.apply("0x" + bytesHash).send().then(res => {
+			// 	console.log(res);
+			// }).catch(err => {
+			// 	console.log("ERROR: " + err);
+			// });
 		});
 
-	}
+	};
 
 	const widgets = {
         ipfsUploadWidget: IPFSUploadWebGatewayWidget
