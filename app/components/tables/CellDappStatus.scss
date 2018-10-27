@@ -13,6 +13,7 @@
     line-height: 22px;
     padding: 0 8px;
     color: #191919;
+    white-space: nowrap;
 
     &.active {
       background: #F2F3F7;
@@ -26,6 +27,10 @@
       display: flex;
       flex-direction: column;
     }
+  }
+
+  &.registry div:not(:first-child) {
+    margin-left: 8px;
   }
 
   .progress-bar {

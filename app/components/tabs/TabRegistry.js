@@ -1,17 +1,16 @@
 import React from 'react';
 
-import Block from '../tabs/BlockTabs';
 import TableRow from '../tables/TableRow';
 import TableHeader from '../tables/TableHeader';
 import CellDappName from '../tables/CellDappName';
 import CellDappStatus from '../tables/CellDappStatus';
 import CellActions from '../tables/CellActions';
 
-import imgMock from './0xuniverse.jpg';
+import imgMock from '../blocks/0xuniverse.jpg';
 
-class BlockRegistry extends React.Component {
+class TabRegistry extends React.Component {
   render() {
-    return (<Block name="Dapps in Registry" type="registry">
+    return (<>
       <TableRow type="header">
         <TableHeader type="registry"/>
       </TableRow>
@@ -35,8 +34,8 @@ class BlockRegistry extends React.Component {
         <CellDappStatus type="registry" challenges={['update', 'remove']}/>
         <CellActions type="registry" challenges={['update', 'remove']}/>
       </TableRow>
-    </Block>);
+    </>);
   }
 }
 
-export default BlockRegistry;
+export default TabRegistry;

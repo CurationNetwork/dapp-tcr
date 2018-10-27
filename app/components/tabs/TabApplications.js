@@ -1,32 +1,31 @@
 import React from 'react';
 
-import Block from './Block';
 import TableRow from '../tables/TableRow';
 import TableHeader from '../tables/TableHeader';
 import CellDappName from '../tables/CellDappName';
 import CellDappStatus from '../tables/CellDappStatus';
 import CellActions from '../tables/CellActions';
 
-import imgMock from './0xuniverse.jpg';
+import imgMock from '../blocks/0xuniverse.jpg';
 
-class BlockChallengedUpdate extends React.Component {
+class TabApplications extends React.Component {
   render() {
-    return (<Block name="Challenged for update" icon="pen-square">
+    return (<>
       <TableRow type="header">
-        <TableHeader type="challenged"/>
+        <TableHeader type="submitted"/>
       </TableRow>
       <TableRow>
         <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="challenged" stage="commit" passedPercent={64}/>
-        <CellActions type="commit"/>
+        <CellDappStatus type="submitted" passedPercent={35}/>
+        <CellActions type="challenge"/>
       </TableRow>
       <TableRow>
         <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="challenged" stage="reveal" passedPercent={87}/>
-        <CellActions type="reveal"/>
+        <CellDappStatus type="updated" passedPercent={59}/>
+        <CellActions type="challenge"/>
       </TableRow>
-    </Block>);
+    </>);
   }
 }
 
-export default BlockChallengedUpdate;
+export default TabApplications;
