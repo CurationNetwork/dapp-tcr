@@ -12,6 +12,66 @@
       "0x4e64586c58e35c5af57bf7b34c55b4e9679060460dfc8b63adcabd4dd426d8ca": {
         "name": "FIFSRegistrar",
         "address": "0x1956f101fe6F0FedAe0d6aee0A555c809C416573"
+      },
+      "0xdae9174c161001e7ba988268ef0be6f4c553923843c79f28d08be7aa93e3e62c": {
+        "name": "Parameterizer",
+        "address": "0x1D13E272bE127dfa7d4cE312cC6c114A34b957c1"
+      },
+      "0x2b3a90fd389b56f55178c5e66c0249881424123389ce35a68ffcb0f096c2a2a2": {
+        "name": "Voting",
+        "address": "0xFAEf911C46Ae3f961b18FAb1374Aa63BF828b549"
+      },
+      "0x72e216c41522ead38022e62e2966b67599007a15f88cee8aa8787c7171644863": {
+        "name": "Token",
+        "address": "0x7aB5Dfe8717DDd757f8A2d77086d211CE9741904"
+      },
+      "0x7a1e8a4a029ec3a08565a5c06217e3f78ddc704b0eb4000a938890adadd8ecb0": {
+        "name": "Registry",
+        "address": "0x66542a74Fa6cdFf0D4334de3361D15030442447b"
+      }
+    }
+  },
+  "0x83af15c5e8ce2c027f888c992bfa880a35fbceb63768dba39aaaacca1be5a470": {
+    "contracts": {
+      "0xdae9174c161001e7ba988268ef0be6f4c553923843c79f28d08be7aa93e3e62c": {
+        "name": "Parameterizer",
+        "address": "0x6281564229AA3bE48566c3d7bD737DeeE09381B9"
+      },
+      "0x2b3a90fd389b56f55178c5e66c0249881424123389ce35a68ffcb0f096c2a2a2": {
+        "name": "Voting",
+        "address": "0x5b69D2AA2E80834c08042051C74295799bC4e632"
+      },
+      "0x72e216c41522ead38022e62e2966b67599007a15f88cee8aa8787c7171644863": {
+        "name": "Token",
+        "address": "0x87343BB8e8Df511Fd0C709085384391B2b799Ec8"
+      },
+      "0x3043b04ad856d169c8f0b0509c0bc63192dc7edd92d6933c58708298a0e381be": {
+        "name": "ENSRegistry",
+        "address": "0x7c9F27A9980480C96a91f3051b0ea8434689Cf55"
+      },
+      "0x50e7d6ec62850dc77d0d077e040a4e69ee01637405e56b550677524dff505998": {
+        "name": "Registry",
+        "address": "0x0cBEf38aaab07Bda223a703B42c526678C9A7581"
+      },
+      "0x0bbf2199a680b6e09e5ca0006750ba59c1dfd8313252df195c41d75cdc90adb2": {
+        "name": "Resolver",
+        "address": "0x676038A359621d42bCE621E126cCd925fa056dD8"
+      },
+      "0xfcf8adae458eb90efafd79036683347e8a11c01594f493e1dcd2ba0f0747745d": {
+        "name": "FIFSRegistrar",
+        "address": "0xED7c5e7A6b0221D08e56f480Ac4cC26cfd365397"
+      },
+      "0xa26935b718a296518244ef225594e0b53004f9c871b846057c89c765c0138b86": {
+        "name": "Registry",
+        "address": "0x2696c5Db239570aC3c7cF8c42d8E8A41A810526a"
+      },
+      "0xc90d0dc2b69381addefefe2b79c1e7d453bb41ba8f0d707f85838f1df3c52513": {
+        "name": "Voting",
+        "address": "0x86640c065C4Bc8293336f87862139618c68d224c"
+      },
+      "0xc9c894a84db10f3d35e903b23591f9d54a8804f72fa10ee47711ebca545084fe": {
+        "name": "Registry",
+        "address": "0x0a2AfCC65B764a78364a0Bd275820C0F2f973Ee1"
       }
     }
   },
