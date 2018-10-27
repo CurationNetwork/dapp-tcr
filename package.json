@@ -17,6 +17,7 @@
     "axios": "^0.18.0",
     "classnames": "^2.2.6",
     "embark": "^3.2.3",
+    "ganache-cli": "^6.1.8",
     "history": "^4.7.2",
     "node-sass": "^4.9.4",
     "react": "^16.6.0",
