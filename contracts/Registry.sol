@@ -199,7 +199,7 @@ contract Registry is IRegistry {
         Listing storage listing = listings[listing_id];
 
         if (state == DAppState.APPLICATION) {
-            if (listing.applicationExpiry >= time() && !challengeExists(listing_id))
+            if (listing.applicationExpiry < time() && !challengeExists(listing_id))
                 return true;
         }
         else if (state == DAppState.DELETING) {
@@ -221,7 +221,7 @@ contract Registry is IRegistry {
         Listing storage listing = listings[listing_id];
 
         if (state == DAppState.APPLICATION) {
-            if (listing.applicationExpiry >= time() && !challengeExists(listing_id))
+            if (listing.applicationExpiry < time() && !challengeExists(listing_id))
                 whitelistApplication(listing_id);
         }
         else if (state == DAppState.DELETING) {
