@@ -24,6 +24,15 @@ contract Voting is IVoting {
     event _StakeWithdrawed(uint indexed pollID, address indexed voter, uint numTokens);
 
     // ============
+    // MODIFIERS:
+    // ============
+
+    modifier onlyRegistry {
+        require(msg.sender == registry);
+        _;
+    }
+
+    // ============
     // DATA STRUCTURES:
     // ============
 
@@ -51,11 +60,19 @@ contract Voting is IVoting {
 
     uint constant public INITIAL_POLL_NONCE = 0;
     uint public pollNonce;
+    address public registry;
 
     AttributeStore.Data store;
 
     constructor() public {
         pollNonce = INITIAL_POLL_NONCE;
+    }
+
+    function set_registry(address registry_) public {
+        require(registry_ != address(0));
+        require(registry == address(0));
+
+        registry = registry_;
     }
 
     // =================

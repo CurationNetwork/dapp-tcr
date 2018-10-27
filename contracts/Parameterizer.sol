@@ -18,60 +18,36 @@ contract Parameterizer {
     // STATE
     // ------
 
-    bool public initialized;
     mapping(bytes32 => uint) public params;
 
     /**
     @dev Initializer        Can only be called once
     @notice _parameters     array of canonical parameters
     */
-    function init(
-        uint[] _parameters
-    ) public {
-        require(!initialized);
-        initialized = true;
-
+    constructor(uint[] _parameters) public {
         // minimum deposit for listing to be whitelisted
         set("minDeposit", _parameters[0]);
-        
-        // minimum deposit to propose a reparameterization
-        set("pMinDeposit", _parameters[1]);
 
         // period over which applicants wait to be whitelisted
-        set("applyStageLen", _parameters[2]);
-
-        // period over which reparmeterization proposals wait to be processed
-        set("pApplyStageLen", _parameters[3]);
+        set("applyStageLen", _parameters[1]);
 
         // length of commit period for voting
-        set("commitStageLen", _parameters[4]);
-        
-        // length of commit period for voting in parameterizer
-        set("pCommitStageLen", _parameters[5]);
-        
-        // length of reveal period for voting
-        set("revealStageLen", _parameters[6]);
+        set("commitStageLen", _parameters[2]);
 
-        // length of reveal period for voting in parameterizer
-        set("pRevealStageLen", _parameters[7]);
+        // length of reveal period for voting
+        set("revealStageLen", _parameters[3]);
 
         // percentage of losing party's deposit distributed to winning party
-        set("dispensationPct", _parameters[8]);
-
-        // percentage of losing party's deposit distributed to winning party in parameterizer
-        set("pDispensationPct", _parameters[9]);
+        set("dispensationPct", _parameters[4]);
 
         // type of majority out of 100 necessary for candidate success
-        set("voteQuorum", _parameters[10]);
-
-        // type of majority out of 100 necessary for proposal success in parameterizer
-        set("pVoteQuorum", _parameters[11]);
+        set("voteQuorum", _parameters[5]);
 
         // minimum length of time user has to wait to exit the registry 
-        set("exitTimeDelay", _parameters[12]);
+        set("exitTimeDelay", _parameters[6]);
 
         // maximum length of time user can wait to exit the registry
-        set("exitPeriodLen", _parameters[13]);
+        set("exitPeriodLen", _parameters[7]);
     }
 
     // --------

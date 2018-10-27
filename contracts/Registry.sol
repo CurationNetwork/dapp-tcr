@@ -6,7 +6,7 @@ import "./Parameterizer.sol";
 import "./IVoting.sol";
 import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
 
-contract Registry {
+contract Registry is IRegistry {
 
     // ------
     // EVENTS
@@ -57,13 +57,8 @@ contract Registry {
     EIP20Interface public token;
     IVoting public voting;
     Parameterizer public parameterizer;
-    string public name;
 
-    /**
-    @dev Initializer. Can only be called once.
-    @param _token The address where the ERC20 token contract is deployed
-    */
-    function init(address _token, address _voting, address _parameterizer, string _name) public {
+    constructor(address _token, address _voting, address _parameterizer) public {
         require(_token != 0 && address(token) == 0);
         require(_voting != 0 && address(voting) == 0);
         require(_parameterizer != 0 && address(parameterizer) == 0);
@@ -71,7 +66,6 @@ contract Registry {
         token = EIP20Interface(_token);
         voting = IVoting(_voting);
         parameterizer = Parameterizer(_parameterizer);
-        name = _name;
     }
 
     // --------------------

@@ -33,10 +33,22 @@ module.exports = {
     ],
     gas: "auto",
     contracts: {
-      // example:
-      //SimpleStorage: {
-      //  args: [ 100 ]
-      //}
+      Token: {
+        args: []
+      },
+
+      Voting: {
+        args: []
+      },
+
+      Parameterizer: {
+        args: [1e18, 60, 60, 60, 50, 51, 60, 60]
+      },
+
+      Registry: {
+        args: ["$Token", "$Voting", "$Parameterizer"],
+        onDeploy: ["Voting.methods.set_registry(Registry).send()"]
+      }
     }
   },
 
