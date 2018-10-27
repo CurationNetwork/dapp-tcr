@@ -411,14 +411,6 @@ contract Registry is IRegistry {
     }
 
     /**
-    @dev                Returns true if apply was called for this listingHash
-    @param listing_id The listingHash whose status is to be examined
-    */
-    function appWasMade(bytes32 listing_id) view public returns (bool exists) {
-        return listings[listing_id].applicationExpiry > 0;
-    }
-
-    /**
     @dev                Returns true if the application/listingHash has an unresolved challenge
     @param listing_id The listingHash whose status is to be examined
     */
