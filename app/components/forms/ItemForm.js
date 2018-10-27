@@ -5,9 +5,9 @@ import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
 
 let module_schemas = {};
-//module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.json');
-//module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
-//module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
+module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.json');
+module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
+module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
 
 
 
