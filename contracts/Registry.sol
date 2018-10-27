@@ -179,6 +179,13 @@ contract Registry is IRegistry {
             bool status_can_be_updated /* if update_status should be called */,
             bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */) {
         checkDAppInvariant(listing_id);
+
+        state = uint(dappState(listing_id));
+        is_challenged = challengeExists(listing_id);
+        status_can_be_updated = can_update_status(listing_id);
+        ipfs_hash = listings[listing_id].ipfs_hash;
+
+        // FIXME FIXME
         edit_ipfs_hash = new bytes(0);
     }
 

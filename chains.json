@@ -64,6 +64,10 @@
       "0xbc5889c3bc5afbf16c9ced4876e215e0d03df777d8a9d1cdae43cd8da7afdafd": {
         "name": "Registry",
         "address": "0x618bD0Af2a93B2781faf9Aa1C2Cd3A9AbA1f7F03"
+      },
+      "0xdd5d91553f7f553a84f3f406693c2b202c1027b558629df8797458647ad6cb06": {
+        "name": "Registry",
+        "address": "0x98c4c56afE412BCAD90defd6890E152E21bB758B"
       }
     }
   }
