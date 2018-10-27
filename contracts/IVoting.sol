@@ -6,11 +6,18 @@ interface IVoting {
 
     function result(uint _pollID) constant external returns (bool passed);
 
-    function isWinner(uint _pollId, address voter) external returns (bool);
+    function isWinner(uint _pollId, address voter) external view returns (bool);
 
-    function getOverallStake(uint _pollId) external returns (uint);
+    function getOverallStake(uint _pollId) external view returns (uint);
 
     function getNumTokens(address _voter, uint _pollID) constant external returns (uint numTokens);
+
+    function pollInfo(uint _pollID) external view returns
+        (uint commitEndDate,
+        uint revealEndDate,
+        uint voteQuorum,
+        uint votesFor,
+        uint votesAgainst);
 
     /**
     @dev Initiates a poll with canonical configured parameters at pollID emitted by PollCreated event

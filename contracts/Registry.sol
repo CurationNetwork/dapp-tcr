@@ -14,7 +14,7 @@ contract Registry is IRegistry {
 
     event _Application(bytes32 indexed listingHash, uint deposit, uint appEndDate, bytes ipfs_hash, address indexed applicant);
     event _EditApplication(bytes32 indexed listingHash, uint deposit, uint appEndDate, bytes ipfs_hash, address indexed applicant);
-    event _Challenge(bytes32 indexed listingHash, uint challengeID, string data, uint commitEndDate, uint revealEndDate, address indexed challenger);
+    event _Challenge(bytes32 indexed listingHash, uint challengeID, uint commitEndDate, uint revealEndDate, address indexed challenger);
     event _Deposit(bytes32 indexed listingHash, uint added, uint newTotal, address indexed owner);
     event _Withdrawal(bytes32 indexed listingHash, uint withdrew, uint newTotal, address indexed owner);
     event _ApplicationWhitelisted(bytes32 indexed listingHash);
@@ -74,7 +74,6 @@ contract Registry is IRegistry {
         uint rewardPool;        // (remaining) Pool of tokens to be distributed to winning voters
         address challenger;     // Owner of Challenge
         bool resolved;          // Indication of if challenge is resolved
-        uint stake;             // Number of tokens at stake for either party during challenge
         uint totalTokens;       // (remaining) Number of tokens used in voting by the winning side
         mapping(address => bool) tokenClaims; // Indicates whether a voter has claimed a reward yet
     }
@@ -323,11 +322,9 @@ contract Registry is IRegistry {
             parameterizer.get("revealStageLen")
         );
 
-/*        uint oneHundred = 100; // Kludge that we need to use SafeMath
         challenges[pollID] = Challenge({
             challenger: msg.sender,
-            rewardPool: ((oneHundred.sub(parameterizer.get("dispensationPct"))).mul(minDeposit)).div(100),
-            stake: minDeposit,
+            rewardPool: ((uint(100).sub(parameterizer.get("dispensationPct"))).mul(this.deposit_size())).div(100),
             resolved: false,
             totalTokens: 0
         });
@@ -335,16 +332,12 @@ contract Registry is IRegistry {
         // Updates listingHash to store most recent challenge
         listing.challengeID = pollID;
 
-        // Locks tokens for listingHash during challenge
-        listing.unstakedDeposit -= minDeposit;
-
         // Takes tokens from challenger
-        require(token.transferFrom(msg.sender, this, minDeposit));
+        require(token.transferFrom(msg.sender, this, this.deposit_size()));
 
-        (uint commitEndDate, uint revealEndDate,,,) = voting.pollMap(pollID);
+        (uint commitEndDate, uint revealEndDate,,,) = voting.pollInfo(pollID);
 
-        emit _Challenge(listing_id, pollID, _data, commitEndDate, revealEndDate, msg.sender);
-        return pollID;*/
+        emit _Challenge(listing_id, pollID, commitEndDate, revealEndDate, msg.sender);
     }
 
     function challenge_status(bytes32 listing_id) external view returns
@@ -416,8 +409,7 @@ contract Registry is IRegistry {
     */
     function challengeExists(bytes32 listing_id) view public returns (bool) {
         uint challengeID = listings[listing_id].challengeID;
-
-        return (listings[listing_id].challengeID > 0 && !challenges[challengeID].resolved);
+        return challengeID > 0 && !challenges[challengeID].resolved;
     }
 
     /**

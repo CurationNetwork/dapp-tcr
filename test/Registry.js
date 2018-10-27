@@ -15,7 +15,7 @@ contract('Registry', function(accounts) {
     async function instantiate() {
       const token = await Token.new();
       const voting = await Voting.new();
-      const params = await Parameterizer.new([web3.toWei(1, 'ether'), 60, 60, 60, 50, 51, 60, 60]);
+      const params = await Parameterizer.new([web3.toWei(1, 'ether'), 60, 60, 60, 50, 50, 60, 60]);
       const registry = await Registry.new(token.address, voting.address, params.address);
 
       await registry.setTime(1000000000);

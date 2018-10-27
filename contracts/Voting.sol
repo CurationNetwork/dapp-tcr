@@ -16,7 +16,7 @@ contract Voting is IVoting {
 
     event _VoteCommitted(uint indexed pollID, address indexed voter);
     event _VoteRevealed(uint indexed pollID, uint numTokens, uint votesFor, uint votesAgainst, uint indexed choice, address indexed voter, uint salt);
-    event _PollCreated(uint commitEndDate, uint revealEndDate, uint indexed pollID, address indexed creator);
+    event _PollCreated(uint commitEndDate, uint revealEndDate, uint indexed pollID);
     event _VotingRightsGranted(uint numTokens, address indexed voter);
     event _VotingRightsWithdrawn(uint numTokens, address indexed voter);
     event _TokensRescued(uint indexed pollID, address indexed voter);
@@ -43,28 +43,23 @@ contract Voting is IVoting {
     struct Poll {
         uint commitEndDate;     /// expiration date of commit period for poll
         uint revealEndDate;     /// expiration date of reveal period for poll
+        uint voteQuorum;	    /// number of votes required for a proposal to pass
         uint votesFor;          /// tally of votes supporting proposal
         uint votesAgainst;      /// tally of votes countering proposal
         mapping(address => bool) didCommit;   /// indicates whether an address committed a vote for this poll
         mapping(address => bool) didReveal;   /// indicates whether an address revealed a vote for this poll
         mapping(address => uint) voteOptions; /// stores the voteOption of an address that revealed
         mapping(address => uint) lockedStakes; ///
-        mapping(address => uint) withdrawedStakes;
     }
 
     // ============
     // STATE VARIABLES:
     // ============
 
-    uint constant public INITIAL_POLL_NONCE = 0;
     uint public pollNonce;
     address public registry;
 
     AttributeStore.Data store;
-
-    constructor() public {
-        pollNonce = INITIAL_POLL_NONCE;
-    }
 
     function set_registry(address registry_) external {
         require(registry_ != address(0));
@@ -81,7 +76,7 @@ contract Voting is IVoting {
     @param _pollID Integer identifier associated with target poll
     @param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)
     */
-    function commitVote(uint _pollID, bytes32 _secretHash, address voter) external {
+    function commitVote(uint _pollID, bytes32 _secretHash, address voter) external onlyRegistry {
         require(commitPeriodActive(_pollID));
 
         // prevent user from committing to zero node placeholder
@@ -106,8 +101,7 @@ contract Voting is IVoting {
     @param _salt Secret number used to generate commitHash for associated poll
     */
 
-    function revealVote(uint _pollID, uint _voteOption, uint _voteStake, uint _salt, address _voter) external {
-        // make sure msg.sender has enough voting rights
+    function revealVote(uint _pollID, uint _voteOption, uint _voteStake, uint _salt, address _voter) external onlyRegistry {
 
         // Make sure the reveal period is active
         require(revealPeriodActive(_pollID));
@@ -144,20 +138,21 @@ contract Voting is IVoting {
     @param _commitDuration Length of desired commit period in seconds
     @param _revealDuration Length of desired reveal period in seconds
     */
-    function startPoll(uint voteQuorum, uint _commitDuration, uint _revealDuration) external returns (uint pollID) {
+    function startPoll(uint voteQuorum, uint _commitDuration, uint _revealDuration) external onlyRegistry returns (uint pollID) {
         pollNonce = pollNonce + 1;
 
-        uint commitEndDate = block.timestamp.add(_commitDuration);
+        uint commitEndDate = time().add(_commitDuration);
         uint revealEndDate = commitEndDate.add(_revealDuration);
 
         pollMap[pollNonce] = Poll({
+            voteQuorum: voteQuorum,
             commitEndDate: commitEndDate,
             revealEndDate: revealEndDate,
             votesFor: 0,
             votesAgainst: 0
         });
 
-        emit _PollCreated(commitEndDate, revealEndDate, pollNonce, msg.sender);
+        emit _PollCreated(commitEndDate, revealEndDate, pollNonce);
         return pollNonce;
     }
 
@@ -166,11 +161,11 @@ contract Voting is IVoting {
     @dev Check if votesFor out of totalVotes exceeds votesQuorum (requires pollEnded)
     @param _pollID Integer identifier associated with target poll
     */
-    function result(uint _pollID) constant external returns (bool passed) {
+    function result(uint _pollID) external view returns (bool passed) {
         require(pollEnded(_pollID));
 
         Poll storage poll = pollMap[_pollID];
-        return poll.votesFor > poll.votesAgainst;
+        return (100 * poll.votesFor) > (poll.voteQuorum * (poll.votesFor + poll.votesAgainst));
     }
 
     function getPollResult(uint _pollId) public view returns (uint votesFor, uint votesAgainst) {
@@ -178,13 +173,13 @@ contract Voting is IVoting {
         return (pollMap[_pollId].votesFor, pollMap[_pollId].votesAgainst);
     }
 
-    function getOverallStake(uint _pollId) external returns (uint) {
+    function getOverallStake(uint _pollId) external view returns (uint) {
         require(pollExists(_pollId));
         Poll storage poll = pollMap[_pollId];
         return poll.votesFor + poll.votesAgainst;
     }
 
-    function isWinner(uint _pollId, address voter) external returns (bool) {
+    function isWinner(uint _pollId, address voter) external view returns (bool) {
         require(pollEnded(_pollId));
         Poll storage poll = pollMap[_pollId];
 
@@ -200,6 +195,20 @@ contract Voting is IVoting {
     // POLLING HELPERS:
     // ----------------
 
+    function pollInfo(uint _pollID) external view returns
+        (uint commitEndDate,
+        uint revealEndDate,
+        uint voteQuorum,
+        uint votesFor,
+        uint votesAgainst)
+    {
+        Poll storage poll = pollMap[_pollID];
+        commitEndDate = poll.commitEndDate;
+        revealEndDate = poll.revealEndDate;
+        voteQuorum = poll.voteQuorum;
+        votesFor = poll.votesFor;
+        votesAgainst = poll.votesAgainst;
+    }
 
     /**
     @notice Determines if poll is over
@@ -306,7 +315,7 @@ contract Voting is IVoting {
     @return expired Boolean indication of whether the terminationDate has passed
     */
     function isExpired(uint _terminationDate) constant public returns (bool expired) {
-        return (block.timestamp > _terminationDate);
+        return (time() > _terminationDate);
     }
 
     /**
@@ -315,8 +324,14 @@ contract Voting is IVoting {
     @return UUID Hash which is deterministic from _user and _pollID
     */
     function attrUUID(address _user, uint _pollID) public pure returns (bytes32 UUID) {
-        return keccak256(abi.encodePacked(_user, _pollID));
+        return keccak256(abi.encode(_user, _pollID));
     }
 
+    // ----------------
+    // FOR UNIT TESTING:
+    // ----------------
 
+    function time() internal view returns (uint) {
+        return now;
+    }
 }
