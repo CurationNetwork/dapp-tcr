@@ -2,13 +2,15 @@ import React from 'react';
 import axios from 'axios';
 import Form from "react-jsonschema-form";
 import { spec } from './spec.js';
-
+import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
 
 let module_schemas = {};
-module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.json');
-module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
-module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
+//module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.json');
+//module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
+//module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
+
+
 
 class ItemForm extends React.Component {
   
@@ -38,12 +40,26 @@ class ItemForm extends React.Component {
 		});
 	}
 
+	const widgets = {
+        ipfsUploadWidget: IPFSUploadWebGatewayWidget
+    }
+
+	let uiSchema = {
+		"metadata": {
+			"images": {
+				"items": {
+					"ui:widget": "ipfsUploadWidget"
+				}
+			}
+		}
+	};
+
     return (<div>
       {/* Do not touch this*/}
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
       <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
       {/* END Do not touch this*/}
-      <Form schema={main_schema} onSubmit={onSubmit} />
+      <Form schema={main_schema} uiSchema={uiSchema} widgets={widgets} onSubmit={onSubmit} />
     </div>);
   }
 }
