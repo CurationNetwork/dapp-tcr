@@ -14,5 +14,21 @@
         "address": "0x1956f101fe6F0FedAe0d6aee0A555c809C416573"
       }
     }
+  },
+  "0xc00ecef048f68ee3a85cc7ad24097b7589c090ea99b89427956c677bc55dd1d4": {
+    "contracts": {
+      "0x3043b04ad856d169c8f0b0509c0bc63192dc7edd92d6933c58708298a0e381be": {
+        "name": "ENSRegistry",
+        "address": "0x41c25288b28Cbf588c46ff7f342Fa6ca9e1cCF30"
+      },
+      "0x55c3154f5b6d3ec672ed97d6265de912b9971c918d97dd280879674894907d2b": {
+        "name": "Resolver",
+        "address": "0x88Ebb745CF20537506Ebd922d5069CE2ca3C4E9b"
+      },
+      "0xec5fda6eb4a4814d903eca1f80f463bc8aa624734efe463ff7489af3fa14f385": {
+        "name": "FIFSRegistrar",
+        "address": "0x538f83a3768450544CaAAE10Ee4058116280bE84"
+      }
+    }
   }
 }

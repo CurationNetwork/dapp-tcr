@@ -1,0 +1,21 @@
+@import '../../styles/variables.scss';
+
+.dapp-name {
+  display: flex;
+  padding: 10px 0;
+
+  .icon img {
+    width: 30px;
+    margin-right: 6px;
+  }
+
+  .name {
+    font-size: 14px;
+    font-family: $f-medium;
+    margin-bottom: 3px;
+  }
+
+  .desc-short {
+    font-size: 12px;
+  }
+}

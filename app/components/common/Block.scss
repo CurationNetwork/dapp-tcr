@@ -1,0 +1,29 @@
+@import '../../styles/variables.scss';
+
+.block {
+  margin: 20px;
+  padding: 20px;
+  background: linear-gradient(#F5F9FA, white 50px);
+
+  .block-header {
+    font-family: $f-bold;
+    font-size: 18px;
+    color: #191919;
+    display: flex;
+
+    .name {
+      flex-grow: 1;
+      line-height: 34px;
+    }
+    
+    .minimize {
+      font-size: 22px;
+      padding: 6;
+      cursor: pointer;
+    }
+
+    .minimize:hover {
+      background: #CFE9EA;
+    }
+  }
+}

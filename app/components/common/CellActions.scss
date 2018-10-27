@@ -1,0 +1,23 @@
+@import '../../styles/variables.scss';
+
+.actions {
+  margin-left: 45px;
+  font-size: 14px;
+  font-family: $f-medium;
+  
+
+  div {
+    height: 70px;
+    line-height: 70px;
+  }
+
+  div:hover {
+    background: #F5F9FA;
+    cursor: pointer;
+  }
+
+  .challenge {
+    padding-left: 20px;
+    color: #C73638;
+  }
+}

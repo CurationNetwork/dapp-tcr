@@ -1,0 +1,40 @@
+@import '../../styles/variables.scss';
+
+.dapp-status {
+  display: flex;
+  margin-left: 35px;
+  flex-grow: 1.6 !important;
+
+  .stage {
+    font-size: 12px;
+    font-family: $f-medium;
+    height: 22px;
+    line-height: 22px;
+    padding: 0 8px;
+
+    &.active {
+      color: #191919;
+      background: #F2F3F7;
+    }
+
+    &.future {
+      color: rgba(23, 23, 24, .3)
+    }
+  }
+
+  .progress-bar {
+    flex-grow: 1;
+    height: 1px;
+    margin-top: 10px;
+    padding: 0 8px;
+    display: flex;
+
+    .filled {
+      background: #191919;
+    }
+
+    .empty {
+      background: #D6D6E0;
+    }
+  }
+}
