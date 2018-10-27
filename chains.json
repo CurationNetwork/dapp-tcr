@@ -40,6 +40,14 @@
       "0xf028dbe999e9b0798eff59690a7ad6b2d4072b7ea0e5dc4f8fd4f96702e03dbc": {
         "name": "Registry",
         "address": "0xEb64D9Eb5Fc851Caa3372054216c58e098BD1cfc"
+      },
+      "0xc90d0dc2b69381addefefe2b79c1e7d453bb41ba8f0d707f85838f1df3c52513": {
+        "name": "Voting",
+        "address": "0x3A8527fCa96e633FcE27f40410E59a8831a92a5a"
+      },
+      "0x313b4d85c69a6e593f47d520d95258442cf877ed455df097368f1b2a3623f2f3": {
+        "name": "Registry",
+        "address": "0xf2E0E8D755f93401545832aE720e758f1db7d139"
       }
     }
   }

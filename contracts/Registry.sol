@@ -227,20 +227,16 @@ contract Registry is IRegistry {
     // -----------------------
 
     function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) public {
-/*        Listing storage listing = listings[_listingHash];
+        DAppState state = dappState(listing_id);
+        Listing storage listing = listings[listing_id];
+
+        require(state == DAppState(state_check));
+        require(state == DAppState.APPLICATION || state == DAppState.EXISTS || state == DAppState.EDIT);
+
         uint minDeposit = parameterizer.get("minDeposit");
 
-        // Listing must be in apply stage or already on the whitelist
-        require(appWasMade(_listingHash) || listing.whitelisted);
         // Prevent multiple challenges
-        require(listing.challengeID == 0 || challenges[listing.challengeID].resolved);
-
-        if (listing.unstakedDeposit < minDeposit) {
-            // Not enough tokens, listingHash auto-delisted
-            resetListing(_listingHash);
-            emit _TouchAndRemoved(_listingHash);
-            return 0;
-        }
+        require(!challengeExists(listing_id));
 
         // Starts poll
         uint pollID = voting.startPoll(
@@ -249,7 +245,7 @@ contract Registry is IRegistry {
             parameterizer.get("revealStageLen")
         );
 
-        uint oneHundred = 100; // Kludge that we need to use SafeMath
+/*        uint oneHundred = 100; // Kludge that we need to use SafeMath
         challenges[pollID] = Challenge({
             challenger: msg.sender,
             rewardPool: ((oneHundred.sub(parameterizer.get("dispensationPct"))).mul(minDeposit)).div(100),
