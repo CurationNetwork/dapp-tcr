@@ -6,8 +6,5 @@ Decentralized DApp list based on TCR
 ```bash
 npm i
 
-# hackish way to run ethpm install
-./node_modules/.bin/truffle install
-
 ./node_modules/.bin/embark run
 ```

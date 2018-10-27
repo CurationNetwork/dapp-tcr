@@ -1,10 +1,10 @@
-pragma solidity 0.4.25;
+pragma solidity ^0.4.24;
 
 import "./IRegistry.sol";
-import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
 import "./Parameterizer.sol";
 import "./IVoting.sol";
-import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract Registry is IRegistry {
 
@@ -51,6 +51,7 @@ contract Registry is IRegistry {
     using SafeMath for uint;
 
     struct Listing {
+        uint ids_position;
         bytes ipfs_hash;
         address owner;          // Owner of Listing
         uint unstakedDeposit;   // Number of tokens in the listing not locked in a challenge
@@ -93,8 +94,10 @@ contract Registry is IRegistry {
     // Maps listingHashes to associated listingHash data
     mapping(bytes32 => Listing) public listings;
 
+    bytes32[] public ids;
+
     // Global Variables
-    EIP20Interface public token;
+    ERC20 public token;
     IVoting public voting;
     Parameterizer public parameterizer;
 
@@ -106,7 +109,7 @@ contract Registry is IRegistry {
         require(_voting != 0 && address(voting) == 0);
         require(_parameterizer != 0 && address(parameterizer) == 0);
 
-        token = EIP20Interface(_token);
+        token = ERC20(_token);
         voting = IVoting(_voting);
         parameterizer = Parameterizer(_parameterizer);
     }
@@ -115,8 +118,8 @@ contract Registry is IRegistry {
     // PUBLISHER INTERFACE:
     // --------------------
 
-    function apply(bytes ipfs_hash) public {
-        bytes32 listing_id = keccak256(++nonce);
+    function apply(bytes ipfs_hash) external {
+        bytes32 listing_id = keccak256(abi.encode(++nonce));
         assert(dappState(listing_id) == DAppState.NOT_EXISTS);
 
         uint token_amount = parameterizer.get("minDeposit");
@@ -133,16 +136,20 @@ contract Registry is IRegistry {
         // Transfers tokens from user to Registry contract
         require(token.transferFrom(listing.owner, this, token_amount));
 
+        // ids <-> listings linkage
+        listing.ids_position = ids.length;
+        ids.push(listing_id);
+
         changeState(listing_id, DAppState.APPLICATION);
         emit _Application(listing_id, token_amount, listing.applicationExpiry, ipfs_hash, msg.sender);
     }
 
-    function edit(bytes32 listing_id, bytes new_ipfs_hash) public requiresState(listing_id, DAppState.EXISTS) {
+    function edit(bytes32 listing_id, bytes new_ipfs_hash) external requiresState(listing_id, DAppState.EXISTS) {
         checkDAppInvariant(listing_id);
         // FIXME FIXME
     }
 
-    function init_exit(bytes32 listing_id) public requiresState(listing_id, DAppState.EXISTS) {
+    function init_exit(bytes32 listing_id) external requiresState(listing_id, DAppState.EXISTS) {
         checkDAppInvariant(listing_id);
         Listing storage listing = listings[listing_id];
 
@@ -163,15 +170,22 @@ contract Registry is IRegistry {
     // VIEW:
     // -----------------------
 
-    function list() public view returns (bytes32[] ids) {
-        return new bytes32[](0);
+    function list() external view returns (bytes32[]) {
+        return ids;
     }
 
-    function get_info(bytes32 listing_id) public view returns
+    function get_info(bytes32 listing_id) external view returns
             (uint state, bool is_challenged /* many states can be challenged */,
             bool status_can_be_updated /* if update_status should be called */,
             bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */) {
         checkDAppInvariant(listing_id);
+
+        state = uint(dappState(listing_id));
+        is_challenged = challengeExists(listing_id);
+        status_can_be_updated = this.can_update_status(listing_id);
+        ipfs_hash = listings[listing_id].ipfs_hash;
+
+        // FIXME FIXME
         edit_ipfs_hash = new bytes(0);
     }
 
@@ -179,13 +193,13 @@ contract Registry is IRegistry {
     // MAINTENANCE:
     // -----------------------
 
-    function can_update_status(bytes32 listing_id) public view returns (bool) {
+    function can_update_status(bytes32 listing_id) external view returns (bool) {
         checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
 
         if (state == DAppState.APPLICATION) {
-            if (listing.applicationExpiry >= time() && !challengeExists(listing_id))
+            if (listing.applicationExpiry < time() && !challengeExists(listing_id))
                 return true;
         }
         else if (state == DAppState.DELETING) {
@@ -201,13 +215,13 @@ contract Registry is IRegistry {
     }
 
     // finish current operation
-    function update_status(bytes32 listing_id) public {
+    function update_status(bytes32 listing_id) external {
         checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
 
         if (state == DAppState.APPLICATION) {
-            if (listing.applicationExpiry >= time() && !challengeExists(listing_id))
+            if (listing.applicationExpiry < time() && !challengeExists(listing_id))
                 whitelistApplication(listing_id);
         }
         else if (state == DAppState.DELETING) {
@@ -229,7 +243,7 @@ contract Registry is IRegistry {
     // TOKEN HOLDER INTERFACE:
     // -----------------------
 
-    function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) public {
+    function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) external {
         checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
@@ -273,19 +287,19 @@ contract Registry is IRegistry {
         return pollID;*/
     }
 
-    function challenge_status(bytes32 listing_id) public view returns
+    function challenge_status(bytes32 listing_id) external view returns
             (uint challenge_id, bool is_commit, bool is_reveal, uint votesFor /* 0 for commit phase */,
             uint votesAgainst /* 0 for commit phase */) {
         checkDAppInvariant(listing_id);
 
     }
 
-    function commit_vote(bytes32 listing_id, bytes32 secret_hash) public {
+    function commit_vote(bytes32 listing_id, bytes32 secret_hash) external {
         checkDAppInvariant(listing_id);
 
     }
 
-    function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt) public {
+    function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt) external {
         checkDAppInvariant(listing_id);
 
     }
@@ -294,7 +308,7 @@ contract Registry is IRegistry {
     // TOKEN FUNCTIONS:
     // ----------------
 
-    function claim_reward(uint challenge_id) public {
+    function claim_reward(uint challenge_id) external {
 /*        Challenge storage challengeInstance = challenges[_challengeID];
         // Ensures the voter has not already claimed tokens and challengeInstance results have
         // been processed
@@ -387,7 +401,7 @@ contract Registry is IRegistry {
     @param _challengeID The challengeID to query
     @param _voter       The voter whose claim status to query for the provided challengeID
     */
-    function tokenClaims(uint _challengeID, address _voter) public view returns (bool) {
+    function tokenClaims(uint _challengeID, address _voter) external view returns (bool) {
         return challenges[_challengeID].tokenClaims[_voter];
     }
 
@@ -456,6 +470,17 @@ contract Registry is IRegistry {
         address owner = listing.owner;
         uint unstakedDeposit = listing.unstakedDeposit;
         listing.owner = address(0);
+
+        // ids <-> listings linkage
+        uint removed_position = listings[listing_id].ids_position;
+        assert(removed_position < ids.length);
+        if (removed_position != ids.length - 1) {
+            listings[ids[ids.length - 1]].ids_position = removed_position;
+            ids[removed_position] = ids[ids.length - 1];
+        }
+        ids[ids.length - 1] = bytes32(0);
+        ids.length--;
+
         changeState(listing_id, DAppState.NOT_EXISTS);
         delete listings[listing_id];
         
@@ -471,6 +496,10 @@ contract Registry is IRegistry {
         }
     }
 
+    // ----------------
+    // STATE & INVARIANTS:
+    // ----------------
+
     function dappState(bytes32 listing_id) internal view returns (Registry.DAppState) {
         return listings[listing_id].state;
     }
@@ -485,6 +514,9 @@ contract Registry is IRegistry {
 
         if (listing.state == DAppState.DELETING || listing.state == DAppState.NOT_EXISTS)
             assert(!challengeExists(listing_id));
+
+        assert(listing.ids_position < ids.length);
+        assert(ids[listing.ids_position] == listing_id);
     }
 
     function changeState(bytes32 listing_id, DAppState new_state) internal {
@@ -499,10 +531,13 @@ contract Registry is IRegistry {
         else assert(false);
 
         listings[listing_id].state = new_state;
-        _StateChanged(listing_id, new_state);
+        emit _StateChanged(listing_id, new_state);
         checkDAppInvariant(listing_id);
     }
 
+    // ----------------
+    // FOR UNIT TESTING:
+    // ----------------
 
     function time() internal view returns (uint) {
         return now;

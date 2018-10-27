@@ -1,6 +1,6 @@
-pragma solidity 0.4.25;
+pragma solidity ^0.4.24;
 
-import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
 
 contract Parameterizer {
 

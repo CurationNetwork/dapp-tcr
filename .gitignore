@@ -1,6 +1,7 @@
-/node_modules/
+/build/
+node_modules/
 /installed_contracts/
-/.idea/
+.idea/
 /.embark/
 /dist/
 /config/production/password
