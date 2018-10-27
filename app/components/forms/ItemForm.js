@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import Form from "react-jsonschema-form";
 import { spec } from './spec.js';
 
@@ -29,14 +30,19 @@ class ItemForm extends React.Component {
 		}
 	}
 
-    const onSubmit = ({formData}) => console.log("Data submitted: ",  formData);
+    const onSubmit = ({formData}) => {
+		const upload_endpoint = 'https://ipfs.dapplist-hackathon.curation.network';
+		let resp = axios.post(upload_endpoint + '/ipfs/', JSON.stringify(formData)).then(resp => {
+			let url = upload_endpoint + resp.headers.location;
+			console.log("IPFS file uploaded to: " + url);
+		});
+	}
 
     return (<div>
       {/* Do not touch this*/}
       <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
       <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
       {/* END Do not touch this*/}
-	
       <Form schema={main_schema} onSubmit={onSubmit} />
     </div>);
   }
