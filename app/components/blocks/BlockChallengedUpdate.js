@@ -1,11 +1,11 @@
 import React from 'react';
 
-import Block from '../common/Block';
-import TableRow from '../common/TableRow';
-import TableHeader from '../common/TableHeader';
-import CellDappName from '../common/CellDappName';
-import CellDappStatus from '../common/CellDappStatus';
-import CellActions from '../common/CellActions';
+import Block from './Block';
+import TableRow from '../tables/TableRow';
+import TableHeader from '../tables/TableHeader';
+import CellDappName from '../tables/CellDappName';
+import CellDappStatus from '../tables/CellDappStatus';
+import CellActions from '../tables/CellActions';
 
 import imgMock from './0xuniverse.jpg';
 

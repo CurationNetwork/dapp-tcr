@@ -11,6 +11,10 @@
     color: #191919;
     display: flex;
 
+    &.registry {
+      margin-bottom: 20px;
+    }
+
     .name {
       flex-grow: 1;
       line-height: 34px;

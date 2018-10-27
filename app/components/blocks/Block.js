@@ -2,6 +2,8 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 
+import ButtonAddDapp from '../common/ButtonAddDapp';
+
 import './Block.scss';
 
 class Block extends React.Component {
@@ -27,7 +29,7 @@ class Block extends React.Component {
     const { minimized } = this.state;
 
     return (<div className={classNames('block', {minimized})}>
-      <div className="block-header">
+      <div className={classNames('block-header', {registry: type === 'registry'})}>
         <div className="name">
           {icon &&
             <><FontAwesomeIcon icon={icon}/>&nbsp;</>
@@ -42,6 +44,10 @@ class Block extends React.Component {
           <div className="minimize" onClick={this.toggleMinimize}>
             <FontAwesomeIcon icon={['far', 'window-minimize']}/>
           </div>
+        }
+
+        {type === 'registry' &&
+          <ButtonAddDapp/>
         }
       </div>
 
