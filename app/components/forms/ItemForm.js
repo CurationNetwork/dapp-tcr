@@ -33,11 +33,8 @@ class ItemForm extends React.Component {
 	}
 
     const onSubmit = ({formData}) => {
-		const upload_endpoint = 'https://ipfs.dapplist-hackathon.curation.network';
-		let resp = axios.post(upload_endpoint + '/ipfs/', JSON.stringify(formData)).then(resp => {
-			let url = upload_endpoint + resp.headers.location;
-			console.log("IPFS file uploaded to: " + url);
-		});
+		console.log("FORM SUBMIT!");
+		console.log(formData);
 	}
 
 	const widgets = {
