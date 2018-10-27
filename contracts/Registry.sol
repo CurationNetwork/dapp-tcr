@@ -206,6 +206,8 @@ contract Registry is IRegistry {
             if (msg.sender == listing.owner &&
                     listing.exitTime < time() && time() < listing.exitTimeExpiry)
                 return true;
+            if (msg.sender == listing.owner && time() >= listing.exitTimeExpiry)
+                return true;
         }
         else if (state == DAppState.EXISTS) {
             // FIXME FIXME finish challenge?
@@ -235,6 +237,12 @@ contract Registry is IRegistry {
                     listing.exitTime < time() && time() < listing.exitTimeExpiry) {
                 resetListing(listing_id);
                 emit _ListingWithdrawn(listing_id, msg.sender);
+                return;
+            }
+            if (msg.sender == listing.owner && time() >= listing.exitTimeExpiry) {
+                listing.exitTime = 0;
+                listing.exitTimeExpiry = 0;
+                changeState(listing_id, DAppState.EXISTS);
                 return;
             }
         }
@@ -488,9 +496,11 @@ contract Registry is IRegistry {
         ids[ids.length - 1] = bytes32(0);
         ids.length--;
 
+        listing.exitTime = 0;
+        listing.exitTimeExpiry = 0;
         changeState(listing_id, DAppState.NOT_EXISTS);
         delete listings[listing_id];
-        
+
         // Transfers any remaining balance back to the owner
         if (unstakedDeposit > 0){
             require(token.transfer(owner, unstakedDeposit));
@@ -522,8 +532,10 @@ contract Registry is IRegistry {
         if (listing.state == DAppState.DELETING || listing.state == DAppState.NOT_EXISTS)
             assert(!challengeExists(listing_id));
 
-        assert(listing.ids_position < ids.length);
-        assert(ids[listing.ids_position] == listing_id);
+        if (listing.state != DAppState.NOT_EXISTS) {
+            assert(listing.ids_position < ids.length);
+            assert(ids[listing.ids_position] == listing_id);
+        }
     }
 
     function changeState(bytes32 listing_id, DAppState new_state) internal {
