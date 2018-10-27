@@ -13,7 +13,7 @@ class BlockChallengedRemove extends React.Component {
   render() {
     return (<Block name="Challenged for removal" icon="minus-square">
       <TableRow type="header">
-        <TableHeader type="submitted"/>
+        <TableHeader type="challenged"/>
       </TableRow>
       <TableRow>
         <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>

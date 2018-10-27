@@ -5,7 +5,7 @@ import './CellActions.scss';
 
 class CellActions extends React.Component {
   render() {
-    const { type } = this.props;
+    const { type, challenges } = this.props;
 
     return (<div className="actions">
       {type === 'challenge' && 
@@ -45,6 +45,21 @@ class CellActions extends React.Component {
           <div className="border"></div>
           <div className="loose">You loose :(</div>
           <div className="close">&times; close</div>
+        </div>
+      }
+
+      {type === 'registry' &&
+        <div className="commit">
+          <div className="border"></div>
+          {(!Array.isArray(challenges) || challenges.indexOf('update') === -1) &&
+            <div className="approve"><FontAwesomeIcon icon="pen"/> Update</div>
+          }
+          {(!Array.isArray(challenges) || challenges.indexOf('remove') === -1) &&
+            <>
+              {!Array.isArray(challenges) && <div className="border"></div>}
+              <div className="reject"><FontAwesomeIcon icon="ban"/> Remove</div>
+            </>
+          }
         </div>
       }
     </div>);        

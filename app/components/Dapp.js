@@ -5,7 +5,7 @@ import { createBrowserHistory } from 'history';
 import BlockSubmitted from './blocks/BlockSubmitted';
 import BlockChallengedRemove from './blocks/BlockChallengedRemove';
 import BlockChallengedUpdate from './blocks/BlockChallengedUpdate';
-// import BlockRegistry from './blocks/BlockRegistry';
+import BlockRegistry from './blocks/BlockRegistry';
 import ItemForm from './forms/ItemForm';
 
 import './Dapp.scss';
@@ -20,9 +20,7 @@ function Main ({location}) {
       <BlockSubmitted/>
       <BlockChallengedUpdate/>
       <BlockChallengedRemove/>
-      {/* 
-        <BlockRegistry/>
-      */}
+      <BlockRegistry/>
     </div>);
   }
 }

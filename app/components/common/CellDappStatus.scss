@@ -13,9 +13,14 @@
     line-height: 22px;
     padding: 0 8px;
     color: #191919;
+    white-space: nowrap;
 
     &.active {
       background: #F2F3F7;
+
+      &.registry {
+        margin-left: 8px;
+      }
     }
 
     &.future {

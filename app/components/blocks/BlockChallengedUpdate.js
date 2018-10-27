@@ -13,7 +13,7 @@ class BlockChallengedUpdate extends React.Component {
   render() {
     return (<Block name="Challenged for update" icon="pen-square">
       <TableRow type="header">
-        <TableHeader type="submitted"/>
+        <TableHeader type="challenged"/>
       </TableRow>
       <TableRow>
         <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>

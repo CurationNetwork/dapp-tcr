@@ -14,5 +14,29 @@
         "address": "0x1956f101fe6F0FedAe0d6aee0A555c809C416573"
       }
     }
+  },
+  "0xc00ecef048f68ee3a85cc7ad24097b7589c090ea99b89427956c677bc55dd1d4": {
+    "contracts": {
+      "0x74138465b7acd238da1cdd9760d036495fad2feb92f165ea80682ef3a233d545": {
+        "name": "Parameterizer",
+        "address": "0x36d0348a2C5c2a67109F58fb54b7357b063F2e89"
+      },
+      "0x8b026068fc449f444a7ee4aff0b71bd8340a8985bc92019069abf52b8bf9c484": {
+        "name": "Registry",
+        "address": "0xD1B4E4c8E3bCd4d26fb1eF8f2783F7fBCf36baD8"
+      },
+      "0x3043b04ad856d169c8f0b0509c0bc63192dc7edd92d6933c58708298a0e381be": {
+        "name": "ENSRegistry",
+        "address": "0xf77780cCBeF0b4F3Ec2C3828BF61DB118D2bF173"
+      },
+      "0x49d2c35cd15f929920abd88b69fe7b516b7197c6ad3be8a2c8cda6c8b425d1c0": {
+        "name": "Resolver",
+        "address": "0x7B7480826695884606dEa2700aF3e75f1398974C"
+      },
+      "0xe58300898d57781868d6b12ebf10cd1110c3fcabe6956368e451af82c331fc0f": {
+        "name": "FIFSRegistrar",
+        "address": "0x0a9E193C9DbF1B4518bd924d4b7Ad7bD02a62d3B"
+      }
+    }
   }
 }
