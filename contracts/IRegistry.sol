@@ -26,13 +26,16 @@ interface IRegistry {
 
     // VIEW
 
+    // size of deposit for applying / edit / challenge
+    function deposit_size() external view returns (uint);
+
     // list the registry
     function list() external view returns (bytes32[] ids);
 
     function get_info(bytes32 listing_id) external view returns
         (uint state, bool is_challenged /* many states can be challenged */,
         bool status_can_be_updated /* if update_status should be called */,
-        bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */);
+        bytes ipfs_hash, bytes proposed_ipfs_hash /* empty if not editing */);
 
 
     // MAINTENANCE

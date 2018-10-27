@@ -13,10 +13,12 @@ contract Registry is IRegistry {
     // ------
 
     event _Application(bytes32 indexed listingHash, uint deposit, uint appEndDate, bytes ipfs_hash, address indexed applicant);
+    event _EditApplication(bytes32 indexed listingHash, uint deposit, uint appEndDate, bytes ipfs_hash, address indexed applicant);
     event _Challenge(bytes32 indexed listingHash, uint challengeID, string data, uint commitEndDate, uint revealEndDate, address indexed challenger);
     event _Deposit(bytes32 indexed listingHash, uint added, uint newTotal, address indexed owner);
     event _Withdrawal(bytes32 indexed listingHash, uint withdrew, uint newTotal, address indexed owner);
     event _ApplicationWhitelisted(bytes32 indexed listingHash);
+    event _EditApplicationWhitelisted(bytes32 indexed listingHash);
     event _ApplicationRemoved(bytes32 indexed listingHash);
     event _ListingRemoved(bytes32 indexed listingHash);
     event _ListingWithdrawn(bytes32 indexed listingHash, address indexed owner);
@@ -54,11 +56,13 @@ contract Registry is IRegistry {
         uint ids_position;
         bytes ipfs_hash;
         address owner;          // Owner of Listing
-        uint unstakedDeposit;   // Number of tokens in the listing not locked in a challenge
 
         DAppState state;
 
         uint applicationExpiry; // Expiration date of apply stage
+
+        bytes proposed_ipfs_hash;
+        address proposal_author;
 
         uint challengeID;       // Corresponds to a PollID in Voting
 
@@ -81,6 +85,16 @@ contract Registry is IRegistry {
 
     modifier requiresState(bytes32 listing_id, Registry.DAppState state) {
         require(dappState(listing_id) == state);
+        _;
+    }
+
+    modifier notChallenged(bytes32 listing_id) {
+        require(!challengeExists(listing_id));
+        _;
+    }
+
+    modifier isChallenged(bytes32 listing_id) {
+        require(challengeExists(listing_id));
         _;
     }
 
@@ -122,8 +136,6 @@ contract Registry is IRegistry {
         bytes32 listing_id = keccak256(abi.encode(++nonce));
         assert(dappState(listing_id) == DAppState.NOT_EXISTS);
 
-        uint token_amount = parameterizer.get("minDeposit");
-
         // Sets owner
         Listing storage listing = listings[listing_id];
         listing.ipfs_hash = ipfs_hash;
@@ -131,31 +143,50 @@ contract Registry is IRegistry {
 
         // Sets apply stage end time
         listing.applicationExpiry = time().add(parameterizer.get("applyStageLen"));
-        listing.unstakedDeposit = token_amount;
 
         // Transfers tokens from user to Registry contract
-        require(token.transferFrom(listing.owner, this, token_amount));
+        require(token.transferFrom(listing.owner, this, this.deposit_size()));
 
         // ids <-> listings linkage
         listing.ids_position = ids.length;
         ids.push(listing_id);
 
         changeState(listing_id, DAppState.APPLICATION);
-        emit _Application(listing_id, token_amount, listing.applicationExpiry, ipfs_hash, msg.sender);
+        emit _Application(listing_id, this.deposit_size(), listing.applicationExpiry, ipfs_hash, msg.sender);
     }
 
-    function edit(bytes32 listing_id, bytes new_ipfs_hash) external requiresState(listing_id, DAppState.EXISTS) {
+    function edit(bytes32 listing_id, bytes new_ipfs_hash)
+        external
+        requiresState(listing_id, DAppState.EXISTS)
+        notChallenged(listing_id)
+    {
         checkDAppInvariant(listing_id);
-        // FIXME FIXME
+        Listing storage listing = listings[listing_id];
+
+        // Sets proposal
+        listing.proposed_ipfs_hash = new_ipfs_hash;
+        listing.proposal_author = msg.sender;
+
+        // Sets apply stage end time
+        listing.applicationExpiry = time().add(parameterizer.get("applyStageLen"));
+
+        // Transfers tokens from user to Registry contract
+        // locking extra deposit even in case proposal_author == owner: he has to back his new proposal
+        require(token.transferFrom(listing.proposal_author, this, this.deposit_size()));
+
+        changeState(listing_id, DAppState.EDIT);
+        emit _EditApplication(listing_id, this.deposit_size(), listing.applicationExpiry, new_ipfs_hash, msg.sender);
     }
 
-    function init_exit(bytes32 listing_id) external requiresState(listing_id, DAppState.EXISTS) {
+    function init_exit(bytes32 listing_id)
+        external
+        requiresState(listing_id, DAppState.EXISTS)
+        notChallenged(listing_id)
+    {
         checkDAppInvariant(listing_id);
         Listing storage listing = listings[listing_id];
 
         require(msg.sender == listing.owner);
-        // Cannot exit during ongoing challenge
-        require(!challengeExists(listing_id));
 
         // Set when the listing may be removed from the whitelist
         listing.exitTime = time().add(parameterizer.get("exitTimeDelay"));
@@ -170,6 +201,10 @@ contract Registry is IRegistry {
     // VIEW:
     // -----------------------
 
+    function deposit_size() external view returns (uint) {
+        return parameterizer.get("minDeposit");
+    }
+
     function list() external view returns (bytes32[]) {
         return ids;
     }
@@ -177,16 +212,14 @@ contract Registry is IRegistry {
     function get_info(bytes32 listing_id) external view returns
             (uint state, bool is_challenged /* many states can be challenged */,
             bool status_can_be_updated /* if update_status should be called */,
-            bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */) {
+            bytes ipfs_hash, bytes proposed_ipfs_hash /* empty if not editing */) {
         checkDAppInvariant(listing_id);
 
         state = uint(dappState(listing_id));
         is_challenged = challengeExists(listing_id);
         status_can_be_updated = this.can_update_status(listing_id);
         ipfs_hash = listings[listing_id].ipfs_hash;
-
-        // FIXME FIXME
-        edit_ipfs_hash = new bytes(0);
+        proposed_ipfs_hash = listings[listing_id].proposed_ipfs_hash;
     }
 
     // -----------------------
@@ -213,11 +246,17 @@ contract Registry is IRegistry {
             // FIXME FIXME finish challenge?
             return false;
         }
+        else if (state == DAppState.EDIT) {
+            if (listing.applicationExpiry < time() && !challengeExists(listing_id))
+                return true;
+        }
         else {
             // FIXME FIXME more states
             assert(state == DAppState.NOT_EXISTS);
             return false;
         }
+
+        return false;
     }
 
     // finish current operation
@@ -246,6 +285,12 @@ contract Registry is IRegistry {
                 return;
             }
         }
+        else if (state == DAppState.EDIT) {
+            if (listing.applicationExpiry < time() && !challengeExists(listing_id)) {
+                whitelistEditProposal(listing_id);
+                return;
+            }
+        }
         else {
             // FIXME FIXME more states
             assert(state == DAppState.NOT_EXISTS);
@@ -258,7 +303,10 @@ contract Registry is IRegistry {
     // TOKEN HOLDER INTERFACE:
     // -----------------------
 
-    function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) external {
+    function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */)
+        external
+        notChallenged(listing_id)
+    {
         checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
@@ -267,9 +315,6 @@ contract Registry is IRegistry {
         require(state == DAppState.APPLICATION || state == DAppState.EXISTS || state == DAppState.EDIT);
 
         uint minDeposit = parameterizer.get("minDeposit");
-
-        // Prevent multiple challenges
-        require(!challengeExists(listing_id));
 
         // Starts poll
         uint pollID = voting.startPoll(
@@ -388,11 +433,13 @@ contract Registry is IRegistry {
                         listingHash. Throws if no challenge exists.
     @param listing_id A listingHash with an unresolved challenge
     */
-    function challengeCanBeResolved(bytes32 listing_id) view public returns (bool) {
+    function challengeCanBeResolved(bytes32 listing_id)
+        public
+        view
+        isChallenged(listing_id)
+        returns (bool)
+    {
         uint challengeID = listings[listing_id].challengeID;
-
-        require(challengeExists(listing_id));
-
         return voting.pollEnded(challengeID);
     }
 
@@ -447,7 +494,7 @@ contract Registry is IRegistry {
         if (voting.result(challengeID)) {
             whitelistApplication(listing_id);
             // Unlock stake so that it can be retrieved by the applicant
-            listings[listing_id].unstakedDeposit += reward;
+            //listings[listing_id].unstakedDeposit += reward;
 
             emit _ChallengeFailed(listing_id, challengeID, challenges[challengeID].rewardPool, challenges[challengeID].totalTokens);
         }
@@ -473,6 +520,22 @@ contract Registry is IRegistry {
         emit _ApplicationWhitelisted(listing_id);
     }
 
+    function whitelistEditProposal(bytes32 listing_id) private {
+        Listing storage listing = listings[listing_id];
+
+        // changing owner - freeing deposit
+        require(token.transfer(listing.owner, this.deposit_size()));
+        listing.owner = listing.proposal_author;
+        delete listing.proposal_author;
+
+        listing.ipfs_hash = listing.proposed_ipfs_hash;
+        delete listing.proposed_ipfs_hash;
+
+        listings[listing_id].applicationExpiry = 0;
+        changeState(listing_id, DAppState.EXISTS);
+        emit _EditApplicationWhitelisted(listing_id);
+    }
+
     /**
     @dev                Deletes a listingHash from the whitelist and transfers tokens back to owner
     @param listing_id The listing hash to delete
@@ -483,7 +546,6 @@ contract Registry is IRegistry {
 
         // Deleting listing to prevent reentry
         address owner = listing.owner;
-        uint unstakedDeposit = listing.unstakedDeposit;
         listing.owner = address(0);
 
         // ids <-> listings linkage
@@ -502,9 +564,9 @@ contract Registry is IRegistry {
         delete listings[listing_id];
 
         // Transfers any remaining balance back to the owner
-        if (unstakedDeposit > 0){
-            require(token.transfer(owner, unstakedDeposit));
-        }
+        //if (unstakedDeposit > 0){
+        //    require(token.transfer(owner, unstakedDeposit));
+        //}
 
         if (DAppState.APPLICATION == state_was) {
             emit _ApplicationRemoved(listing_id);
@@ -525,9 +587,14 @@ contract Registry is IRegistry {
         Listing storage listing = listings[listing_id];
 
         assert((listing.state == DAppState.NOT_EXISTS) == (listing.owner == address(0)));
-        assert((listing.state == DAppState.APPLICATION) == (listing.applicationExpiry != 0));
+        assert((listing.state == DAppState.APPLICATION || listing.state == DAppState.EDIT)
+                == (listing.applicationExpiry != 0));
+
         assert((listing.state == DAppState.DELETING) == (listing.exitTime != 0));
         assert((listing.state == DAppState.DELETING) == (listing.exitTimeExpiry != 0));
+
+        assert((listing.state == DAppState.EDIT) == (listing.proposed_ipfs_hash.length != 0));
+        assert((listing.state == DAppState.EDIT) == (listing.proposal_author != address(0)));
 
         if (listing.state == DAppState.DELETING || listing.state == DAppState.NOT_EXISTS)
             assert(!challengeExists(listing_id));

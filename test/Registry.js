@@ -32,6 +32,8 @@ contract('Registry', function(accounts) {
         [token, voting, params, registry] = await instantiate();
     });
 
+    // APPLICATION ------------------------------------------------------------
+
     it("test apply", async function() {
         await registry.apply(web3.toHex('foobar'));
 
@@ -95,6 +97,8 @@ contract('Registry', function(accounts) {
         assert.equal((await registry.get_info(list[1]))[0], 2);   // EXISTS
     });
 
+    // DELETION ---------------------------------------------------------------
+
     it("test calling off", async function() {
         await registry.init_exit(first_listing_id);
 
@@ -130,5 +134,59 @@ contract('Registry', function(accounts) {
         const list = await registry.list();
         assert.equal(list.length, 1);
         assert.equal(list[0], second_listing_id);   // not called off!
+    });
+
+    // EDIT -------------------------------------------------------------------
+
+    it("test edit", async function() {
+        [token, voting, params, registry] = await instantiate();
+
+        await registry.apply(web3.toHex('foobar'));
+        first_listing_id = (await registry.list())[0];
+        second_listing_id = undefined;
+
+        await registry.setTime(1000000100);
+        await registry.update_status(first_listing_id);
+        assert.equal((await registry.get_info(first_listing_id))[0], 2);    // EXISTS
+
+        await registry.edit(first_listing_id, web3.toHex('baz'));
+
+        const list = await registry.list();
+        assert.equal(list.length, 1);
+
+        const info = await registry.get_info(first_listing_id);
+        assert.equal(info[0], 3);   // EDIT
+        assert.equal(info[1], false);   // is_challenged
+        assert.equal(info[2], false);   // status_can_be_updated
+        assert.equal(info[3], web3.toHex('foobar'));   // ipfs_hash
+        assert.equal(info[4], web3.toHex('baz'));   // edit_ipfs_hash
+    });
+
+    it("test edit can be accepted", async function() {
+        await registry.setTime(1000000200);
+
+        const list = await registry.list();
+        assert.equal(list.length, 1);
+
+        const info = await registry.get_info(first_listing_id);
+        assert.equal(info[0], 3);   // EDIT
+        assert.equal(info[1], false);   // is_challenged
+        assert.equal(info[2], true);   // status_can_be_updated
+        assert.equal(info[3], web3.toHex('foobar'));   // ipfs_hash
+        assert.equal(info[4], web3.toHex('baz'));   // edit_ipfs_hash
+    });
+
+    it("test edit accepted", async function() {
+        await registry.update_status(first_listing_id);
+
+        const list = await registry.list();
+        assert.equal(list.length, 1);
+
+        const info = await registry.get_info(first_listing_id);
+        assert.equal(info[0], 2);   // EXISTS
+        assert.equal(info[1], false);   // is_challenged
+        assert.equal(info[2], false);   // status_can_be_updated
+        assert.equal(info[3], web3.toHex('baz'));   // ipfs_hash
+        assert.equal(info[4], '0x');   // edit_ipfs_hash*/
     });
 });
