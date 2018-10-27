@@ -1,8 +1,8 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.25;
 
-import "tokens/eip20/EIP20Interface.sol";
-import "attrstore/AttributeStore.sol";
-import "zeppelin/math/SafeMath.sol";
+import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
+import "./AttributeStore.sol";
+import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
 import "./IVoting.sol";
 /**
 @title Partial-Lock-Commit-Reveal Voting scheme with ERC20 tokens
@@ -22,6 +22,15 @@ contract Voting is IVoting {
     event _VotingRightsWithdrawn(uint numTokens, address indexed voter);
     event _TokensRescued(uint indexed pollID, address indexed voter);
     event _StakeWithdrawed(uint indexed pollID, address indexed voter, uint numTokens);
+
+    // ============
+    // MODIFIERS:
+    // ============
+
+    modifier onlyRegistry {
+        require(msg.sender == registry);
+        _;
+    }
 
     // ============
     // DATA STRUCTURES:
@@ -51,11 +60,19 @@ contract Voting is IVoting {
 
     uint constant public INITIAL_POLL_NONCE = 0;
     uint public pollNonce;
+    address public registry;
 
     AttributeStore.Data store;
 
     constructor() public {
         pollNonce = INITIAL_POLL_NONCE;
+    }
+
+    function set_registry(address registry_) public {
+        require(registry_ != address(0));
+        require(registry == address(0));
+
+        registry = registry_;
     }
 
     // =================
@@ -152,17 +169,11 @@ contract Voting is IVoting {
     @dev Check if votesFor out of totalVotes exceeds votesQuorum (requires pollEnded)
     @param _pollID Integer identifier associated with target poll
     */
-    function result(uint _pollID) constant public returns (uint passed) {
+    function result(uint _pollID) constant public returns (bool passed) {
         require(pollEnded(_pollID));
 
-        Poll memory poll = pollMap[_pollID];
-        if (poll.votesFor > poll.votesAgainst) {
-            return 1;
-        }
-        if (poll.votesFor <= poll.votesAgainst) {
-            return 0;
-        }
-
+        Poll storage poll = pollMap[_pollID];
+        return poll.votesFor > poll.votesAgainst;
     }
 
     function getPollResult(uint _pollId) public view returns (uint votesFor, uint votesAgainst) {
@@ -183,14 +194,9 @@ contract Voting is IVoting {
         if (!poll.didReveal[voter])
             return false;
 
-        uint vote = poll.voteOptions[voter] == 1? 1: 0;
+        bool vote = poll.voteOptions[voter] == 1;
 
-        if (vote == result(_pollId)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return vote == result(_pollId);
     }
 
     // ----------------

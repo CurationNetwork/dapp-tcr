@@ -12,6 +12,22 @@
       "0x4e64586c58e35c5af57bf7b34c55b4e9679060460dfc8b63adcabd4dd426d8ca": {
         "name": "FIFSRegistrar",
         "address": "0x1956f101fe6F0FedAe0d6aee0A555c809C416573"
+      },
+      "0xdae9174c161001e7ba988268ef0be6f4c553923843c79f28d08be7aa93e3e62c": {
+        "name": "Parameterizer",
+        "address": "0x1D13E272bE127dfa7d4cE312cC6c114A34b957c1"
+      },
+      "0x2b3a90fd389b56f55178c5e66c0249881424123389ce35a68ffcb0f096c2a2a2": {
+        "name": "Voting",
+        "address": "0xFAEf911C46Ae3f961b18FAb1374Aa63BF828b549"
+      },
+      "0x72e216c41522ead38022e62e2966b67599007a15f88cee8aa8787c7171644863": {
+        "name": "Token",
+        "address": "0x7aB5Dfe8717DDd757f8A2d77086d211CE9741904"
+      },
+      "0x7a1e8a4a029ec3a08565a5c06217e3f78ddc704b0eb4000a938890adadd8ecb0": {
+        "name": "Registry",
+        "address": "0x66542a74Fa6cdFf0D4334de3361D15030442447b"
       }
     }
   }
