@@ -23,11 +23,11 @@ class BlockSubmitted extends React.Component {
         <CellActions type="challenge"/>
       </TableRow>
 
-      {/*
-        <div className="stage future">
-          <FontAwesomeIcon icon="gavel"/> Challenged. Commit
-        </div>
-      */}
+      <TableRow>
+        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
+        <CellDappStatus type="challenged" stage="commit" passedPercent={70}/>
+        <CellActions type="challenge"/>
+      </TableRow>
     </Block>);
   }
 }
