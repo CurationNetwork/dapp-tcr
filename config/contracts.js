@@ -33,6 +33,19 @@ module.exports = {
     ],
     gas: "auto",
     contracts: {
+      BasicToken: {
+        "deploy": false
+      },
+      SafeMath: {
+        "deploy": false
+      },
+      AttributeStore: {
+        "deploy": false
+      },
+      StandardToken: {
+        "deploy": false
+      },
+
       Token: {
         args: []
       },
@@ -42,12 +55,12 @@ module.exports = {
       },
 
       Parameterizer: {
-        args: [1e18, 60, 60, 60, 50, 51, 60, 60]
+        args: [[1e18, 60, 60, 60, 50, 51, 60, 60]]
       },
 
       Registry: {
         args: ["$Token", "$Voting", "$Parameterizer"],
-        onDeploy: ["Voting.methods.set_registry(Registry).send()"]
+        "onDeploy": ["Voting.methods.set_registry(Registry.address).send()"]
       }
     }
   },

@@ -2,11 +2,15 @@ pragma solidity 0.4.25;
 
 interface IVoting {
 
-    function getPollResult(uint _pollId) public view returns (uint votesFor, uint votesAgainst);
+    function pollEnded(uint _pollID) constant public returns (bool ended);
+
+    function result(uint _pollID) constant public returns (bool passed);
 
     function isWinner(uint _pollId, address voter) public returns (bool);
 
     function getOverallStake(uint _pollId) public returns (uint);
+
+    function getNumTokens(address _voter, uint _pollID) constant public returns (uint numTokens);
 
     /**
     @dev Initiates a poll with canonical configured parameters at pollID emitted by PollCreated event

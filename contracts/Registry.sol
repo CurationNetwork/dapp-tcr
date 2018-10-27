@@ -26,6 +26,27 @@ contract Registry is IRegistry {
     event _RewardClaimed(uint indexed challengeID, uint reward, address indexed voter);
     event _ExitInitialized(bytes32 indexed listingHash, uint exitTime, uint exitDelayEndDate, address indexed owner);
 
+    // ============
+    // DATA STRUCTURES:
+    // ============
+
+    enum DAppState {
+        // registry does not know about the dapp
+        NOT_EXISTS,
+
+        // application for inclusion to the registry is in progress
+        APPLICATION,
+
+        // dapp exists in the registry
+        EXISTS,
+
+        // application for edit of registry dapp is in progress
+        EDIT,
+
+        // submitter is calling of the dapp
+        DELETING
+    }
+
     using SafeMath for uint;
 
     struct Listing {
@@ -34,7 +55,7 @@ contract Registry is IRegistry {
         address owner;          // Owner of Listing
         uint unstakedDeposit;   // Number of tokens in the listing not locked in a challenge
         uint challengeID;       // Corresponds to a PollID in Voting
-	uint exitTime;		// Time the listing may leave the registry
+        uint exitTime;          // Time the listing may leave the registry
         uint exitTimeExpiry;    // Expiration date of exit period
     }
 
@@ -46,6 +67,19 @@ contract Registry is IRegistry {
         uint totalTokens;       // (remaining) Number of tokens used in voting by the winning side
         mapping(address => bool) tokenClaims; // Indicates whether a voter has claimed a reward yet
     }
+
+    // ============
+    // MODIFIERS:
+    // ============
+
+    modifier requiresState(bytes32 _listingHash, Registry.DAppState state) {
+        require(dappState(_listingHash) == state);
+        _;
+    }
+
+    // ============
+    // GLOBAL STATE:
+    // ============
 
     // Maps challengeIDs to associated challenge data
     mapping(uint => Challenge) public challenges;
@@ -72,15 +106,8 @@ contract Registry is IRegistry {
     // PUBLISHER INTERFACE:
     // --------------------
 
-    /**
-    @dev                Allows a user to start an application. Takes tokens from user and sets
-                        apply stage end time.
-    @param _listingHash The hash of a potential listing a user is applying to add to the registry
-    @param _amount      The number of ERC20 tokens a user is willing to potentially stake
-    @param _data        Extra data relevant to the application. Think IPFS hashes.
-    */
-    function apply(bytes32 _listingHash, uint _amount, string _data) external {
-        require(!isWhitelisted(_listingHash));
+    function apply(bytes ipfs_hash) public {
+/*        require(!isWhitelisted(_listingHash));
         require(!appWasMade(_listingHash));
         require(_amount >= parameterizer.get("minDeposit"));
 
@@ -95,15 +122,15 @@ contract Registry is IRegistry {
         // Transfers tokens from user to Registry contract
         require(token.transferFrom(listing.owner, this, _amount));
 
-        emit _Application(_listingHash, _amount, listing.applicationExpiry, _data, msg.sender);
+        emit _Application(_listingHash, _amount, listing.applicationExpiry, _data, msg.sender);*/
     }
 
-    /**
-    @dev		Initialize an exit timer for a listing to leave the whitelist
-    @param _listingHash	A listing hash msg.sender is the owner of
-    */
-    function initExit(bytes32 _listingHash) external {	
-        Listing storage listing = listings[_listingHash];
+    function edit(bytes32 listing_id, bytes new_ipfs_hash) public {
+
+    }
+
+    function init_exit(bytes32 listing_id) public {
+/*        Listing storage listing = listings[_listingHash];
 
         require(msg.sender == listing.owner);
         require(isWhitelisted(_listingHash));
@@ -118,14 +145,10 @@ contract Registry is IRegistry {
 	// Set exit period end time
 	listing.exitTimeExpiry = listing.exitTime.add(parameterizer.get("exitPeriodLen"));
         emit _ExitInitialized(_listingHash, listing.exitTime,
-            listing.exitTimeExpiry, msg.sender);
+            listing.exitTimeExpiry, msg.sender);*/
     }
 
-    /**
-    @dev		Allow a listing to leave the whitelist
-    @param _listingHash A listing hash msg.sender is the owner of
-    */
-    function finalizeExit(bytes32 _listingHash) external {
+/*    function finalizeExit(bytes32 _listingHash) external {
         Listing storage listing = listings[_listingHash];
 
         require(msg.sender == listing.owner);
@@ -140,21 +163,48 @@ contract Registry is IRegistry {
 
         resetListing(_listingHash);
         emit _ListingWithdrawn(_listingHash, msg.sender);
+    }*/
+
+    // -----------------------
+    // VIEW:
+    // -----------------------
+
+    function list() public view returns (bytes32[] ids) {
+        return new bytes32[](0);
+    }
+
+    function get_info(bytes32 listing_id) public view returns
+            (uint state, bool is_challenged /* many states can be challenged */,
+            bool status_can_be_updated /* if update_status should be called */,
+            bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */) {
+        edit_ipfs_hash = new bytes(0);
+    }
+
+    // -----------------------
+    // MAINTENANCE:
+    // -----------------------
+
+    function can_update_status(bytes32 listing_id) public view returns (bool) {
+        assert(false);
+    }
+
+    // finish current operation
+    function update_status(bytes32 listing_id) public {
+        if (canBeWhitelisted(listing_id)) {
+            whitelistApplication(listing_id);
+        } else if (challengeCanBeResolved(listing_id)) {
+            resolveChallenge(listing_id);
+        } else {
+            revert();
+        }
     }
 
     // -----------------------
     // TOKEN HOLDER INTERFACE:
     // -----------------------
 
-    /**
-    @dev                Starts a poll for a listingHash which is either in the apply stage or
-                        already in the whitelist. Tokens are taken from the challenger and the
-                        applicant's deposits are locked.
-    @param _listingHash The listingHash being challenged, whether listed or in application
-    @param _data        Extra data relevant to the challenge. Think IPFS hashes.
-    */
-    function challenge(bytes32 _listingHash, string _data) external returns (uint challengeID) {
-        Listing storage listing = listings[_listingHash];
+    function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) public {
+/*        Listing storage listing = listings[_listingHash];
         uint minDeposit = parameterizer.get("minDeposit");
 
         // Listing must be in apply stage or already on the whitelist
@@ -197,35 +247,29 @@ contract Registry is IRegistry {
         (uint commitEndDate, uint revealEndDate,,,) = voting.pollMap(pollID);
 
         emit _Challenge(_listingHash, pollID, _data, commitEndDate, revealEndDate, msg.sender);
-        return pollID;
+        return pollID;*/
     }
 
-    /**
-    @dev                Updates a listingHash's status from 'application' to 'listing' or resolves
-                        a challenge if one exists.
-    @param _listingHash The listingHash whose status is being updated
-    */
-    function updateStatus(bytes32 _listingHash) public {
-        if (canBeWhitelisted(_listingHash)) {
-            whitelistApplication(_listingHash);
-        } else if (challengeCanBeResolved(_listingHash)) {
-            resolveChallenge(_listingHash);
-        } else {
-            revert();
-        }
+    function challenge_status(bytes32 listing_id) public view returns
+            (uint challenge_id, bool is_commit, bool is_reveal, uint votesFor /* 0 for commit phase */,
+            uint votesAgainst /* 0 for commit phase */) {
+
+    }
+
+    function commit_vote(bytes32 listing_id, bytes32 secret_hash) public {
+
+    }
+
+    function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt) public {
+
     }
 
     // ----------------
     // TOKEN FUNCTIONS:
     // ----------------
 
-    /**
-    @dev                Called by a voter to claim their reward for each completed vote. Someone
-                        must call updateStatus() before this can be called.
-    @param _challengeID The pollID of the challenge a reward is being claimed for
-    */
-    function claimReward(uint _challengeID) public {
-        Challenge storage challengeInstance = challenges[_challengeID];
+    function claim_reward(uint challenge_id) public {
+/*        Challenge storage challengeInstance = challenges[_challengeID];
         // Ensures the voter has not already claimed tokens and challengeInstance results have
         // been processed
         require(challengeInstance.tokenClaims[msg.sender] == false);
@@ -245,7 +289,7 @@ contract Registry is IRegistry {
 
         require(token.transfer(msg.sender, reward));
 
-        emit _RewardClaimed(_challengeID, reward, msg.sender);
+        emit _RewardClaimed(_challengeID, reward, msg.sender);*/
     }
 
     // --------
@@ -262,7 +306,7 @@ contract Registry is IRegistry {
     public view returns (uint) {
         uint totalTokens = challenges[_challengeID].totalTokens;
         uint rewardPool = challenges[_challengeID].rewardPool;
-        uint voterTokens = voting.getNumPassingTokens(_voter, _challengeID);
+        uint voterTokens = voting.getNumTokens(_voter, _challengeID);
         return voterTokens.mul(rewardPool).div(totalTokens);
     }
 
@@ -333,13 +377,13 @@ contract Registry is IRegistry {
     function determineReward(uint _challengeID) public view returns (uint) {
         require(!challenges[_challengeID].resolved && voting.pollEnded(_challengeID));
 
-        // Edge case, nobody voted, give all tokens to the challenger.
+/*        // Edge case, nobody voted, give all tokens to the challenger.
         if (voting.getTotalNumberOfTokensForWinningOption(_challengeID) == 0) {
             return 2 * challenges[_challengeID].stake;
         }
 
         return (2 * challenges[_challengeID].stake) - challenges[_challengeID].rewardPool;
-    }
+*/    }
 
     /**
     @dev                Getter for Challenge tokenClaims mappings
@@ -370,11 +414,11 @@ contract Registry is IRegistry {
         challenges[challengeID].resolved = true;
 
         // Stores the total tokens used for voting by the winning side for reward purposes
-        challenges[challengeID].totalTokens =
-            voting.getTotalNumberOfTokensForWinningOption(challengeID);
+//        challenges[challengeID].totalTokens =
+//            voting.getTotalNumberOfTokensForWinningOption(challengeID);
 
         // Case: challenge failed
-        if (voting.isPassed(challengeID)) {
+        if (voting.result(challengeID)) {
             whitelistApplication(_listingHash);
             // Unlock stake so that it can be retrieved by the applicant
             listings[_listingHash].unstakedDeposit += reward;
@@ -425,5 +469,14 @@ contract Registry is IRegistry {
         if (unstakedDeposit > 0){
             require(token.transfer(owner, unstakedDeposit));
         }
+    }
+
+    function dappState(bytes32 _listingHash) internal view returns (Registry.DAppState) {
+        Listing storage listing = listings[_listingHash];
+
+        if (address(0) == listing.owner)
+            return Registry.DAppState.NOT_EXISTS;
+
+        assert(false);
     }
 }

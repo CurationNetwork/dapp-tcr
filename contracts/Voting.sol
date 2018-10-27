@@ -1,7 +1,7 @@
 pragma solidity 0.4.25;
 
 import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
-import "installed_contracts/attrstore/contracts/AttributeStore.sol";
+import "./AttributeStore.sol";
 import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
 import "./IVoting.sol";
 /**
@@ -169,17 +169,11 @@ contract Voting is IVoting {
     @dev Check if votesFor out of totalVotes exceeds votesQuorum (requires pollEnded)
     @param _pollID Integer identifier associated with target poll
     */
-    function result(uint _pollID) constant public returns (uint passed) {
+    function result(uint _pollID) constant public returns (bool passed) {
         require(pollEnded(_pollID));
 
-        Poll memory poll = pollMap[_pollID];
-        if (poll.votesFor > poll.votesAgainst) {
-            return 1;
-        }
-        if (poll.votesFor <= poll.votesAgainst) {
-            return 0;
-        }
-
+        Poll storage poll = pollMap[_pollID];
+        return poll.votesFor > poll.votesAgainst;
     }
 
     function getPollResult(uint _pollId) public view returns (uint votesFor, uint votesAgainst) {
@@ -200,14 +194,9 @@ contract Voting is IVoting {
         if (!poll.didReveal[voter])
             return false;
 
-        uint vote = poll.voteOptions[voter] == 1? 1: 0;
+        bool vote = poll.voteOptions[voter] == 1;
 
-        if (vote == result(_pollId)) {
-            return true;
-        }
-        else {
-            return false;
-        }
+        return vote == result(_pollId);
     }
 
     // ----------------
