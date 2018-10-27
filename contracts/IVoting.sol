@@ -1,9 +1,7 @@
 pragma solidity ^0.4.24;
 
 
-contract IVoting {
-    constructor() public {}
-
+interface IVoting {
 
     function getPollResult(uint _pollId) public view returns (uint votesFor, uint votesAgainst);
 
@@ -33,5 +31,4 @@ contract IVoting {
     @param _salt Secret number used to generate commitHash for associated poll
     */
     function revealVote(uint _pollID, uint _voteOption, uint _voteStake, uint _salt, address _voter) public;
-
 }

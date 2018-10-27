@@ -105,40 +105,6 @@ contract Registry {
     }
 
     /**
-    @dev                Allows the owner of a listingHash to increase their unstaked deposit.
-    @param _listingHash A listingHash msg.sender is the owner of
-    @param _amount      The number of ERC20 tokens to increase a user's unstaked deposit
-    */
-    function deposit(bytes32 _listingHash, uint _amount) external {
-        Listing storage listing = listings[_listingHash];
-
-        require(listing.owner == msg.sender);
-
-        listing.unstakedDeposit += _amount;
-        require(token.transferFrom(msg.sender, this, _amount));
-
-        emit _Deposit(_listingHash, _amount, listing.unstakedDeposit, msg.sender);
-    }
-
-    /**
-    @dev                Allows the owner of a listingHash to decrease their unstaked deposit.
-    @param _listingHash A listingHash msg.sender is the owner of.
-    @param _amount      The number of ERC20 tokens to withdraw from the unstaked deposit.
-    */
-    function withdraw(bytes32 _listingHash, uint _amount) external {
-        Listing storage listing = listings[_listingHash];
-
-        require(listing.owner == msg.sender);
-        require(_amount <= listing.unstakedDeposit);
-        require(listing.unstakedDeposit - _amount >= parameterizer.get("minDeposit"));
-
-        listing.unstakedDeposit -= _amount;
-        require(token.transfer(msg.sender, _amount));
-
-        emit _Withdrawal(_listingHash, _amount, listing.unstakedDeposit, msg.sender);
-    }
-
-    /**
     @dev		Initialize an exit timer for a listing to leave the whitelist
     @param _listingHash	A listing hash msg.sender is the owner of
     */
@@ -255,18 +221,6 @@ contract Registry {
         }
     }
 
-    /**
-    @dev                  Updates an array of listingHashes' status from 'application' to 'listing' or resolves
-                          a challenge if one exists.
-    @param _listingHashes The listingHashes whose status are being updated
-    */
-    function updateStatuses(bytes32[] _listingHashes) public {
-        // loop through arrays, revealing each individual vote values
-        for (uint i = 0; i < _listingHashes.length; i++) {
-            updateStatus(_listingHashes[i]);
-        }
-    }
-
     // ----------------
     // TOKEN FUNCTIONS:
     // ----------------
@@ -274,7 +228,7 @@ contract Registry {
     /**
     @dev                Called by a voter to claim their reward for each completed vote. Someone
                         must call updateStatus() before this can be called.
-    @param _challengeID The PLCR pollID of the challenge a reward is being claimed for
+    @param _challengeID The pollID of the challenge a reward is being claimed for
     */
     function claimReward(uint _challengeID) public {
         Challenge storage challengeInstance = challenges[_challengeID];
@@ -298,18 +252,6 @@ contract Registry {
         require(token.transfer(msg.sender, reward));
 
         emit _RewardClaimed(_challengeID, reward, msg.sender);
-    }
-
-    /**
-    @dev                 Called by a voter to claim their rewards for each completed vote. Someone
-                         must call updateStatus() before this can be called.
-    @param _challengeIDs The PLCR pollIDs of the challenges rewards are being claimed for
-    */
-    function claimRewards(uint[] _challengeIDs) public {
-        // loop through arrays, claiming each individual vote reward
-        for (uint i = 0; i < _challengeIDs.length; i++) {
-            claimReward(_challengeIDs[i]);
-        }
     }
 
     // --------
