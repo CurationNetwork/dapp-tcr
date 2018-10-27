@@ -16,7 +16,7 @@ module.exports = function(deployer, network) {
     return deployer.deploy(Voting);
   }).then(function (ret) {
     voting = ret;
-    return deployer.deploy(Parameterizer, [web3.toWei(1, 'ether'), 60, 60, 60, 50, 51, 60, 60]);
+    return deployer.deploy(Parameterizer, [web3.toWei(100, 'ether'), 60, 60, 60, 50, 51, 60, 60]);
   }).then(function(ret){
     params = ret;
     return deployer.deploy(Registry, token.address, voting.address, params.address);
