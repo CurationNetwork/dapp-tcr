@@ -63,8 +63,14 @@ function subscribe(args, cb) {
     log.info(`New subscribe, contract: ${args.contractName} event: ${args.eventName} fromBlock: ${args.fromBlock}`);
 }
 
+function call(contractName, method, args = []) {
+    let contract = contractMap[contractName];
+
+    return contract[method].call(...args);
+}
 
 module.exports = {
     initContracts: initContracts,
     subscribe: subscribe,
+    call: call,
 };
