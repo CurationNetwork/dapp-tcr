@@ -11,9 +11,9 @@ class Dapp extends React.Component {
   render() {
     return (<div className="dapp-container">
       <BlockSubmitted/>
-      {/* 
-      <BlockChallengedRemove/>
       <BlockChallengedUpdate/>
+      <BlockChallengedRemove/>
+      {/* 
       <BlockRegistry/>
       */}
     </div>);

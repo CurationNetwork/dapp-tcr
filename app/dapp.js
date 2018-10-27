@@ -2,9 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { library } from '@fortawesome/fontawesome-svg-core';
 
-import { faPenSquare, faPlusSquare, faMinusSquare, faBan } from '@fortawesome/free-solid-svg-icons';
-import { faWindowMinimize } from '@fortawesome/free-regular-svg-icons';
-library.add(faWindowMinimize, faPenSquare, faPlusSquare, faMinusSquare, faBan);
+import { faPenSquare, faPlusSquare, faMinusSquare, faBan, faCheck, faGavel, faCoins
+  } from '@fortawesome/free-solid-svg-icons';
+import { faWindowMinimize, faEye } from '@fortawesome/free-regular-svg-icons';
+library.add(faWindowMinimize, faPenSquare, faPlusSquare, faMinusSquare, faBan, faCheck, faGavel,
+  faEye, faCoins);
 
 import Dapp from './components/Dapp';
 

@@ -52,9 +52,9 @@ class CellDappStatus extends React.Component {
     }
 
     if (type === 'challenged') {
-      let [submittedStatus, passed1, revealStatus, passed2, finishStatus] = new Array(5);
+      let [challengedStatus, passed1, revealStatus, passed2, finishStatus] = new Array(5);
 
-      submittedStatus = stage === 'commit' ? 'active' : 'passed';
+      challengedStatus = stage === 'commit' ? 'active' : 'passed';
       passed1 = stage === 'commit' ? passedPercent : 100;
 
       if (stage === 'commit') {
@@ -72,14 +72,14 @@ class CellDappStatus extends React.Component {
       }
       
       return (<div className="dapp-status">
-        <Stage type="submitted" status={submittedStatus}/>
+        <Stage type="challenged" status={challengedStatus}/>
         <ProgressBar passedPercent={passed1}/>
         <Stage type="reveal" status={revealStatus}/>
         <ProgressBar passedPercent={passed2}/>
         <ProgressBarFork status={finishStatus}/>
         <div className="finish">
-          <Stage type="in-registry" status={status === 'in-registry' ? 'active' : 'future'}/>
-          <Stage type="rejected" status={status === 'rejected' ? 'active' : 'future'}/>
+          <Stage type="in-registry" status={stage === 'in-registry' ? 'active' : 'future'}/>
+          <Stage type="rejected" status={stage === 'rejected' ? 'active' : 'future'}/>
         </div>
       </div>);
     }
