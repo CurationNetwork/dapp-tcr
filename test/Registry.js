@@ -8,6 +8,9 @@ const l = console.log;
 
 contract('Registry', function(accounts) {
 
+    let token, voting, params, registry;
+    let listing_id;
+
     async function instantiate() {
       const token = await Token.new();
       const voting = await Voting.new();
@@ -25,22 +28,64 @@ contract('Registry', function(accounts) {
     }
 
     it("test instantiate", async function() {
-        const [token, voting, params, registry] = await instantiate();
+        [token, voting, params, registry] = await instantiate();
     });
 
     it("test apply", async function() {
-        const [token, voting, params, registry] = await instantiate();
-
         await registry.apply(web3.toHex('foobar'));
 
         const list = await registry.list();
         assert.equal(list.length, 1);
+        listing_id = list[0];
 
-        let info = await registry.get_info(list[0]);
+        const info = await registry.get_info(listing_id);
         assert.equal(info[0], 1);   // APPLICATION
         assert.equal(info[1], false);   // is_challenged
         assert.equal(info[2], false);   // status_can_be_updated
         assert.equal(info[3], web3.toHex('foobar'));   // ipfs_hash
+        assert.equal(info[4], '0x');   // edit_ipfs_hash
+    });
+
+    it("test application can be accepted", async function() {
+        await registry.setTime(1000000100);
+
+        const list = await registry.list();
+        assert.equal(list.length, 1);
+
+        const info = await registry.get_info(listing_id);
+        assert.equal(info[0], 1);   // APPLICATION
+        assert.equal(info[1], false);   // is_challenged
+        assert.equal(info[2], true);   // status_can_be_updated
+        assert.equal(info[3], web3.toHex('foobar'));   // ipfs_hash
+        assert.equal(info[4], '0x');   // edit_ipfs_hash
+    });
+
+    it("test application accepted", async function() {
+        await registry.update_status(listing_id);
+
+        const list = await registry.list();
+        assert.equal(list.length, 1);
+
+        const info = await registry.get_info(listing_id);
+        assert.equal(info[0], 2);   // EXISTS
+        assert.equal(info[1], false);   // is_challenged
+        assert.equal(info[2], false);   // status_can_be_updated
+        assert.equal(info[3], web3.toHex('foobar'));   // ipfs_hash
+        assert.equal(info[4], '0x');   // edit_ipfs_hash*/
+    });
+
+    it("test another application", async function() {
+        await registry.apply(web3.toHex('zzz'));
+
+        const list = await registry.list();
+        assert.equal(list.length, 2);
+        assert.equal(list[0], listing_id);
+
+        const info = await registry.get_info(list[1]);
+        assert.equal(info[0], 1);   // APPLICATION
+        assert.equal(info[1], false);   // is_challenged
+        assert.equal(info[2], false);   // status_can_be_updated
+        assert.equal(info[3], web3.toHex('zzz'));   // ipfs_hash
         assert.equal(info[4], '0x');   // edit_ipfs_hash
     });
 });

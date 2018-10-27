@@ -207,6 +207,10 @@ contract Registry is IRegistry {
                     listing.exitTime < time() && time() < listing.exitTimeExpiry)
                 return true;
         }
+        else if (state == DAppState.EXISTS) {
+            // FIXME FIXME finish challenge?
+            return false;
+        }
         else {
             // FIXME FIXME more states
             assert(state == DAppState.NOT_EXISTS);
@@ -221,14 +225,17 @@ contract Registry is IRegistry {
         Listing storage listing = listings[listing_id];
 
         if (state == DAppState.APPLICATION) {
-            if (listing.applicationExpiry < time() && !challengeExists(listing_id))
+            if (listing.applicationExpiry < time() && !challengeExists(listing_id)) {
                 whitelistApplication(listing_id);
+                return;
+            }
         }
         else if (state == DAppState.DELETING) {
             if (msg.sender == listing.owner &&
                     listing.exitTime < time() && time() < listing.exitTimeExpiry) {
                 resetListing(listing_id);
                 emit _ListingWithdrawn(listing_id, msg.sender);
+                return;
             }
         }
         else {
