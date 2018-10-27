@@ -112,6 +112,18 @@
       "0x724c0bdbc3283b255b29e8a27f166bef4221e34dd322ae60d0ebfaaf4891e7ca": {
         "name": "Registry",
         "address": "0xCe38E4611b8c2FbCDeDea106bc6EF34c5598A0c0"
+      },
+      "0x6923f3145040cb7a7e204700e2751a66e89c87756edfff6e3a8a845620f5694b": {
+        "name": "Voting",
+        "address": "0x81F126cB1aaFa499B1d0d45671abED08ee816AEa"
+      },
+      "0x48eb87a42745d9315a7e0a0fec710ae2d298c3ac34632ae54524b651fcddacfd": {
+        "name": "Token",
+        "address": "0x43e2DCea07afD7D473505cDA37f8213642Ad5367"
+      },
+      "0x75e455b575b324c6e0f91448f8b6180b1b5baebd7f3aa0d714cc6cdf67264f45": {
+        "name": "Registry",
+        "address": "0x35F6258387Fc9c7A7326815FE186931AFED9f1e3"
       }
     }
   }
