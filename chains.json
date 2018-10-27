@@ -68,6 +68,18 @@
       "0xdd5d91553f7f553a84f3f406693c2b202c1027b558629df8797458647ad6cb06": {
         "name": "Registry",
         "address": "0x98c4c56afE412BCAD90defd6890E152E21bB758B"
+      },
+      "0x6923f3145040cb7a7e204700e2751a66e89c87756edfff6e3a8a845620f5694b": {
+        "name": "Voting",
+        "address": "0x211cDc7b4C6940c1836E2CeBCDEF3B09BF710c52"
+      },
+      "0x48eb87a42745d9315a7e0a0fec710ae2d298c3ac34632ae54524b651fcddacfd": {
+        "name": "Token",
+        "address": "0x062DAfeA99eC66E10169524EE06770B3a06A4320"
+      },
+      "0x167a118c6763190b63d49388960f521a5f5ef52ef1e33d5df70b777f4840cf67": {
+        "name": "Registry",
+        "address": "0xDD421E12cDb047CAf03dE7Db291F5eFB4CD12A52"
       }
     }
   }

@@ -16,8 +16,15 @@ contract('Registry', function(accounts) {
 
       await voting.set_registry(registry.address);
 
+      const my_tokens = await token.balanceOf(accounts[0]);
+      await token.approve(registry.address, my_tokens);
+
       return [token, voting, params, registry];
     }
+
+    it("test instantiate", async function() {
+        const [token, voting, params, registry] = await instantiate();
+    });
 
     it("test apply", async function() {
         const [token, voting, params, registry] = await instantiate();
