@@ -51,6 +51,7 @@ contract Registry is IRegistry {
     using SafeMath for uint;
 
     struct Listing {
+        uint ids_position;
         bytes ipfs_hash;
         address owner;          // Owner of Listing
         uint unstakedDeposit;   // Number of tokens in the listing not locked in a challenge
@@ -93,6 +94,8 @@ contract Registry is IRegistry {
     // Maps listingHashes to associated listingHash data
     mapping(bytes32 => Listing) public listings;
 
+    bytes32[] public ids;
+
     // Global Variables
     EIP20Interface public token;
     IVoting public voting;
@@ -133,6 +136,10 @@ contract Registry is IRegistry {
         // Transfers tokens from user to Registry contract
         require(token.transferFrom(listing.owner, this, token_amount));
 
+        // ids <-> listings linkage
+        listing.ids_position = ids.length;
+        ids.push(listing_id);
+
         changeState(listing_id, DAppState.APPLICATION);
         emit _Application(listing_id, token_amount, listing.applicationExpiry, ipfs_hash, msg.sender);
     }
@@ -163,8 +170,8 @@ contract Registry is IRegistry {
     // VIEW:
     // -----------------------
 
-    function list() public view returns (bytes32[] ids) {
-        return new bytes32[](0);
+    function list() public view returns (bytes32[]) {
+        return ids;
     }
 
     function get_info(bytes32 listing_id) public view returns
@@ -456,6 +463,17 @@ contract Registry is IRegistry {
         address owner = listing.owner;
         uint unstakedDeposit = listing.unstakedDeposit;
         listing.owner = address(0);
+
+        // ids <-> listings linkage
+        uint removed_position = listings[listing_id].ids_position;
+        assert(removed_position < ids.length);
+        if (removed_position != ids.length - 1) {
+            listings[ids[ids.length - 1]].ids_position = removed_position;
+            ids[removed_position] = ids[ids.length - 1];
+        }
+        ids[ids.length - 1] = bytes32(0);
+        ids.length--;
+
         changeState(listing_id, DAppState.NOT_EXISTS);
         delete listings[listing_id];
         
@@ -485,6 +503,9 @@ contract Registry is IRegistry {
 
         if (listing.state == DAppState.DELETING || listing.state == DAppState.NOT_EXISTS)
             assert(!challengeExists(listing_id));
+
+        assert(listing.ids_position < ids.length);
+        assert(ids[listing.ids_position] == listing_id);
     }
 
     function changeState(bytes32 listing_id, DAppState new_state) internal {

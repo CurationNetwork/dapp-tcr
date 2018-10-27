@@ -56,6 +56,14 @@
       "0x4a0de5b149b7efc7079b2e8b1c73be0346fa65fc2a2d73d99a9453d733a57497": {
         "name": "Registry",
         "address": "0xbdf7d1B0b01Ba107c92C3Af5c3f6d239EbAA0256"
+      },
+      "0xdc4d1b32479a149d4d640d59a1cfffb1e8e3350785282282978f70c2d8d626a7": {
+        "name": "Registry",
+        "address": "0xAB89612a12aF847a387705BFE5c85AF340e97f0E"
+      },
+      "0xbc5889c3bc5afbf16c9ced4876e215e0d03df777d8a9d1cdae43cd8da7afdafd": {
+        "name": "Registry",
+        "address": "0x618bD0Af2a93B2781faf9Aa1C2Cd3A9AbA1f7F03"
       }
     }
   }
