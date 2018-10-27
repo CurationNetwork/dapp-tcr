@@ -17,7 +17,7 @@ contract Voting is IVoting {
 
     event _VoteCommitted(uint indexed pollID, address indexed voter);
     event _VoteRevealed(uint indexed pollID, uint numTokens, uint votesFor, uint votesAgainst, uint indexed choice, address indexed voter, uint salt);
-    event _PollCreated(uint itemId, uint commitEndDate, uint revealEndDate, uint indexed pollID, address indexed creator);
+    event _PollCreated(uint commitEndDate, uint revealEndDate, uint indexed pollID, address indexed creator);
     event _VotingRightsGranted(uint numTokens, address indexed voter);
     event _VotingRightsWithdrawn(uint numTokens, address indexed voter);
     event _TokensRescued(uint indexed pollID, address indexed voter);
@@ -42,7 +42,6 @@ contract Voting is IVoting {
     mapping(uint => Poll) public pollMap; // maps pollID to Poll struct
 
     struct Poll {
-        uint itemId;
         uint commitEndDate;     /// expiration date of commit period for poll
         uint revealEndDate;     /// expiration date of reveal period for poll
         uint votesFor;          /// tally of votes supporting proposal
@@ -146,21 +145,20 @@ contract Voting is IVoting {
     @param _commitDuration Length of desired commit period in seconds
     @param _revealDuration Length of desired reveal period in seconds
     */
-    function startPoll(uint _itemId, uint _commitDuration, uint _revealDuration) public returns (uint pollID) {
+    function startPoll(uint voteQuorum, uint _commitDuration, uint _revealDuration) public returns (uint pollID) {
         pollNonce = pollNonce + 1;
 
         uint commitEndDate = block.timestamp.add(_commitDuration);
         uint revealEndDate = commitEndDate.add(_revealDuration);
 
         pollMap[pollNonce] = Poll({
-            itemId: _itemId,
             commitEndDate: commitEndDate,
             revealEndDate: revealEndDate,
             votesFor: 0,
             votesAgainst: 0
         });
 
-        emit _PollCreated(_itemId, commitEndDate, revealEndDate, pollNonce, msg.sender);
+        emit _PollCreated(commitEndDate, revealEndDate, pollNonce, msg.sender);
         return pollNonce;
     }
 

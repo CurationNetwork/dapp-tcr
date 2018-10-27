@@ -9,7 +9,7 @@ interface IRegistry {
     // APPLICATION -> EXISTS | NOT_EXISTS
     // EXISTS -> EDIT | DELETING | NOT_EXISTS
     // EDIT -> EXISTS
-    // DELETING -> NOT_EXISTS
+    // DELETING -> NOT_EXISTS | EXISTS
 
 
     // ADDING & EDITING
