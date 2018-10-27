@@ -1,8 +1,11 @@
 import React from 'react';
 import axios from 'axios';
 import Form from "react-jsonschema-form";
+import Registry from 'Embark/contracts/Registry';
+
 import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
+const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
 
 let module_schemas = {};
 
@@ -15,6 +18,7 @@ let module_schemas = {};
 class ItemForm extends React.Component {
   
   render() {
+
 	// MERGING SCHEMAS
 	for (module in module_schemas) {
 		for (let k in module_schemas[module]) {
@@ -32,9 +36,20 @@ class ItemForm extends React.Component {
 		}
 	}
 
+	let uploadedIPFSHash = null;
+
     const onSubmit = ({formData}) => {
 		console.log("FORM SUBMIT!");
-		console.log(formData);
+		axios.post(uploadEndpoint + '/ipfs/', JSON.stringify(formData)).then(resp => {
+			uploadedIPFSHash = resp.headers['ipfs-hash'];
+			let bytesHash = Buffer.from(uploadedIPFSHash).toString('hex');
+			Registry.methods.apply("0x" + bytesHash).send().then(res => {
+				console.log(res);
+			}).catch(err => {
+				console.log("ERROR: " + err);
+			});
+		});
+
 	}
 
 	const widgets = {
@@ -51,6 +66,9 @@ class ItemForm extends React.Component {
 			}
 		}
 	};
+	main_schema.properties.spec_version['default'] = '0.1.0';
+	main_schema.properties.metadata.properties.name['default'] = 'Default Name';
+	main_schema.properties.prev_meta['default'] = '';
 
     return (<div>
       {/* Do not touch this*/}
