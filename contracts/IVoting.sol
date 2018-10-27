@@ -17,7 +17,9 @@ interface IVoting {
         uint revealEndDate,
         uint voteQuorum,
         uint votesFor,
-        uint votesAgainst);
+        uint votesAgainst,
+        bool commitPeriodActive,
+        bool revealPeriodActive);
 
     /**
     @dev Initiates a poll with canonical configured parameters at pollID emitted by PollCreated event
