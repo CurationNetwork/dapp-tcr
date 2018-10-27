@@ -3,7 +3,7 @@
 const Token = artifacts.require("./Token.sol");
 const Voting = artifacts.require("./Voting.sol");
 const Parameterizer = artifacts.require("./Parameterizer.sol");
-const Registry = artifacts.require("./Registry.sol");
+const Registry = artifacts.require("RegistryTestHelper.sol");
 const l = console.log;
 
 contract('Registry', function(accounts) {

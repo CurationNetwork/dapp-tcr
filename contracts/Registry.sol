@@ -118,8 +118,8 @@ contract Registry is IRegistry {
     // PUBLISHER INTERFACE:
     // --------------------
 
-    function apply(bytes ipfs_hash) public {
-        bytes32 listing_id = keccak256(++nonce);
+    function apply(bytes ipfs_hash) external {
+        bytes32 listing_id = keccak256(abi.encode(++nonce));
         assert(dappState(listing_id) == DAppState.NOT_EXISTS);
 
         uint token_amount = parameterizer.get("minDeposit");
@@ -144,12 +144,12 @@ contract Registry is IRegistry {
         emit _Application(listing_id, token_amount, listing.applicationExpiry, ipfs_hash, msg.sender);
     }
 
-    function edit(bytes32 listing_id, bytes new_ipfs_hash) public requiresState(listing_id, DAppState.EXISTS) {
+    function edit(bytes32 listing_id, bytes new_ipfs_hash) external requiresState(listing_id, DAppState.EXISTS) {
         checkDAppInvariant(listing_id);
         // FIXME FIXME
     }
 
-    function init_exit(bytes32 listing_id) public requiresState(listing_id, DAppState.EXISTS) {
+    function init_exit(bytes32 listing_id) external requiresState(listing_id, DAppState.EXISTS) {
         checkDAppInvariant(listing_id);
         Listing storage listing = listings[listing_id];
 
@@ -170,11 +170,11 @@ contract Registry is IRegistry {
     // VIEW:
     // -----------------------
 
-    function list() public view returns (bytes32[]) {
+    function list() external view returns (bytes32[]) {
         return ids;
     }
 
-    function get_info(bytes32 listing_id) public view returns
+    function get_info(bytes32 listing_id) external view returns
             (uint state, bool is_challenged /* many states can be challenged */,
             bool status_can_be_updated /* if update_status should be called */,
             bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing */) {
@@ -182,7 +182,7 @@ contract Registry is IRegistry {
 
         state = uint(dappState(listing_id));
         is_challenged = challengeExists(listing_id);
-        status_can_be_updated = can_update_status(listing_id);
+        status_can_be_updated = this.can_update_status(listing_id);
         ipfs_hash = listings[listing_id].ipfs_hash;
 
         // FIXME FIXME
@@ -193,7 +193,7 @@ contract Registry is IRegistry {
     // MAINTENANCE:
     // -----------------------
 
-    function can_update_status(bytes32 listing_id) public view returns (bool) {
+    function can_update_status(bytes32 listing_id) external view returns (bool) {
         checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
@@ -215,7 +215,7 @@ contract Registry is IRegistry {
     }
 
     // finish current operation
-    function update_status(bytes32 listing_id) public {
+    function update_status(bytes32 listing_id) external {
         checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
@@ -243,7 +243,7 @@ contract Registry is IRegistry {
     // TOKEN HOLDER INTERFACE:
     // -----------------------
 
-    function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) public {
+    function challenge(bytes32 listing_id, uint state_check /* pass state seen by you to prevent race condition */) external {
         checkDAppInvariant(listing_id);
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
@@ -287,19 +287,19 @@ contract Registry is IRegistry {
         return pollID;*/
     }
 
-    function challenge_status(bytes32 listing_id) public view returns
+    function challenge_status(bytes32 listing_id) external view returns
             (uint challenge_id, bool is_commit, bool is_reveal, uint votesFor /* 0 for commit phase */,
             uint votesAgainst /* 0 for commit phase */) {
         checkDAppInvariant(listing_id);
 
     }
 
-    function commit_vote(bytes32 listing_id, bytes32 secret_hash) public {
+    function commit_vote(bytes32 listing_id, bytes32 secret_hash) external {
         checkDAppInvariant(listing_id);
 
     }
 
-    function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt) public {
+    function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt) external {
         checkDAppInvariant(listing_id);
 
     }
@@ -308,7 +308,7 @@ contract Registry is IRegistry {
     // TOKEN FUNCTIONS:
     // ----------------
 
-    function claim_reward(uint challenge_id) public {
+    function claim_reward(uint challenge_id) external {
 /*        Challenge storage challengeInstance = challenges[_challengeID];
         // Ensures the voter has not already claimed tokens and challengeInstance results have
         // been processed
@@ -401,7 +401,7 @@ contract Registry is IRegistry {
     @param _challengeID The challengeID to query
     @param _voter       The voter whose claim status to query for the provided challengeID
     */
-    function tokenClaims(uint _challengeID, address _voter) public view returns (bool) {
+    function tokenClaims(uint _challengeID, address _voter) external view returns (bool) {
         return challenges[_challengeID].tokenClaims[_voter];
     }
 
@@ -531,7 +531,7 @@ contract Registry is IRegistry {
         else assert(false);
 
         listings[listing_id].state = new_state;
-        _StateChanged(listing_id, new_state);
+        emit _StateChanged(listing_id, new_state);
         checkDAppInvariant(listing_id);
     }
 
