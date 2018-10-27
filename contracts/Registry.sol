@@ -1,10 +1,10 @@
-pragma solidity ^0.4.11;
+pragma solidity 0.4.25;
 
 import "./IRegistry.sol";
-import "tokens/eip20/EIP20Interface.sol";
+import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
 import "./Parameterizer.sol";
 import "./IVoting.sol";
-import "zeppelin/math/SafeMath.sol";
+import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
 
 contract Registry {
 

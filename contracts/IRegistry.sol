@@ -1,6 +1,5 @@
 pragma solidity 0.4.25;
 
-
 interface IRegistry {
 
     // states: NOT_EXISTS (0); APPLICATION (1); EXISTS (2); EDIT (3); DELETING (4)
