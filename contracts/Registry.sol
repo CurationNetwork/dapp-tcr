@@ -1,10 +1,10 @@
-pragma solidity 0.4.25;
+pragma solidity ^0.4.24;
 
 import "./IRegistry.sol";
-import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
 import "./Parameterizer.sol";
 import "./IVoting.sol";
-import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
+import "zeppelin-solidity/contracts/math/SafeMath.sol";
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
 
 contract Registry is IRegistry {
 
@@ -97,7 +97,7 @@ contract Registry is IRegistry {
     bytes32[] public ids;
 
     // Global Variables
-    EIP20Interface public token;
+    ERC20 public token;
     IVoting public voting;
     Parameterizer public parameterizer;
 
@@ -109,7 +109,7 @@ contract Registry is IRegistry {
         require(_voting != 0 && address(voting) == 0);
         require(_parameterizer != 0 && address(parameterizer) == 0);
 
-        token = EIP20Interface(_token);
+        token = ERC20(_token);
         voting = IVoting(_voting);
         parameterizer = Parameterizer(_parameterizer);
     }
@@ -496,6 +496,10 @@ contract Registry is IRegistry {
         }
     }
 
+    // ----------------
+    // STATE & INVARIANTS:
+    // ----------------
+
     function dappState(bytes32 listing_id) internal view returns (Registry.DAppState) {
         return listings[listing_id].state;
     }
@@ -531,6 +535,9 @@ contract Registry is IRegistry {
         checkDAppInvariant(listing_id);
     }
 
+    // ----------------
+    // FOR UNIT TESTING:
+    // ----------------
 
     function time() internal view returns (uint) {
         return now;

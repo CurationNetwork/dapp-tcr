@@ -1,9 +1,9 @@
-pragma solidity 0.4.25;
+pragma solidity ^0.4.24;
 
-import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
-import "installed_contracts/zeppelin/contracts/token/StandardToken.sol";
+import "zeppelin-solidity/contracts/token/ERC20/ERC20.sol";
+import "zeppelin-solidity/contracts/token/ERC20/StandardToken.sol";
 
-contract Token is EIP20Interface, StandardToken {
+contract Token is ERC20, StandardToken {
 
     string public constant tokenName = "DApp Registry Token";
     string public constant symbol = "DRT";
@@ -12,7 +12,7 @@ contract Token is EIP20Interface, StandardToken {
     uint256 public constant INITIAL_SUPPLY = 1000000 * (uint(10) ** uint(decimals));
 
     constructor() public {
-        totalSupply = INITIAL_SUPPLY;
+        totalSupply_ = INITIAL_SUPPLY;
         balances[msg.sender] = INITIAL_SUPPLY;
         emit Transfer(address(0), msg.sender, INITIAL_SUPPLY);
     }
