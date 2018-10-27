@@ -1,9 +1,5 @@
 pragma solidity 0.4.25;
 
-<<<<<<< HEAD
-contract Parameterizer {
-
-=======
 import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
 
 contract Parameterizer {
@@ -78,6 +74,5 @@ contract Parameterizer {
     function set(string _name, uint _value) private {
         params[keccak256(abi.encodePacked(_name))] = _value;
     }
->>>>>>> origin/master
 }
 

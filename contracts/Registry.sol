@@ -1,18 +1,13 @@
 pragma solidity 0.4.25;
 
 import "./IRegistry.sol";
-<<<<<<< HEAD
-=======
 import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
 import "./Parameterizer.sol";
 import "./IVoting.sol";
 import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
->>>>>>> origin/master
 
 contract Registry is IRegistry {
 
-<<<<<<< HEAD
-=======
     // ------
     // EVENTS
     // ------
@@ -512,5 +507,4 @@ contract Registry is IRegistry {
     function time() internal view returns (uint) {
         return now;
     }
->>>>>>> origin/master
 }

@@ -1,11 +1,8 @@
 pragma solidity 0.4.25;
 
-<<<<<<< HEAD
-=======
 import "installed_contracts/tokens/contracts/eip20/EIP20Interface.sol";
 import "./AttributeStore.sol";
 import "installed_contracts/zeppelin/contracts/math/SafeMath.sol";
->>>>>>> origin/master
 import "./IVoting.sol";
 /**
 @title Partial-Lock-Commit-Reveal Voting scheme with ERC20 tokens
@@ -14,8 +11,6 @@ import "./IVoting.sol";
 contract Voting is IVoting {
 
 
-<<<<<<< HEAD
-=======
     // ============
     // EVENTS:
     // ============
@@ -325,5 +320,4 @@ contract Voting is IVoting {
     }
 
 
->>>>>>> origin/master
 }
