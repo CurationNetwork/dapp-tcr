@@ -26,7 +26,7 @@ class ButtonAddDapp extends React.Component {
   render() {
     return (<>
       <button className="add-dapp" onClick={this.toggleModal.bind(this)}>
-        <FontAwesomeIcon icon="plus-square"/> Add a Dapp
+        <FontAwesomeIcon icon="plus-square"/> Submit a Dapp
       </button>
 
       <ModalDapp isOpen={this.state.isModalOpen} onClose={this.toggleModal}/>

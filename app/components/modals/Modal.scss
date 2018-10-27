@@ -23,18 +23,20 @@
 
   .component-modal-window {
     position: absolute;
-    border-radius: 5px;
+    border-radius: 20px;
     background-color: #FFFFFF;
     top: 5vh;
 
     .component-modal-close {
       position: absolute;
       z-index: 100;
-      top: 15px;
-      right: 15px;
+      top: 10px;
+      right: 5;
       font-size: 36px;
+      color: rgba(0, 0, 0, .5);
       cursor: pointer;
       border: 0;
+      background: transparent;
     }
   }
 }

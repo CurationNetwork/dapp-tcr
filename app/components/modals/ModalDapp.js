@@ -12,6 +12,7 @@ class ModalDapp extends React.Component {
         isOpen={this.props.isOpen}
         onClose={this.props.onClose}>
         <div className="modal-dapp">
+          <div class="modal-h">Submit a Dapp</div>
           <ItemForm/>
         </div>
       </ModalContainer>
