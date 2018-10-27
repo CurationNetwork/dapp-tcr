@@ -28,6 +28,18 @@
       "0x7a1e8a4a029ec3a08565a5c06217e3f78ddc704b0eb4000a938890adadd8ecb0": {
         "name": "Registry",
         "address": "0x66542a74Fa6cdFf0D4334de3361D15030442447b"
+      },
+      "0x3d39b1b11e7f9a23a5fcf721211dc9f9d2d0e9d9a1c98b907f1e18042b93b614": {
+        "name": "Registry",
+        "address": "0x796a0475A503A845514b2181573f8Bb4374317D1"
+      },
+      "0x694ad239e6b12456c3ce490ea22d2243468ae60813bc09ec7def45e081ab7b52": {
+        "name": "Registry",
+        "address": "0x9565dd89c78Bd54Fd5bc45eE72071A4E9b36A163"
+      },
+      "0xf028dbe999e9b0798eff59690a7ad6b2d4072b7ea0e5dc4f8fd4f96702e03dbc": {
+        "name": "Registry",
+        "address": "0xEb64D9Eb5Fc851Caa3372054216c58e098BD1cfc"
       }
     }
   }

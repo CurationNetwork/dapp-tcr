@@ -12,7 +12,7 @@ contract Registry is IRegistry {
     // EVENTS
     // ------
 
-    event _Application(bytes32 indexed listingHash, uint deposit, uint appEndDate, string data, address indexed applicant);
+    event _Application(bytes32 indexed listingHash, uint deposit, uint appEndDate, bytes ipfs_hash, address indexed applicant);
     event _Challenge(bytes32 indexed listingHash, uint challengeID, string data, uint commitEndDate, uint revealEndDate, address indexed challenger);
     event _Deposit(bytes32 indexed listingHash, uint added, uint newTotal, address indexed owner);
     event _Withdrawal(bytes32 indexed listingHash, uint withdrew, uint newTotal, address indexed owner);
@@ -50,11 +50,15 @@ contract Registry is IRegistry {
     using SafeMath for uint;
 
     struct Listing {
-        uint applicationExpiry; // Expiration date of apply stage
-        bool whitelisted;       // Indicates registry status
+        bytes ipfs_hash;
         address owner;          // Owner of Listing
         uint unstakedDeposit;   // Number of tokens in the listing not locked in a challenge
+
+        uint applicationExpiry; // Expiration date of apply stage
+        bool whitelisted;       // Indicates registry status
+
         uint challengeID;       // Corresponds to a PollID in Voting
+
         uint exitTime;          // Time the listing may leave the registry
         uint exitTimeExpiry;    // Expiration date of exit period
     }
@@ -92,7 +96,10 @@ contract Registry is IRegistry {
     IVoting public voting;
     Parameterizer public parameterizer;
 
-    constructor(address _token, address _voting, address _parameterizer) public {
+    uint nonce;
+
+
+    function Registry(address _token, address _voting, address _parameterizer) public {
         require(_token != 0 && address(token) == 0);
         require(_voting != 0 && address(voting) == 0);
         require(_parameterizer != 0 && address(parameterizer) == 0);
@@ -107,22 +114,25 @@ contract Registry is IRegistry {
     // --------------------
 
     function apply(bytes ipfs_hash) public {
-/*        require(!isWhitelisted(_listingHash));
-        require(!appWasMade(_listingHash));
-        require(_amount >= parameterizer.get("minDeposit"));
+        bytes32 _listingHash = keccak256(++nonce);
+        assert(dappState(_listingHash) == DAppState.NOT_EXISTS);
+
+        uint token_amount = parameterizer.get("minDeposit");
 
         // Sets owner
         Listing storage listing = listings[_listingHash];
+        listing.ipfs_hash = ipfs_hash;
         listing.owner = msg.sender;
 
         // Sets apply stage end time
         listing.applicationExpiry = block.timestamp.add(parameterizer.get("applyStageLen"));
-        listing.unstakedDeposit = _amount;
+        listing.unstakedDeposit = token_amount;
 
         // Transfers tokens from user to Registry contract
-        require(token.transferFrom(listing.owner, this, _amount));
+        require(token.transferFrom(listing.owner, this, token_amount));
 
-        emit _Application(_listingHash, _amount, listing.applicationExpiry, _data, msg.sender);*/
+        assert(dappState(_listingHash) == DAppState.APPLICATION);
+        emit _Application(_listingHash, token_amount, listing.applicationExpiry, ipfs_hash, msg.sender);
     }
 
     function edit(bytes32 listing_id, bytes new_ipfs_hash) public {
@@ -185,17 +195,30 @@ contract Registry is IRegistry {
     // -----------------------
 
     function can_update_status(bytes32 listing_id) public view returns (bool) {
-        assert(false);
+        DAppState state = dappState(listing_id);
+        Listing storage listing = listings[listing_id];
+
+        if (state == DAppState.APPLICATION) {
+            if (listing.applicationExpiry >= now && !challengeExists(listing_id))
+                return true;
+        }
+        else {
+            assert(state == DAppState.NOT_EXISTS);
+            return false;
+        }
     }
 
     // finish current operation
     function update_status(bytes32 listing_id) public {
-        if (canBeWhitelisted(listing_id)) {
-            whitelistApplication(listing_id);
-        } else if (challengeCanBeResolved(listing_id)) {
-            resolveChallenge(listing_id);
-        } else {
-            revert();
+        DAppState state = dappState(listing_id);
+        Listing storage listing = listings[listing_id];
+
+        if (state == DAppState.APPLICATION) {
+            if (listing.applicationExpiry >= now && !challengeExists(listing_id))
+                whitelistApplication(listing_id);
+        }
+        else {
+            assert(state == DAppState.NOT_EXISTS);
         }
     }
 
@@ -444,6 +467,7 @@ contract Registry is IRegistry {
     function whitelistApplication(bytes32 _listingHash) private {
         if (!listings[_listingHash].whitelisted) { emit _ApplicationWhitelisted(_listingHash); }
         listings[_listingHash].whitelisted = true;
+        listings[_listingHash].applicationExpiry = 0;
     }
 
     /**
@@ -475,8 +499,12 @@ contract Registry is IRegistry {
         Listing storage listing = listings[_listingHash];
 
         if (address(0) == listing.owner)
-            return Registry.DAppState.NOT_EXISTS;
+            return DAppState.NOT_EXISTS;
 
-        assert(false);
+        if (appWasMade(_listingHash))
+            return DAppState.APPLICATION;
+
+        assert(isWhitelisted(_listingHash));
+        return DAppState.EXISTS;
     }
 }
