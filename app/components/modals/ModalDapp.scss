@@ -12,6 +12,14 @@
     font-family: $f-bold;
     font-size: 24px;
     margin-bottom: 26px;
+
+    &.challenge, &.reject, &.remove {
+      color: #C73638;
+    }
+
+    &.approve, &.reveal, &.get-reward, &.update {
+      color: #247F92;
+    }
   }
 
   .rjsf > p {

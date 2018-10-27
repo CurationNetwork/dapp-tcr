@@ -9,8 +9,6 @@ module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.
 module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
 module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
 
-
-
 class ItemForm extends React.Component {
   
   render() {
@@ -51,10 +49,6 @@ class ItemForm extends React.Component {
 	};
 
     return (<div>
-      {/* Do not touch this*/}
-      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
-      <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js"></script>
-      {/* END Do not touch this*/}
       <Form schema={main_schema} uiSchema={uiSchema} widgets={widgets} onSubmit={onSubmit} />
     </div>);
   }
