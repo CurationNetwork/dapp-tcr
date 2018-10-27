@@ -3,7 +3,7 @@
 const Token = artifacts.require("./Token.sol");
 const Voting = artifacts.require("./Voting.sol");
 const Parameterizer = artifacts.require("./Parameterizer.sol");
-const Registry = artifacts.require("./Registry.sol");
+const Registry = artifacts.require("RegistryTestHelper.sol");
 const l = console.log;
 
 contract('Registry', function(accounts) {
@@ -13,6 +13,8 @@ contract('Registry', function(accounts) {
       const voting = await Voting.new();
       const params = await Parameterizer.new([web3.toWei(1, 'ether'), 60, 60, 60, 50, 51, 60, 60]);
       const registry = await Registry.new(token.address, voting.address, params.address);
+
+      await registry.setTime(1000000000);
 
       await voting.set_registry(registry.address);
 
@@ -31,6 +33,14 @@ contract('Registry', function(accounts) {
 
         await registry.apply(web3.toHex('foobar'));
 
-        l(await registry.list());
+        const list = await registry.list();
+        assert.equal(list.length, 1);
+
+        let info = await registry.get_info(list[0]);
+        assert.equal(info[0], 1);   // APPLICATION
+        assert.equal(info[1], false);   // is_challenged
+        assert.equal(info[2], false);   // status_can_be_updated
+        assert.equal(info[3], web3.toHex('foobar'));   // ipfs_hash
+        assert.equal(info[4], '0x');   // edit_ipfs_hash
     });
 });

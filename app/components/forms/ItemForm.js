@@ -5,10 +5,11 @@ import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
 
 let module_schemas = {};
-module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.json');
-module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
-module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
 
+// SKIP additional modules for hackathon
+// module_schemas['contact'] = require('../../../schema/module-contact-spec-v0.1.0.json');
+// module_schemas['ontology'] = require('../../../schema/module-ontology-spec-v0.1.0.json');
+// module_schemas['standard'] = require('../../../schema/module-standard-spec-v0.1.0.json');
 
 
 class ItemForm extends React.Component {
@@ -42,6 +43,7 @@ class ItemForm extends React.Component {
 
 	let uiSchema = {
 		"metadata": {
+			"logo" : { "ui:widget": "ipfsUploadWidget" },
 			"images": {
 				"items": {
 					"ui:widget": "ipfsUploadWidget"
