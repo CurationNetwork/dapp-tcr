@@ -335,16 +335,30 @@ contract Registry is IRegistry {
         // Takes tokens from challenger
         require(token.transferFrom(msg.sender, this, this.deposit_size()));
 
-        (uint commitEndDate, uint revealEndDate,,,) = voting.pollInfo(pollID);
+        (uint commitEndDate, uint revealEndDate,,,,,) = voting.pollInfo(pollID);
 
         emit _Challenge(listing_id, pollID, commitEndDate, revealEndDate, msg.sender);
     }
 
-    function challenge_status(bytes32 listing_id) external view returns
+    function challenge_status(bytes32 listing_id)
+        external
+        view
+        isChallenged(listing_id)
+        returns
             (uint challenge_id, bool is_commit, bool is_reveal, uint votesFor /* 0 for commit phase */,
-            uint votesAgainst /* 0 for commit phase */) {
+            uint votesAgainst /* 0 for commit phase */,
+            uint commitEndDate, uint revealEndDate)
+    {
         checkDAppInvariant(listing_id);
 
+        challenge_id = listings[listing_id].challengeID;
+        (commitEndDate,
+        revealEndDate,
+        ,
+        votesFor,
+        votesAgainst,
+        is_commit,
+        is_reveal) = voting.pollInfo(challenge_id);
     }
 
     function commit_vote(bytes32 listing_id, bytes32 secret_hash) external {

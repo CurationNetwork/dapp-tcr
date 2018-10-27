@@ -54,7 +54,8 @@ interface IRegistry {
     // status of a challenge
     function challenge_status(bytes32 listing_id) external view returns
         (uint challenge_id, bool is_commit, bool is_reveal, uint votesFor /* 0 for commit phase */,
-        uint votesAgainst /* 0 for commit phase */);    // only for challenged
+        uint votesAgainst /* 0 for commit phase */,
+        uint commitEndDate, uint revealEndDate);    // only for challenged
 
     function commit_vote(bytes32 listing_id, bytes32 secret_hash) external;  // only for challenged
 

@@ -168,11 +168,6 @@ contract Voting is IVoting {
         return (100 * poll.votesFor) > (poll.voteQuorum * (poll.votesFor + poll.votesAgainst));
     }
 
-    function getPollResult(uint _pollId) public view returns (uint votesFor, uint votesAgainst) {
-        require(pollEnded(_pollId));
-        return (pollMap[_pollId].votesFor, pollMap[_pollId].votesAgainst);
-    }
-
     function getOverallStake(uint _pollId) external view returns (uint) {
         require(pollExists(_pollId));
         Poll storage poll = pollMap[_pollId];
@@ -200,7 +195,9 @@ contract Voting is IVoting {
         uint revealEndDate,
         uint voteQuorum,
         uint votesFor,
-        uint votesAgainst)
+        uint votesAgainst,
+        bool commitPeriodActive_,
+        bool revealPeriodActive_)
     {
         Poll storage poll = pollMap[_pollID];
         commitEndDate = poll.commitEndDate;
@@ -208,6 +205,8 @@ contract Voting is IVoting {
         voteQuorum = poll.voteQuorum;
         votesFor = poll.votesFor;
         votesAgainst = poll.votesAgainst;
+        commitPeriodActive_ = commitPeriodActive(_pollID);
+        revealPeriodActive_ = revealPeriodActive(_pollID);
     }
 
     /**
