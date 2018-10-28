@@ -16,6 +16,7 @@ import './Dapp.scss';
 import logo from '../assets/logo-horisontal.svg';
 import {afterInit, Contract} from "../helpers/eth";
 import axios from 'axios';
+import { log } from 'util';
 //
 // function Main ({location}) {
 //
@@ -76,9 +77,11 @@ class Dapp extends React.Component {
       let contract = Contract('Registry');
 
       let list = null;
+      let listIds = null;
 
       contract.call('list')
         .then(ids => {
+          listIds = ids;
           return Promise.all(ids.map(id => {
             return contract.call('get_info', [id])
           }))
@@ -93,6 +96,20 @@ class Dapp extends React.Component {
           res.forEach((data, idx) => {
             list[idx].ipfs_data = data;
           });
+
+          const newList = list.map((l, i) => {
+            const res = {};
+            res.id = listIds[i];
+            res.state = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'][+l[0].toString()];
+            res.isChallenged = l[1];
+            res.canBeUpdated = l[2];
+            res.ipfsHash = l[3];
+            res.proposedIpfsHash = l[4];
+            res.ipfsData = l.ipfs_data.data;
+            return res;
+          });
+
+          console.log(newList);
 
           this.setState({list: list})
         });
