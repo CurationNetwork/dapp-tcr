@@ -21,7 +21,7 @@ class TabChallenges extends React.Component {
         return(
         <TableRow key={idx}>
           <CellDappName icon={imgMock} name={item.ipfsData.metadata.name}
-                        desc={item.ipfsData.metadata.short_description}/>
+                        desc={item.ipfsData.metadata.short_description} item={item}/>
           <CellDappStatus type="challenged" item={item}/>
           <CellActions type={actionType} item={item}/>
         </TableRow>);

@@ -47,12 +47,6 @@ function ProgressBarFork(props) {
 
 class CellDappStatus extends React.Component {
 
-  updateStatus() {
-    let contract = Contract('Registry');
-
-    contract.send('update_status', [this.props.item.id])
-      .then(console.log());
-  }
 
   render() {
     const { type, stage, passedPercent, challenges, item } = this.props;
@@ -118,9 +112,6 @@ class CellDappStatus extends React.Component {
 
     return (<>
       {paylo}
-      <div className="update" onClick={() => this.updateStatus()}>
-        <FontAwesomeIcon icon="ban"/> Update Status
-      </div>
     </>)
   }
 }
