@@ -83,7 +83,7 @@ class CellDappStatus extends React.Component {
         passed2 = 0;
       } else {
         revealStatus = stage === 'reveal' ? 'active' : 'passed';
-        passed2 = stage === 'reveal' ? (challengeStatus.revealEndDate - new Date().getTime()/1000) : 100;
+        passed2 = stage === 'reveal' ? (challengeStatus.revealEndDate - new Date().getTime()/1000) / 60 : 100;
       }
 
       if (stage === 'commit' || stage === 'reveal') {

@@ -20,7 +20,7 @@ class TabApplications extends React.Component {
       {this.props.data.filter(item => (item.state === 'APPLICATION' || item.state === 'EDIT')).map((item, idx) =>
         <TableRow key={idx}>
           <CellDappName icon={imgMock} name={item.ipfsData.metadata.name} desc={item.ipfsData.metadata.short_description}/>
-          <CellDappStatus type="registry"/>
+          <CellDappStatus type="registry" item={item}/>
           <CellActions type="registry" item={item} subtype={item.state}/>
         </TableRow>
       )}
