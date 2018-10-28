@@ -472,7 +472,8 @@ contract Registry is IRegistry {
         Challenge storage challengeInstance = challenges[_challengeID];
 
         voterTokens = voting.getNumTokens(_voter, _challengeID);
-        assert(voterTokens <= challengeInstance.totalTokens);
+        if (isWinner)
+            assert(voterTokens <= challengeInstance.totalTokens);
 
         isWinner = voting.isWinner(_challengeID, _voter);
         if (isWinner)

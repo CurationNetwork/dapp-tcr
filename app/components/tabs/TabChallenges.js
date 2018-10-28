@@ -14,36 +14,13 @@ class TabChallenges extends React.Component {
       <TableRow type="header">
         <TableHeader type="submitted"/>
       </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="challenged" subtype="application" stage="commit" passedPercent={64}/>
-        <CellActions type="commit"/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="challenged" subtype="update" stage="commit" passedPercent={64}/>
-        <CellActions type="commit"/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="challenged" subtype="removal" stage="commit" passedPercent={64}/>
-        <CellActions type="commit"/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="challenged" subtype="application" stage="reveal" passedPercent={87}/>
-        <CellActions type="reveal"/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="challenged" subtype="application" stage="in-registry"/>
-        <CellActions type="get-reward"/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="challenged" subtype="application" stage="rejected"/>
-        <CellActions type="loose"/>
-      </TableRow>
+      {this.props.data.filter(item => item[1]).map((item, idx) =>
+        <TableRow key={idx}>
+          <CellDappName icon={imgMock} name={item.ipfs_data.data.metadata.name} desc={item.ipfs_data.data.metadata.short_description}/>
+          <CellDappStatus type="registry"/>
+          <CellActions type="registry"/>
+        </TableRow>
+      )}
     </>);
   }
 }
