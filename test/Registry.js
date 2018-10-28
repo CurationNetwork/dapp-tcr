@@ -48,6 +48,10 @@ contract('Registry', function(accounts) {
         return web3.sha3(encoded, {encoding: 'hex'});
     }
 
+    function BN(n) {
+        return new web3.BigNumber(n);
+    }
+
     async function snapshotBalances(token) {
         const ret = {
             [roles.author]: await token.balanceOf(roles.author),
@@ -338,5 +342,92 @@ contract('Registry', function(accounts) {
         assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(0.5, 'ether'));
         // voter2 won NO reward!
         assertBigNumberEqual((await token.balanceOf(roles.voter2)).sub(balances_snapshot[roles.voter2]), web3.toWei(0, 'ether'));
+    });
+
+    it("test edit challenged", async function() {
+        balances_snapshot = await snapshotBalances(token);
+
+        await registry.edit(first_listing_id, web3.toHex('bzzz'), {from: roles.author});
+
+        await registry.challenge(first_listing_id, 3, {from: roles.challenger});
+
+        let info = await registry.get_info(first_listing_id);
+        assert.equal(info[0], 3);   // EDIT
+        assert.equal(info[1], true);   // is_challenged
+        assert.equal(info[2], false);   // status_can_be_updated
+
+        info = unpackChallengeInfo(await registry.challenge_status(first_listing_id));
+        assert.equal(info.challenge_id, 2);
+        assert.equal(info.is_commit, true);
+        assert.equal(info.is_reveal, false);
+        assert.equal(info.votesFor, 0);
+        assert.equal(info.votesAgainst, 0);
+        assertBigNumberEqual(info.commitEndDate, 1000000200 + 60);
+        assertBigNumberEqual(info.revealEndDate, 1000000200 + 60 + 60);
+    });
+
+    it("test edit challenge voting", async function() {
+        await registry.commit_vote(first_listing_id, getCommitHash(1, web3.toWei(5, 'ether'), 500), {from: roles.voter1});
+        await registry.commit_vote(first_listing_id, getCommitHash(0, web3.toWei(5, 'ether'), 583), {from: roles.voter2});
+        await registry.commit_vote(first_listing_id, getCommitHash(0, web3.toWei(5, 'ether'), 12), {from: roles.challenger});
+
+        let info = unpackChallengeInfo(await registry.challenge_status(first_listing_id));
+        assert.equal(info.is_commit, true);
+        assert.equal(info.is_reveal, false);
+        assert.equal(info.votesFor, 0);
+        assert.equal(info.votesAgainst, 0);
+
+        await registry.setTime(1000000300);
+        await voting.setTime(1000000300);
+
+        await registry.reveal_vote(first_listing_id, 1, web3.toWei(5, 'ether'), 500, {from: roles.voter1});
+        await registry.reveal_vote(first_listing_id, 0, web3.toWei(5, 'ether'), 583, {from: roles.voter2});
+        await registry.reveal_vote(first_listing_id, 0, web3.toWei(5, 'ether'), 12, {from: roles.challenger});
+
+        info = unpackChallengeInfo(await registry.challenge_status(first_listing_id));
+        assert.equal(info.is_commit, false);
+        assert.equal(info.is_reveal, true);
+        assertBigNumberEqual(info.votesFor, web3.toWei(5, 'ether'));
+        assertBigNumberEqual(info.votesAgainst, web3.toWei(10, 'ether'));
+    });
+
+    it("test edit challenge finalization", async function() {
+        await registry.setTime(1000000400);
+        await voting.setTime(1000000400);
+
+        assert(await registry.can_update_status(first_listing_id));
+        await registry.update_status(first_listing_id);
+
+        const list = await registry.list();
+        assert.equal(list.length, 1);
+
+        const info = await registry.get_info(first_listing_id);
+        assert.equal(info[0], 2);   // EXISTS
+        assert.equal(info[1], false);   // is_challenged
+        assert.equal(info[2], false);   // status_can_be_updated
+        assert.equal(info[3], web3.toHex('foobar'));   // ipfs_hash
+        assert.equal(info[4], '0x');   // edit_ipfs_hash
+
+        // checking balances:
+
+        // challenger won!
+        assertBigNumberEqual((await token.balanceOf(roles.challenger)).sub(balances_snapshot[roles.challenger]),
+            BN(web3.toWei(0.5, 'ether')).sub(web3.toWei(5, 'ether')));  // challenger stake is still in the registry
+
+        // author lost!
+        assertBigNumberEqual(balances_snapshot[roles.author].sub(await token.balanceOf(roles.author)), web3.toWei(1, 'ether'));
+    });
+
+    it("test edit challenge finalization: stakes & rewards of voters", async function() {
+        await registry.claim_reward(2, {from: roles.voter1});
+        await registry.claim_reward(2, {from: roles.voter2});
+        await registry.claim_reward(2, {from: roles.challenger});
+
+        // voter1 won NO reward!
+        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(0, 'ether'));
+        // voter2 won some reward!
+        assertBigNumberEqual((await token.balanceOf(roles.voter2)).sub(balances_snapshot[roles.voter2]), web3.toWei(0.25, 'ether'));
+        // challenger won some reward and part of author stake!
+        assertBigNumberEqual((await token.balanceOf(roles.challenger)).sub(balances_snapshot[roles.challenger]), web3.toWei(0.25 + 0.5, 'ether'));
     });
 });
