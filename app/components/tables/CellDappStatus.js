@@ -66,7 +66,7 @@ class CellDappStatus extends React.Component {
 
       let challengeStatus = item.challengeStatus;
 
-      let subtype = item.state;
+      let subtype = item.state === 'EXISTS' ? 'Removal' : 'Update';
 
       let stage = challengeStatus.phase;
       challengedStatus = stage === 'commit' ? 'active' : 'passed';
