@@ -46,6 +46,7 @@ contract Voting is IVoting {
         uint voteQuorum;	    /// number of votes required for a proposal to pass
         uint votesFor;          /// tally of votes supporting proposal
         uint votesAgainst;      /// tally of votes countering proposal
+        uint staticFees;        /// amount of fees paid for commits
         mapping(address => bool) didCommit;   /// indicates whether an address committed a vote for this poll
         mapping(address => bool) didReveal;   /// indicates whether an address revealed a vote for this poll
         mapping(address => uint) voteOptions; /// stores the voteOption of an address that revealed
@@ -75,7 +76,7 @@ contract Voting is IVoting {
     @param _pollID Integer identifier associated with target poll
     @param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)
     */
-    function commitVote(uint _pollID, bytes32 _secretHash, address voter) external onlyRegistry {
+    function commitVote(uint _pollID, bytes32 _secretHash, address voter, uint _staticFee) external onlyRegistry {
         require(commitPeriodActive(_pollID));
 
         // prevent user from committing to zero node placeholder
@@ -88,6 +89,7 @@ contract Voting is IVoting {
         store.setAttribute(UUID, "commitHash", uint(_secretHash));
 
         pollMap[_pollID].didCommit[voter] = true;
+        pollMap[_pollID].staticFees += _staticFee;
 
         emit _VoteCommitted(_pollID, voter);
     }
@@ -147,7 +149,8 @@ contract Voting is IVoting {
             commitEndDate: commitEndDate,
             revealEndDate: revealEndDate,
             votesFor: 0,
-            votesAgainst: 0
+            votesAgainst: 0,
+            staticFees: 0
         });
 
         emit _PollCreated(commitEndDate, revealEndDate, pollNonce);
@@ -189,6 +192,9 @@ contract Voting is IVoting {
         return this.result(_pollID) ? poll.votesFor : poll.votesAgainst;
     }
 
+    function getStaticFees(uint _pollID) constant external returns (uint) {
+        return pollMap[_pollID].staticFees;
+    }
 
     // ----------------
     // POLLING HELPERS:

@@ -332,13 +332,13 @@ contract('Registry', function(accounts) {
 
     it("test application challenge finalization: stakes & rewards of voters", async function() {
         // voters have't claimed stakes & rewards
-        assertBigNumberEqual(balances_snapshot[roles.voter1].sub(await token.balanceOf(roles.voter1)), web3.toWei(5, 'ether'));
-        assertBigNumberEqual(balances_snapshot[roles.voter2].sub(await token.balanceOf(roles.voter2)), web3.toWei(2, 'ether'));
+        assertBigNumberEqual(balances_snapshot[roles.voter1].sub(await token.balanceOf(roles.voter1)), web3.toWei(5 + 1, 'ether'));
+        assertBigNumberEqual(balances_snapshot[roles.voter2].sub(await token.balanceOf(roles.voter2)), web3.toWei(2 + 1, 'ether'));
 
         await registry.claim_reward(1, {from: roles.voter1});
 
         // voter1 won some reward!
-        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(2.5, 'ether'));
+        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(2.5 + 1, 'ether'));
         // voter2 won NO reward!
     });
 
@@ -410,7 +410,7 @@ contract('Registry', function(accounts) {
 
         // challenger won!
         assertBigNumberEqual((await token.balanceOf(roles.challenger)).sub(balances_snapshot[roles.challenger]),
-            BN(web3.toWei(0.5, 'ether')).sub(web3.toWei(5, 'ether')));  // challenger stake is still in the registry
+            BN(web3.toWei(0.5, 'ether')).sub(web3.toWei(5 + 1, 'ether')));  // challenger stake is still in the registry
 
         // author lost!
         assertBigNumberEqual(balances_snapshot[roles.author].sub(await token.balanceOf(roles.author)), web3.toWei(1, 'ether'));
@@ -421,15 +421,17 @@ contract('Registry', function(accounts) {
         await registry.claim_reward(2, {from: roles.challenger});
 
         // voter1 won NO reward!
-        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(-5, 'ether'));
+        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(-5 - 1, 'ether'));
         // voter2 won some reward!
         // 0.25: reward from author slashed deposit
         // 2.5: voter1 slashed stake
-        assertBigNumberEqual((await token.balanceOf(roles.voter2)).sub(balances_snapshot[roles.voter2]), web3.toWei(0.25 + 2.5, 'ether'));
+        // 0.5: part of voter1 static fee
+        assertBigNumberEqual((await token.balanceOf(roles.voter2)).sub(balances_snapshot[roles.voter2]), web3.toWei(0.25 + 2.5 + 0.5, 'ether'));
         // challenger won some reward and part of author stake!
         // 0.25: reward from author slashed deposit
         // 0.5: challenge won
         // 2.5: voter1 slashed stake
-        assertBigNumberEqual((await token.balanceOf(roles.challenger)).sub(balances_snapshot[roles.challenger]), web3.toWei(0.25 + 0.5 + 2.5, 'ether'));
+        // 0.5: part of voter1 static fee
+        assertBigNumberEqual((await token.balanceOf(roles.challenger)).sub(balances_snapshot[roles.challenger]), web3.toWei(0.25 + 0.5 + 2.5 + 0.5, 'ether'));
     });
 });

@@ -419,7 +419,8 @@ contract Registry is IRegistry {
         isChallenged(listing_id)
     {
         checkDAppInvariant(listing_id);
-        voting.commitVote(listings[listing_id].challengeID, secret_hash, msg.sender);
+        require(token.transferFrom(msg.sender, this, this.deposit_size()));
+        voting.commitVote(listings[listing_id].challengeID, secret_hash, msg.sender, this.deposit_size());
     }
 
     function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt)
@@ -547,6 +548,7 @@ contract Registry is IRegistry {
         // stakes of voters that chose the wrong side are slashed!
         // also here we are returning winners stake as rewards
         challenges[challengeID].rewardPool += voting.getOverallStake(challengeID);
+        challenges[challengeID].rewardPool += voting.getStaticFees(challengeID);
 
         challenger_won = !voting.result(challengeID);
 
