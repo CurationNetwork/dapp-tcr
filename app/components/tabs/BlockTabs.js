@@ -29,7 +29,6 @@ class Block extends React.Component {
       </span>
     ];
 
-    this.tabContent = [<TabRegistry/>, <TabApplications/>, <TabChallenges/>];
 
     this.switchTab = this.switchTab.bind(this);
   }
@@ -40,6 +39,8 @@ class Block extends React.Component {
   }
 
   render() {
+    this.tabContent = [<TabRegistry {...this.props}/>, <TabApplications {...this.props}/>, <TabChallenges {...this.props}/>];
+
     const { tabActive } = this.state;
 
     return (<div className="block with-tabs">
