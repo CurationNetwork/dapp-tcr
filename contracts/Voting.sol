@@ -49,7 +49,6 @@ contract Voting is IVoting {
         mapping(address => bool) didCommit;   /// indicates whether an address committed a vote for this poll
         mapping(address => bool) didReveal;   /// indicates whether an address revealed a vote for this poll
         mapping(address => uint) voteOptions; /// stores the voteOption of an address that revealed
-        mapping(address => uint) lockedStakes; ///
     }
 
     // ============
@@ -107,13 +106,12 @@ contract Voting is IVoting {
         require(revealPeriodActive(_pollID));
         require(pollMap[_pollID].didCommit[_voter]);                         // make sure user has committed a vote for this poll
         require(!pollMap[_pollID].didReveal[_voter]);                        // prevent user from revealing multiple times
-        require(keccak256(abi.encodePacked(_voteOption, _voteStake, _salt)) == getCommitHash(_voter, _pollID)); // compare resultant hash from inputs to original commitHash
-
-        pollMap[_pollID].lockedStakes[_voter] += _voteStake;
+        require(keccak256(abi.encode(_voteOption, _voteStake, _salt)) == getCommitHash(_voter, _pollID)); // compare resultant hash from inputs to original commitHash
 
         //  uint numTokens = getNumTokens(msg.sender, _pollID);
         bytes32 UUID = attrUUID(_voter, _pollID);
 
+        assert(0 == getNumTokens(_voter, _pollID));
         store.setAttribute(UUID, "numTokens", _voteStake);
 
         if (_voteOption == 1) {// apply numTokens to appropriate poll choice
@@ -185,6 +183,12 @@ contract Voting is IVoting {
 
         return vote == this.result(_pollId);
     }
+
+    function getTotalNumberOfTokensForWinningOption(uint _pollID) constant external returns (uint numTokens) {
+        Poll storage poll = pollMap[_pollID];
+        return this.result(_pollID) ? poll.votesFor : poll.votesAgainst;
+    }
+
 
     // ----------------
     // POLLING HELPERS:

@@ -230,6 +230,9 @@ contract Registry is IRegistry {
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
 
+        if (challengeExists(listing_id) && challengeCanBeResolved(listing_id))
+            return true;
+
         if (state == DAppState.APPLICATION) {
             if (listing.applicationExpiry < time() && !challengeExists(listing_id))
                 return true;
@@ -264,16 +267,36 @@ contract Registry is IRegistry {
         DAppState state = dappState(listing_id);
         Listing storage listing = listings[listing_id];
 
+        bool process_challenge = challengeExists(listing_id) && challengeCanBeResolved(listing_id);
+        uint challengeID = process_challenge ? listings[listing_id].challengeID : 0;
+        bool challenger_won;
+        uint reward;
+
         if (state == DAppState.APPLICATION) {
             if (listing.applicationExpiry < time() && !challengeExists(listing_id)) {
                 whitelistApplication(listing_id);
+                return;
+            }
+
+            if (process_challenge) {
+                (challenger_won, reward) = resolveChallenge(listing_id);
+                if (!challenger_won) {
+                    whitelistApplication(listing_id);
+                    // transfer of reward, but minimal deposit must remain stacked
+                    token.transfer(listing.owner, reward.sub(this.deposit_size()));
+                }
+                else {
+                    resetListing(listing_id, false);
+                    // Transfer the reward to the challenger
+                    require(token.transfer(challenges[challengeID].challenger, reward));
+                }
                 return;
             }
         }
         else if (state == DAppState.DELETING) {
             if (msg.sender == listing.owner &&
                     listing.exitTime < time() && time() < listing.exitTimeExpiry) {
-                resetListing(listing_id);
+                resetListing(listing_id, true);
                 emit _ListingWithdrawn(listing_id, msg.sender);
                 return;
             }
@@ -289,9 +312,41 @@ contract Registry is IRegistry {
                 whitelistEditProposal(listing_id);
                 return;
             }
+
+            if (process_challenge) {
+                (challenger_won, reward) = resolveChallenge(listing_id);
+                if (!challenger_won) {
+                    // transfer of reward, but proposal deposit must remain stacked
+                    token.transfer(listing.proposal_author, reward.sub(this.deposit_size()));
+                    whitelistEditProposal(listing_id);
+                }
+                else {
+                    // Transfer the reward to the challenger
+                    require(token.transfer(challenges[challengeID].challenger, reward));
+                    delete listing.proposal_author;
+                    delete listing.proposed_ipfs_hash;
+                    listings[listing_id].applicationExpiry = 0;
+                    changeState(listing_id, DAppState.EXISTS);
+                }
+                return;
+            }
+        }
+        else if (state == DAppState.EXISTS) {
+            if (process_challenge) {
+                (challenger_won, reward) = resolveChallenge(listing_id);
+                if (!challenger_won) {
+                    // transfer of reward, but minimal deposit must remain stacked
+                    token.transfer(listing.owner, reward.sub(this.deposit_size()));
+                }
+                else {
+                    resetListing(listing_id, false);
+                    // Transfer the reward to the challenger
+                    require(token.transfer(challenges[challengeID].challenger, reward));
+                }
+                return;
+            }
         }
         else {
-            // FIXME FIXME more states
             assert(state == DAppState.NOT_EXISTS);
         }
 
@@ -312,8 +367,6 @@ contract Registry is IRegistry {
 
         require(state == DAppState(state_check));
         require(state == DAppState.APPLICATION || state == DAppState.EXISTS || state == DAppState.EDIT);
-
-        uint minDeposit = parameterizer.get("minDeposit");
 
         // Starts poll
         uint pollID = voting.startPoll(
@@ -361,14 +414,21 @@ contract Registry is IRegistry {
         is_reveal) = voting.pollInfo(challenge_id);
     }
 
-    function commit_vote(bytes32 listing_id, bytes32 secret_hash) external {
+    function commit_vote(bytes32 listing_id, bytes32 secret_hash)
+        external
+        isChallenged(listing_id)
+    {
         checkDAppInvariant(listing_id);
-
+        voting.commitVote(listings[listing_id].challengeID, secret_hash, msg.sender);
     }
 
-    function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt) external {
+    function reveal_vote(bytes32 listing_id, uint vote_option /* 1: for, other: against */, uint vote_stake, uint salt)
+        external
+        isChallenged(listing_id)
+    {
         checkDAppInvariant(listing_id);
-
+        require(token.transferFrom(msg.sender, this, vote_stake));
+        voting.revealVote(listings[listing_id].challengeID, vote_option, vote_stake, salt, msg.sender);
     }
 
     // ----------------
@@ -376,45 +436,49 @@ contract Registry is IRegistry {
     // ----------------
 
     function claim_reward(uint challenge_id) external {
-/*        Challenge storage challengeInstance = challenges[_challengeID];
-        // Ensures the voter has not already claimed tokens and challengeInstance results have
-        // been processed
-        require(challengeInstance.tokenClaims[msg.sender] == false);
+        Challenge storage challengeInstance = challenges[challenge_id];
         require(challengeInstance.resolved == true);
+        require(challengeInstance.tokenClaims[msg.sender] == false);
 
-        uint voterTokens = voting.getNumPassingTokens(msg.sender, _challengeID);
-        uint reward = voterTokens.mul(challengeInstance.rewardPool)
-                      .div(challengeInstance.totalTokens);
-
-        // Subtracts the voter's information to preserve the participation ratios
-        // of other voters compared to the remaining pool of rewards
-        challengeInstance.totalTokens -= voterTokens;
-        challengeInstance.rewardPool -= reward;
+        (uint reward, uint voterTokens, bool isWinner) = voterReward(msg.sender, challenge_id);
 
         // Ensures a voter cannot claim tokens again
         challengeInstance.tokenClaims[msg.sender] = true;
 
-        require(token.transfer(msg.sender, reward));
+        // returning stake! TODO: dont do it for losers
+        require(token.transfer(msg.sender, voterTokens));
 
-        emit _RewardClaimed(_challengeID, reward, msg.sender);*/
+        if (isWinner) {
+            // Subtracts the voter's information to preserve the participation ratios
+            // of other voters compared to the remaining pool of rewards
+            challengeInstance.totalTokens -= voterTokens;
+            challengeInstance.rewardPool -= reward;
+
+            require(token.transfer(msg.sender, reward));
+
+            emit _RewardClaimed(challenge_id, reward, msg.sender);
+        }
     }
 
     // --------
     // GETTERS:
     // --------
 
-    /**
-    @dev                Calculates the provided voter's token reward for the given poll.
-    @param _voter       The address of the voter whose reward balance is to be returned
-    @param _challengeID The pollID of the challenge a reward balance is being queried for
-    @return             The uint indicating the voter's reward
-    */
     function voterReward(address _voter, uint _challengeID)
-    public view returns (uint) {
-        uint totalTokens = challenges[_challengeID].totalTokens;
-        uint rewardPool = challenges[_challengeID].rewardPool;
-        uint voterTokens = voting.getNumTokens(_voter, _challengeID);
-        return voterTokens.mul(rewardPool).div(totalTokens);
+        public
+        view
+        returns (uint reward, uint voterTokens, bool isWinner)
+    {
+        Challenge storage challengeInstance = challenges[_challengeID];
+
+        voterTokens = voting.getNumTokens(_voter, _challengeID);
+        assert(voterTokens <= challengeInstance.totalTokens);
+
+        isWinner = voting.isWinner(_challengeID, _voter);
+        if (isWinner)
+            reward = voterTokens.mul(challengeInstance.rewardPool).div(challengeInstance.totalTokens);
+        else
+            reward = 0;
     }
 
     /**
@@ -422,8 +486,7 @@ contract Registry is IRegistry {
     @param listing_id The listingHash whose status is to be examined
     */
     function challengeExists(bytes32 listing_id) view public returns (bool) {
-        uint challengeID = listings[listing_id].challengeID;
-        return challengeID > 0 && !challenges[challengeID].resolved;
+        return listings[listing_id].challengeID > 0;
     }
 
     /**
@@ -443,18 +506,18 @@ contract Registry is IRegistry {
 
     /**
     @dev                Determines the number of tokens awarded to the winning party in a challenge.
+                        This reward is for author or challenger only. For other voter rewards see claim_reward.
+                        Reward is: (winner's full stake) + (dispensationPct * loser's stake).
     @param _challengeID The challengeID to determine a reward for
     */
-    function determineReward(uint _challengeID) public view returns (uint) {
-        require(!challenges[_challengeID].resolved && voting.pollEnded(_challengeID));
-
-/*        // Edge case, nobody voted, give all tokens to the challenger.
+    function determineReward(uint _challengeID) private view returns (uint) {
+        // Edge case, nobody voted, give all tokens to the winner.
         if (voting.getTotalNumberOfTokensForWinningOption(_challengeID) == 0) {
-            return 2 * challenges[_challengeID].stake;
+            return 2 * this.deposit_size();
         }
 
-        return (2 * challenges[_challengeID].stake) - challenges[_challengeID].rewardPool;
-*/    }
+        return (2 * this.deposit_size()).sub(challenges[_challengeID].rewardPool);
+    }
 
     /**
     @dev                Getter for Challenge tokenClaims mappings
@@ -474,34 +537,27 @@ contract Registry is IRegistry {
                         either whitelists or de-whitelists the listingHash.
     @param listing_id A listingHash with a challenge that is to be resolved
     */
-    function resolveChallenge(bytes32 listing_id) private {
+    function resolveChallenge(bytes32 listing_id) private returns (bool challenger_won, uint reward) {
         uint challengeID = listings[listing_id].challengeID;
 
         // Calculates the winner's reward,
-        // which is: (winner's full stake) + (dispensationPct * loser's stake)
-        uint reward = determineReward(challengeID);
+        reward = determineReward(challengeID);
 
         // Sets flag on challenge being processed
         challenges[challengeID].resolved = true;
+        listings[listing_id].challengeID = 0;
 
         // Stores the total tokens used for voting by the winning side for reward purposes
-//        challenges[challengeID].totalTokens =
-//            voting.getTotalNumberOfTokensForWinningOption(challengeID);
+        challenges[challengeID].totalTokens =
+            voting.getTotalNumberOfTokensForWinningOption(challengeID);
 
-        // Case: challenge failed
-        if (voting.result(challengeID)) {
-            whitelistApplication(listing_id);
-            // Unlock stake so that it can be retrieved by the applicant
-            //listings[listing_id].unstakedDeposit += reward;
+        challenger_won = !voting.result(challengeID);
 
+        if (!challenger_won) {
             emit _ChallengeFailed(listing_id, challengeID, challenges[challengeID].rewardPool, challenges[challengeID].totalTokens);
         }
         // Case: challenge succeeded or nobody voted
         else {
-            resetListing(listing_id);
-            // Transfer the reward to the challenger
-            require(token.transfer(challenges[challengeID].challenger, reward));
-
             emit _ChallengeSucceeded(listing_id, challengeID, challenges[challengeID].rewardPool, challenges[challengeID].totalTokens);
         }
     }
@@ -538,12 +594,13 @@ contract Registry is IRegistry {
     @dev                Deletes a listingHash from the whitelist and transfers tokens back to owner
     @param listing_id The listing hash to delete
     */
-    function resetListing(bytes32 listing_id) private {
+    function resetListing(bytes32 listing_id, bool refund_owner) private {
         Listing storage listing = listings[listing_id];
         DAppState state_was = dappState(listing_id);
 
         // Deleting listing to prevent reentry
         address owner = listing.owner;
+        assert(owner != address(0));
         listing.owner = address(0);
 
         // ids <-> listings linkage
@@ -556,15 +613,14 @@ contract Registry is IRegistry {
         ids[ids.length - 1] = bytes32(0);
         ids.length--;
 
-        listing.exitTime = 0;
-        listing.exitTimeExpiry = 0;
+        delete listings[listing_id];    // resetting everything
+        listing.state = state_was;      // except state
         changeState(listing_id, DAppState.NOT_EXISTS);
-        delete listings[listing_id];
 
         // Transfers any remaining balance back to the owner
-        //if (unstakedDeposit > 0){
-        //    require(token.transfer(owner, unstakedDeposit));
-        //}
+        if (refund_owner) {
+            require(token.transfer(owner, this.deposit_size()));
+        }
 
         if (DAppState.APPLICATION == state_was) {
             emit _ApplicationRemoved(listing_id);
