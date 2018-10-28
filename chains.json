@@ -124,6 +124,26 @@
       "0x75e455b575b324c6e0f91448f8b6180b1b5baebd7f3aa0d714cc6cdf67264f45": {
         "name": "Registry",
         "address": "0x35F6258387Fc9c7A7326815FE186931AFED9f1e3"
+      },
+      "0xcd24a6f952d169e69bd733faab951e4d3407a25dc1f151cbabb7fb198ece2884": {
+        "name": "Migrations",
+        "address": "0xBad07daA3d4DFf352c684346bE10ef53F431fA7C"
+      },
+      "0xfc62720c716172c17e356eadacd84ca104723bbdef8f77cec9e021684a8884c8": {
+        "name": "Voting",
+        "address": "0x43EEB9EB2A55a7763986D043047cfD28a7DF7b4c"
+      },
+      "0x88f39a4c99de3d81f1eae49505915f92c2370f5c28a4d140fdf278c826ca243a": {
+        "name": "Registry",
+        "address": "0x43E552273D1F8893b0CAd303f12704Fba33c8992"
+      },
+      "0x6967dd97f69b8444ee0fc7922b4e7b915b74dd6db4c6de8b257599c24e3c08be": {
+        "name": "Voting",
+        "address": "0xd2E6220c56a94Aa8c9bf51162d6d977DF22b5F39"
+      },
+      "0x7a9b7dbbd6b2158a7c2a7f4f73a7d3770720770e857c1cc12ac11180ddb5c31a": {
+        "name": "Registry",
+        "address": "0xEE68B6eE0160bcd0A9F4C9881F05244c07f337B5"
       }
     }
   }
