@@ -100,11 +100,12 @@ class CellDappStatus extends React.Component {
     }
 
     else if (type === 'registry') {
+      console.log(this.props);
       paylo = (<div className="dapp-status registry">
-        {(Array.isArray(challenges) && challenges.indexOf('update') !== -1) &&
+        {(item.isChallenged && item.state === 'EDIT') &&
           <Stage type="challenged-update" status="active "/>
         }
-        {(Array.isArray(challenges) && challenges.indexOf('remove') !== -1) &&
+        {(item.isChallenged && item.state !== 'EDIT') &&
           <Stage type="challenged-remove" status="active"/>
         }
       </div>);

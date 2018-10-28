@@ -40,7 +40,7 @@ class TabRegistry extends React.Component {
       {this.props.data.filter(item => item.state === 'EXISTS').map((item, idx) =>
         <TableRow key={idx}>
           <CellDappName icon={imgMock} name={item.ipfsData.metadata.name} desc={item.ipfsData.metadata.short_description} item={item}/>
-          <CellDappStatus type="registry"/>
+          <CellDappStatus type="registry"  item={item}/>
           <CellActions type="registry" subtype={item.state} item={item}/>
         </TableRow>
 			)}
