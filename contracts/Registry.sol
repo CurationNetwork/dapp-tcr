@@ -440,24 +440,19 @@ contract Registry is IRegistry {
         require(challengeInstance.resolved == true);
         require(challengeInstance.tokenClaims[msg.sender] == false);
 
-        (uint reward, uint voterTokens, bool isWinner) = voterReward(msg.sender, challenge_id);
+        (uint reward, uint voterTokens) = voterReward(msg.sender, challenge_id);
 
         // Ensures a voter cannot claim tokens again
         challengeInstance.tokenClaims[msg.sender] = true;
 
-        // returning stake! TODO: dont do it for losers
-        require(token.transfer(msg.sender, voterTokens));
+        // Subtracts the voter's information to preserve the participation ratios
+        // of other voters compared to the remaining pool of rewards
+        challengeInstance.totalTokens = challengeInstance.totalTokens.sub(voterTokens);
+        challengeInstance.rewardPool = challengeInstance.rewardPool.sub(reward);
 
-        if (isWinner) {
-            // Subtracts the voter's information to preserve the participation ratios
-            // of other voters compared to the remaining pool of rewards
-            challengeInstance.totalTokens -= voterTokens;
-            challengeInstance.rewardPool -= reward;
+        require(token.transfer(msg.sender, reward));
 
-            require(token.transfer(msg.sender, reward));
-
-            emit _RewardClaimed(challenge_id, reward, msg.sender);
-        }
+        emit _RewardClaimed(challenge_id, reward, msg.sender);
     }
 
     // --------
@@ -467,19 +462,16 @@ contract Registry is IRegistry {
     function voterReward(address _voter, uint _challengeID)
         public
         view
-        returns (uint reward, uint voterTokens, bool isWinner)
+        returns (uint reward, uint voterTokens)
     {
         Challenge storage challengeInstance = challenges[_challengeID];
+        require(voting.isWinner(_challengeID, _voter));
 
         voterTokens = voting.getNumTokens(_voter, _challengeID);
-        if (isWinner)
-            assert(voterTokens <= challengeInstance.totalTokens);
+        assert(voterTokens <= challengeInstance.totalTokens);
 
-        isWinner = voting.isWinner(_challengeID, _voter);
-        if (isWinner)
-            reward = voterTokens.mul(challengeInstance.rewardPool).div(challengeInstance.totalTokens);
-        else
-            reward = 0;
+        reward = voterTokens.mul(challengeInstance.rewardPool).div(challengeInstance.totalTokens);
+        assert(reward >= voterTokens);
     }
 
     /**
@@ -551,6 +543,10 @@ contract Registry is IRegistry {
         // Stores the total tokens used for voting by the winning side for reward purposes
         challenges[challengeID].totalTokens =
             voting.getTotalNumberOfTokensForWinningOption(challengeID);
+
+        // stakes of voters that chose the wrong side are slashed!
+        // also here we are returning winners stake as rewards
+        challenges[challengeID].rewardPool += voting.getOverallStake(challengeID);
 
         challenger_won = !voting.result(challengeID);
 

@@ -336,12 +336,10 @@ contract('Registry', function(accounts) {
         assertBigNumberEqual(balances_snapshot[roles.voter2].sub(await token.balanceOf(roles.voter2)), web3.toWei(2, 'ether'));
 
         await registry.claim_reward(1, {from: roles.voter1});
-        await registry.claim_reward(1, {from: roles.voter2});
 
         // voter1 won some reward!
-        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(0.5, 'ether'));
+        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(2.5, 'ether'));
         // voter2 won NO reward!
-        assertBigNumberEqual((await token.balanceOf(roles.voter2)).sub(balances_snapshot[roles.voter2]), web3.toWei(0, 'ether'));
     });
 
     it("test edit challenged", async function() {
@@ -419,15 +417,19 @@ contract('Registry', function(accounts) {
     });
 
     it("test edit challenge finalization: stakes & rewards of voters", async function() {
-        await registry.claim_reward(2, {from: roles.voter1});
         await registry.claim_reward(2, {from: roles.voter2});
         await registry.claim_reward(2, {from: roles.challenger});
 
         // voter1 won NO reward!
-        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(0, 'ether'));
+        assertBigNumberEqual((await token.balanceOf(roles.voter1)).sub(balances_snapshot[roles.voter1]), web3.toWei(-5, 'ether'));
         // voter2 won some reward!
-        assertBigNumberEqual((await token.balanceOf(roles.voter2)).sub(balances_snapshot[roles.voter2]), web3.toWei(0.25, 'ether'));
+        // 0.25: reward from author slashed deposit
+        // 2.5: voter1 slashed stake
+        assertBigNumberEqual((await token.balanceOf(roles.voter2)).sub(balances_snapshot[roles.voter2]), web3.toWei(0.25 + 2.5, 'ether'));
         // challenger won some reward and part of author stake!
-        assertBigNumberEqual((await token.balanceOf(roles.challenger)).sub(balances_snapshot[roles.challenger]), web3.toWei(0.25 + 0.5, 'ether'));
+        // 0.25: reward from author slashed deposit
+        // 0.5: challenge won
+        // 2.5: voter1 slashed stake
+        assertBigNumberEqual((await token.balanceOf(roles.challenger)).sub(balances_snapshot[roles.challenger]), web3.toWei(0.25 + 0.5 + 2.5, 'ether'));
     });
 });
