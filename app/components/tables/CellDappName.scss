@@ -2,9 +2,14 @@
 
 .dapp-name {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   min-height: 70px;
 
+  .icon {
+    padding-top: 10px;
+    padding-right: 5px;
+  }
+  
   .icon img {
     width: 30px;
     margin-right: 6px;
@@ -14,6 +19,7 @@
     font-size: 14px;
     font-family: $f-medium;
     margin-bottom: 3px;
+    padding-top: 10px;
   }
 
   .desc-short {
@@ -23,5 +29,14 @@
   &:hover {
     background: #F5F9FA;
     cursor: pointer;
+  }
+
+  .update {
+    margin: 10px 0;
+    font-size: 13px;
+
+    svg {
+      width: 10px;
+    }
   }
 }
