@@ -88,10 +88,11 @@
 		  "items": {"$ref": "#/definitions/eth_address"}
 		},
 
-        "platform": {
-          "title": "Platform for DApp",
+        "networks": {
+          "title": "Networks, where DApp is presented",
           "$comment": "Platform of the DApp",
-          "type": "string"
+          "type": "array",
+		  "items": {"$ref": "#/definitions/network"}
         }
 
       }
@@ -136,6 +137,11 @@
       	"ipfs_hash": "^Qm[1-9A-HJ-NP-Za-km-z]{44}$"
       }
     },
+
+	"network": {
+      "type": "string"
+    },
+
 
     "eth_address": {
       "type": "string",
