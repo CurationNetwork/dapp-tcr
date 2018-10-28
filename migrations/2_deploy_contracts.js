@@ -7,7 +7,7 @@ const Parameterizer = artifacts.require("./Parameterizer.sol");
 const Registry = artifacts.require("Registry.sol");
 
 
-const initialTokenHolders = ['0x6290C445A720E8E77dd8527694030028D1762073'];
+const initialTokenHolders = ['0x6290C445A720E8E77dd8527694030028D1762073', '0xfF20387Dd4dbfA3e72AbC7Ee9B03393A941EE36E'];
 const initialTokens = 1000;
 const totalSupply = 1000000;
 
@@ -17,6 +17,7 @@ module.exports = function(deployer, network) {
   let voting;
   let params;
   let faucet;
+  let registry;
 
   deployer.deploy(Token).then(function (ret) {
     token = ret;
@@ -30,8 +31,11 @@ module.exports = function(deployer, network) {
   }).then(function(ret){
     params = ret;
     return deployer.deploy(Registry, token.address, voting.address, params.address);
-  }).then(function(registry){
+  }).then(function(ret){
+    registry = ret;
     return voting.set_registry(registry.address);
+  }).then(function() {
+    return token.set_registry(registry.address);
   }).then(function() {
       return token.transfer(faucet.address, web3.toWei(totalSupply - initialTokens * initialTokenHolders.length));
   }).then(function () {
