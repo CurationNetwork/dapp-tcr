@@ -27,10 +27,10 @@ import * as Faucet from './contracts/Faucet.json';
 import * as Registry from './contracts/Registry.json';
 
 const contractAddr = {
-    Token: '0x85368f0c7e041262465694b533dd6817b6720dbe',
-    Voting: '0x26ca91feb9cfd767c4bcf18678f14aab71af142e',
-    Faucet: '0xd4c8d624a6c5a2315cdf2ccc039ffbaf7595de40',
-    Registry: '0x466d27fc44840077980bcdf072be593ac7ccabe5'
+    Token: '0x81f7cff4e30d8878114111b211f8bcc6c7fa31ae',
+    Voting: '0x675e30a1c9c7dadfe9f650958338866ade0952e9',
+    Faucet: '0x93c405df3680dc317b42fe044cc88c2db8026b7c',
+    Registry: '0x663e8bd1450b30b400afcff6c73bdd7afbc5d331'
 };
 
 const contractAbi = {

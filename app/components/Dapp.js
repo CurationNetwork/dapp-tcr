@@ -62,7 +62,7 @@ class Dapp extends React.Component {
 
     this.interval = setInterval(() => {
       this.fetch_data();
-    }, 30 * 1000);
+    }, 60 * 1000);
   }
 
   // componentWillUnmount() {
