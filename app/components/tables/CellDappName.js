@@ -3,6 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import './CellDappName.scss';
 import {Contract} from "../../helpers/eth";
+import poa from '../../assets/poa.png';
+import ethereum from '../../assets/ethereum.png';
 
 class CellDappName extends React.Component {
 
@@ -21,6 +23,12 @@ class CellDappName extends React.Component {
       <div>
         <div className="name">
           {name}
+          {(item.ipfsData.metadata.networks && item.ipfsData.metadata.networks.indexOf('POA Network') !== -1) &&
+            <img src={poa} alt="POA Network" style={{height: '16px', marginLeft: '6px'}} />
+          }
+          {(item.ipfsData.metadata.networks && item.ipfsData.metadata.networks.indexOf('Ethereum') !== -1) &&
+            <img src={ethereum} alt="Ethereum" style={{height: '14px', marginLeft: '6px'}} />
+          }
         </div>
         <div className="desc-short">{desc}</div>
         <div className="update" onClick={() => this.updateStatus()}>
