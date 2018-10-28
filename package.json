@@ -30,6 +30,7 @@
     "sass-loader": "^7.1.0",
     "solc": "0.4.24",
     "truffle": "^4.1.14",
+    "truffle-hdwallet-provider": "0.0.6",
     "zeppelin-solidity": "^1.12.0"
   }
 }

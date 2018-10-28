@@ -10,6 +10,8 @@ import axios from 'axios';
 const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
 import imgMock from '../blocks/0xuniverse.jpg';
 
+import { Contract, afterInit } from '../../helpers/eth';
+
 let contract = {
     get_info: function(id) {
         // uint state,
@@ -52,63 +54,86 @@ let contract = {
 
 
 class TabRegistry extends React.Component {
-  render() {
+	constructor(props) {
+		super(props);
 
-	let dapps_ids = contract.list();
-	let dapps = [];
-	let promises = [];
-	for (let dapp_id in dapps_ids) {
-		let info = contract.get_info(dapp_id);
+    this.state = {
+      list: []
+    };
 
-		dapps.push({
-			id: dapp_id,
-			state: info[0],
-			is_challenged: info[1],
-			can_be_updated: info[2],
-			current_ipfs_hash: info[3],
-			challenged_edit_ipfs_hash: info[4]
-		});
+    this.interval = null;
 	}
 
+	fetch_data() {
+		afterInit.then(() => {
+      let contract = Contract('Registry');
 
-	let ipfs_get_results = [];
-	Promise.all(dapps.map(dapp => (
-		axios.get(uploadEndpoint + '/ipfs/' + dapp['current_ipfs_hash'])
-	)))
-	.then(results => {
-		for (let r in results) {
-			try {
-				ipfs_get_results.push(results[r].data);
-			} catch(err) {
-				ipfs_get_results.push({});
-			}
-		}
-	});
+      let list = null;
+
+      contract.call('list')
+        .then(ids => {
+          return Promise.all(ids.map(id => {
+            return contract.call('get_info', [id])
+          }))
+        })
+        .then(res => {
+          list = res;
+          return Promise.all(list.map(item => {
+            return axios.get('https://ipfs.io' + '/ipfs/' + Buffer.from(item[3].substr(2), 'hex').toString())
+          }))
+        })
+        .then(res => {
+          res.forEach((data, idx) => {
+            list[idx].ipfs_data = data;
+          });
+
+          this.setState({list: list})
+        });
+    });
+	}
+
+	componentWillMount() {
+    this.fetch_data();
+
+		this.interval = setInterval(() => {
+			this.fetch_data();
+    }, 30 * 1000);
+	}
+
+  componentWillUnmount() {
+    if (this.interval) {
+      clearInterval(this.interval);
+      this.interval = null;
+    }
+  }
+
+  render() {
+		// let dapps_ids = contract.list();
+		// let dapps = [];
+		// for (let dapp_id in dapps_ids) {
+		// 	let info = contract.get_info(dapp_id);
+    //
+		// 	dapps.push({
+		// 		id: dapp_id,
+		// 		state: info[0],
+		// 		is_challenged: info[1],
+		// 		can_be_updated: info[2],
+		// 		current_ipfs_hash: info[3],
+		// 		challenged_edit_ipfs_hash: info[4]
+		// 	});
+		// }
 
     return (<>
       <TableRow type="header">
         <TableHeader type="registry"/>
       </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="registry"/>
-        <CellActions type="registry"/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="registry" challenges={['update']}/>
-        <CellActions type="registry" challenges={['update']}/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="registry" challenges={['remove']}/>
-        <CellActions type="registry" challenges={['remove']}/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="registry" challenges={['update', 'remove']}/>
-        <CellActions type="registry" challenges={['update', 'remove']}/>
-      </TableRow>
+      {this.state.list.map((item, idx) =>
+        <TableRow key={idx}>
+          <CellDappName icon={imgMock} name={item.ipfs_data.data.metadata.name} desc={item.ipfs_data.data.metadata.short_description}/>
+          <CellDappStatus type="registry"/>
+          <CellActions type="registry"/>
+        </TableRow>
+			)}
     </>);
   }
 }

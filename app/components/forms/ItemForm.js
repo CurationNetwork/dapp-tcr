@@ -41,30 +41,22 @@ class ItemForm extends React.Component {
 	let uploadedIPFSHash = null;
 
     const onSubmit = ({formData}) => {
-		console.log("FORM SUBMIT!");
 		axios.post(uploadEndpoint + '/ipfs/', JSON.stringify(formData)).then(resp => {
 			uploadedIPFSHash = resp.headers['ipfs-hash'];
-			let bytesHash = Buffer.from(uploadedIPFSHash).toString('hex');
-			// Registry.methods.apply("0x" + bytesHash).send().then(res => {
-			// 	console.log(res);
-			// }).catch(err => {
-			// 	console.log("ERROR: " + err);
-			// });
+			let bytesHash = '0x' + Buffer.from(uploadedIPFSHash).toString('hex');
 
-			console.log(Contract('Token'));
-
-			Contract('Token').send('transfer', ['0x6290c445a720e8e77dd8527694030028d1762073', '10000000000'])
+			Contract('Registry').send('apply', [bytesHash])
 				.then(res => {
-					alert(`Balance: ${res}`);
+					console.log(`tx hash: ${res}`);
 				})
-				.catch(console.log);
+				.catch(console.error);
 		});
 
 	};
 
 	const widgets = {
         ipfsUploadWidget: IPFSUploadWebGatewayWidget
-    }
+    };
 
 	let uiSchema = {
 		"metadata": {

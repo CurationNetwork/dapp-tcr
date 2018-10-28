@@ -27,10 +27,10 @@ import * as Faucet from './contracts/Faucet.json';
 import * as Registry from './contracts/Registry.json';
 
 const contractAddr = {
-    Token: '0xb6c77b0365a3f5830579dea88126d3a77f4e8587',
-    Voting: '0xfede8c5ec0584abfe2448d178ceb782e8c9d2f7d',
-    Faucet: '0xdf44291b8a644babbf80ea30f4f833b665827192',
-    Registry: '0xa9a3bbb03b35c1a32dcf2606e9ecd7396c902d65'
+    Token: '0x81f7cff4e30d8878114111b211f8bcc6c7fa31ae',
+    Voting: '0x675e30a1c9c7dadfe9f650958338866ade0952e9',
+    Faucet: '0x93c405df3680dc317b42fe044cc88c2db8026b7c',
+    Registry: '0x663e8bd1450b30b400afcff6c73bdd7afbc5d331'
 };
 
 const contractAbi = {
@@ -41,6 +41,11 @@ const contractAbi = {
 };
 
 let contracts = [];
+let onInit;
+
+export const afterInit = new Promise((resolve, reject) => {
+  onInit = resolve;
+});
 
 const addContract = (name, address, abi) => {
   let inst = web3.eth.contract(abi).at(address);//new web3.eth.Contract(abi, address);
@@ -85,7 +90,6 @@ const addContract = (name, address, abi) => {
       }
   };
 
-  console.log(contracts);
 };
 
 
@@ -95,11 +99,12 @@ export const Contract = (name) => {
 
 
 const init = () => {
-    console.log(web3);
 
     Object.keys(contractAddr).forEach(key => {
         addContract(key, contractAddr[key], contractAbi[key]);
     });
+
+    onInit();
 };
 
 export const getNetworkId = cb => {

@@ -7,7 +7,13 @@ const Parameterizer = artifacts.require("./Parameterizer.sol");
 const Registry = artifacts.require("Registry.sol");
 
 
-const initialTokenHolders = ['0x6290C445A720E8E77dd8527694030028D1762073', '0xfF20387Dd4dbfA3e72AbC7Ee9B03393A941EE36E'];
+const initialTokenHolders = [
+    '0x6290C445A720E8E77dd8527694030028D1762073',
+    '0x49d22f8740d6f08B3235ACE9a90648b206962CBd',
+    '0x65dD7690901500FdD6B26f0a4d722e1e859Ad301',
+    '0xfF20387Dd4dbfA3e72AbC7Ee9B03393A941EE36E'
+];
+
 const initialTokens = 1000;
 const totalSupply = 1000000;
 
