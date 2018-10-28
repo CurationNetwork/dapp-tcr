@@ -13,6 +13,13 @@ const initialTokenHolders = [
     '0x65dD7690901500FdD6B26f0a4d722e1e859Ad301',
     '0xfF20387Dd4dbfA3e72AbC7Ee9B03393A941EE36E'
 ];
+const initialApplications = [
+	'Qmf7L4VLuWsAxDQimWrsjsMmxBPc8AF5B8rF6DhvBVTyBx',
+	'QmS8rfAmZDFnZLUxZveP19as5E9YgVz6wzsw3gZWmaig8R',
+	'QmdEt1zsm3umViBrx3sQmdRMdEXHqyN6KipG48AT3B25qd',
+	'QmYgNZ2XaRMDtUFxyqMwAJXckCoxoBuSzx2HnfczMKAEXn', // DopeRaider
+	'QmfPVD1BMuMKwrwrutXTeWRxpEBnY4bvfWz87nh9MtZusT', // Aragon
+];
 
 const initialTokens = 1000;
 const totalSupply = 1000000;
@@ -50,5 +57,14 @@ module.exports = function(deployer, network) {
             token.transfer(addr, web3.toWei(initialTokens))
           })
       );
+  }).then(function () {
+      return Promise.all(
+          initialApplications.map(ipfs_hash => {
+			let bytes_hash = '0x' + Buffer.from(ipfs_hash).toString('hex');
+            registry.apply(bytes_hash);
+			console.log("applied hash: " + ipfs_hash);
+          })
+      );
   });
+
 };
