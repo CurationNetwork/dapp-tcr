@@ -157,7 +157,12 @@ class Dapp extends React.Component {
                 <img src={logo}/>
                 <div>Token curated DApp registry</div>
               </div>
-              <div className="add-buttin"><ButtonAddDapp/></div>
+              <div className="add-button">
+                <ButtonAddDapp/>
+                <div className="faucet">
+                  <a href="https://smartz.io/dapp/0c45c585f27a6cfdeffd493c">DRT Rinkeby faucet</a>
+                </div>
+              </div>
             </div>
 
             <BlockTabs data={this.state.list}/>
