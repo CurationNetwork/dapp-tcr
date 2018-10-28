@@ -16,12 +16,34 @@ let contract = {
         // bool is_challenged /* many states can be challenged */,
         // bool status_can_be_updated /* if update_status should be called */,
         // bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing *
-        return [
-		1,
-		false,
-		true,
-		'QmS8rfAmZDFnZLUxZveP19as5E9YgVz6wzsw3gZWmaig8R',
-		'Qmbznk5jrZ3tyW6dimjJkbp7YW37G6NSeL4qBSoJhpa'];
+		if (id == 0) {
+        	return [
+				1,
+				false,
+				true,
+				'QmS8rfAmZDFnZLUxZveP19as5E9YgVz6wzsw3gZWmaig8R',
+				null
+			];
+		}
+		if (id == 1) {
+			return [
+				1,
+				false,
+				true,
+				'QmdEt1zsm3umViBrx3sQmdRMdEXHqyN6KipG48AT3B25qd',
+				null
+			];
+		}
+
+		if (true) {
+			return [
+				1,
+				false,
+				true,
+				'Qmf7L4VLuWsAxDQimWrsjsMmxBPc8AF5B8rF6DhvBVTyBx',
+				null
+			];
+		}
     },
 	list: function() {
 		return [1,2,3];
@@ -61,7 +83,6 @@ class TabRegistry extends React.Component {
 				ipfs_get_results.push({});
 			}
 		}
-		console.log(ipfs_get_results);
 	});
 
     return (<>
