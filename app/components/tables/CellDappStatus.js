@@ -4,6 +4,8 @@ import classNames from 'classnames';
 
 import './CellDappStatus.scss';
 
+import { Contract, afterInit } from '../../helpers/eth';
+
 function Stage(props) {
   const { type, status, subtype } = props;
 
@@ -44,11 +46,21 @@ function ProgressBarFork(props) {
 }
 
 class CellDappStatus extends React.Component {
+
+  updateStatus() {
+    let contract = Contract('Registry');
+
+    contract.send('update_status', [this.props.item.id])
+      .then(console.log());
+  }
+
   render() {
-    const { type, stage, passedPercent, challenges, subtype } = this.props;
+    const { type, stage, passedPercent, challenges, item } = this.props;
+
+    let paylo = null;
 
     if (type === 'submitted' || type === 'updated') {
-      return (<div className="dapp-status">
+      paylo = (<div className="dapp-status">
         <Stage type={type} status="active"/>
         <ProgressBar passedPercent={passedPercent}/>
         <Stage type="in-registry" status="future"/>
@@ -58,15 +70,20 @@ class CellDappStatus extends React.Component {
     else if (type === 'challenged') {
       let [challengedStatus, passed1, revealStatus, passed2, finishStatus] = new Array(5);
 
+      let challengeStatus = item.challengeStatus;
+
+      let subtype = item.state;
+
+      let stage = challengeStatus.phase;
       challengedStatus = stage === 'commit' ? 'active' : 'passed';
-      passed1 = stage === 'commit' ? passedPercent : 100;
+      passed1 = stage === 'commit' ? (challengeStatus.commitEndDate - new Date().getTime()/1000) / 60 : 100;
 
       if (stage === 'commit') {
         revealStatus = 'future';
         passed2 = 0;
       } else {
         revealStatus = stage === 'reveal' ? 'active' : 'passed';
-        passed2 = stage === 'reveal' ? passedPercent : 100;
+        passed2 = stage === 'reveal' ? (challengeStatus.revealEndDate - new Date().getTime()/1000) : 100;
       }
 
       if (stage === 'commit' || stage === 'reveal') {
@@ -74,8 +91,8 @@ class CellDappStatus extends React.Component {
       } else {
         finishStatus = stage;
       }
-      
-      return (<div className="dapp-status">
+
+      paylo = (<div className="dapp-status">
         <Stage type="challenged" status={challengedStatus} subtype={subtype} />
         <ProgressBar passedPercent={passed1}/>
         <Stage type="reveal" status={revealStatus}/>
@@ -89,15 +106,22 @@ class CellDappStatus extends React.Component {
     }
 
     else if (type === 'registry') {
-      return (<div className="dapp-status registry">
+      paylo = (<div className="dapp-status registry">
         {(Array.isArray(challenges) && challenges.indexOf('update') !== -1) &&
           <Stage type="challenged-update" status="active "/>
         }
         {(Array.isArray(challenges) && challenges.indexOf('remove') !== -1) &&
           <Stage type="challenged-remove" status="active"/>
         }
-      </div>);      
+      </div>);
     }
+
+    return (<>
+      {paylo}
+      <div className="update" onClick={() => this.updateStatus()}>
+        <FontAwesomeIcon icon="ban"/> Update Status
+      </div>
+    </>)
   }
 }
 

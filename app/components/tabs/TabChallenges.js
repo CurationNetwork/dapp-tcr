@@ -14,11 +14,11 @@ class TabChallenges extends React.Component {
       <TableRow type="header">
         <TableHeader type="submitted"/>
       </TableRow>
-      {this.props.data.filter(item => item[1]).map((item, idx) =>
+      {this.props.data.filter(item => item.isChallenged).map((item, idx) =>
         <TableRow key={idx}>
-          <CellDappName icon={imgMock} name={item.ipfs_data.data.metadata.name} desc={item.ipfs_data.data.metadata.short_description}/>
-          <CellDappStatus type="registry"/>
-          <CellActions type="registry"/>
+          <CellDappName icon={imgMock} name={item.ipfsData.metadata.name} desc={item.ipfsData.metadata.short_description}/>
+          <CellDappStatus type="challenged" item={item}/>
+          <CellActions type="challenge" item={item}/>
         </TableRow>
       )}
     </>);

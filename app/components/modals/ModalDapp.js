@@ -9,7 +9,7 @@ import './ModalDapp.scss';
 
 class ModalDapp extends React.Component {
   render() {
-    const {isOpen, onClose, action} = this.props;
+    const {isOpen, onClose, action, item} = this.props;
     return (
       <ModalContainer isOpen={isOpen} onClose={onClose}>
         <div className="modal-dapp">
@@ -20,7 +20,7 @@ class ModalDapp extends React.Component {
 
           {action === 'challenge' && <>
             <div className="modal-h challenge"><FontAwesomeIcon icon="ban"/> Challenge a Dapp</div>
-            <FormChallenge buttonText="Start challenge"/>
+            <FormChallenge buttonText="Start challenge" item={item}/>
           </>}
 
           {action === 'approve' && <>

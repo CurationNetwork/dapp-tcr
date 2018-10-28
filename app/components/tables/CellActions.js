@@ -19,7 +19,7 @@ class CellActions extends React.Component {
   }
 
   render() {
-    const { type, challenges } = this.props;
+    const { type, challenges, item, subtype } = this.props;
     const { isPopup, action } = this.state;
 
     return (<div className="actions">
@@ -74,23 +74,20 @@ class CellActions extends React.Component {
       {type === 'registry' &&
         <div className="commit">
           <div className="border"></div>
-          {(!Array.isArray(challenges) || challenges.indexOf('update') === -1) &&
+          {(subtype === 'EDIT') &&
             <div className="approve" onClick={this.togglePopup.bind(this, 'update')}>
-              <FontAwesomeIcon icon="pen"/> Update
+              <FontAwesomeIcon icon="pen"/> Decline Update
             </div>
           }
-          {(!Array.isArray(challenges) || challenges.indexOf('remove') === -1) &&
-            <>
-              {!Array.isArray(challenges) && <div className="border"></div>}
-              <div className="reject" onClick={this.togglePopup.bind(this, 'challenge')}>
-                <FontAwesomeIcon icon="ban"/> Remove
-              </div>
-            </>
+          {(subtype === 'APPLICATION') &&
+            <div className="reject" onClick={this.togglePopup.bind(this, 'challenge')}>
+              <FontAwesomeIcon icon="ban"/> Remove
+            </div>
           }
         </div>
       }
 
-      <ModalDapp isOpen={this.state.isPopup} onClose={this.togglePopup} action={action}/>
+      <ModalDapp isOpen={this.state.isPopup} onClose={this.togglePopup} action={action} item={item}/>
     </div>);        
   }
 }

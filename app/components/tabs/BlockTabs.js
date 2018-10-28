@@ -31,12 +31,12 @@ class Block extends React.Component {
     this.tabContent = [<TabRegistry {...this.props}/>, <TabApplications {...this.props}/>, <TabChallenges {...this.props}/>];
 
     this.tabHeaders = [
-      <>Dapps in Registry&nbsp;&mdash; {this.props.data.filter(item => item[0] === 2).length}</>,
+      <>Dapps in Registry&nbsp;&mdash; {this.props.data.filter(item => item.state === 'EXISTS').length}</>,
       <span className="applications">
-        <FontAwesomeIcon icon="pen"/> Applications&nbsp;&mdash; {this.props.data.filter(item => item[0] in [1, 3]).length}
+        <FontAwesomeIcon icon="pen"/> Applications&nbsp;&mdash; {this.props.data.filter(item => (item.state === 'APPLICATION' || item.state === 'EDIT')).length}
       </span>,
       <span className="challenges">
-        <FontAwesomeIcon icon="ban"/> Challenges&nbsp;&mdash; {this.props.data.filter(item => item[1]).length}
+        <FontAwesomeIcon icon="ban"/> Challenges&nbsp;&mdash; {this.props.data.filter(item => item.isChallenged).length}
       </span>
     ];
     const { tabActive } = this.state;

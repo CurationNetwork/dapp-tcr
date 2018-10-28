@@ -72,6 +72,37 @@ class Dapp extends React.Component {
   //   }
   // }
 
+  fetch_challenge_statuses() {
+    let contract = Contract('Registry');
+
+    let list = this.state.list;
+
+    Promise.all(this.state.list.map(item => {
+      if (item.isChallenged)
+        return contract.call('challenge_status', [item.id]);
+      else
+        return null;
+    })).then(res => {
+      res.forEach((status, idx) => {
+        if (status !== null) {
+          list[idx].challengeStatus = {
+            phase: status[1] === 0 ? 'commit' : 'reveal',
+            challengeId: status[0],
+            votesFor: status[3],
+            votesAgainst: status[4],
+            commitEndDate: status[5],
+            revealEndDate: status[6]
+          }
+        }
+        else {
+          list[idx].challengeStatus = null;
+        }
+      });
+
+      this.setState({list: list});
+    });
+  }
+
   fetch_data() {
     afterInit.then(() => {
       let contract = Contract('Registry');
@@ -109,9 +140,9 @@ class Dapp extends React.Component {
             return res;
           });
 
-          console.log(newList);
-
-          this.setState({list: list})
+          this.state.list = newList;
+          //this.setState({list: newList});
+          this.fetch_challenge_statuses()
         });
     });
   }

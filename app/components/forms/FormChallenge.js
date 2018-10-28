@@ -3,9 +3,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import './Form.scss';
 
+import { Contract } from "../../helpers/eth";
+
+
 class FormChallenge extends React.Component {
   constructor(props) {
     super(props);
+  }
+
+  stateToInt(state) {
+    let states = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'];
+
+    return states.findIndex(s => s === state);
+  }
+
+  doChallenge() {
+    console.log([this.props.item.id, this.stateToInt(this.props.item.state)]);
+    Contract('Registry').send('challenge', [this.props.item.id, this.stateToInt(this.props.item.state)])
+      .then()
   }
 
   render() {
@@ -16,13 +31,10 @@ class FormChallenge extends React.Component {
       <div className="p-bold">Token deposit</div>
       <div className="p-thin">If the most of voters will stake against you, you will completely loose this tokens.</div>
       <div className="sum-n-button">
-        <div className="sum"><span>10</span> DRT</div>
-        <div className="button">
-          <button>Approve</button>
-        </div>
+        <div className="sum"><span>1</span> DRT</div>
       </div>
       <div className="big-button">
-        <button className="disabled">{buttonText}</button>
+        <button onClick={() => this.doChallenge()}>{buttonText}</button>
       </div>
     </>);
   }

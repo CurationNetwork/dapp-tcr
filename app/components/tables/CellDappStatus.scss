@@ -6,6 +6,17 @@
   margin-left: 35px;
   flex-grow: 2 !important;
 
+
+  .update {
+    display: flex;
+    align-items: center;
+    height: 70px;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+
   .stage {
     font-size: 12px;
     font-family: $f-medium;

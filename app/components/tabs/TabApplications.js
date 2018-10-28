@@ -10,15 +10,18 @@ import imgMock from '../blocks/0xuniverse.jpg';
 
 class TabApplications extends React.Component {
   render() {
+
+    console.log(this.props);
+
     return (<>
       <TableRow type="header">
         <TableHeader type="submitted"/>
       </TableRow>
-      {this.props.data.filter(item => item[0] in [1, 3]).map((item, idx) =>
+      {this.props.data.filter(item => (item.state === 'APPLICATION' || item.state === 'EDIT')).map((item, idx) =>
         <TableRow key={idx}>
-          <CellDappName icon={imgMock} name={item.ipfs_data.data.metadata.name} desc={item.ipfs_data.data.metadata.short_description}/>
+          <CellDappName icon={imgMock} name={item.ipfsData.metadata.name} desc={item.ipfsData.metadata.short_description}/>
           <CellDappStatus type="registry"/>
-          <CellActions type="registry"/>
+          <CellActions type="registry" item={item} subtype={item.state}/>
         </TableRow>
       )}
     </>);
