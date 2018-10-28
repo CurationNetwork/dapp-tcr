@@ -131,6 +131,25 @@
           "type": "uint256"
         }
       ],
+      "name": "getStaticFees",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_pollID",
+          "type": "uint256"
+        }
+      ],
       "name": "pollInfo",
       "outputs": [
         {
@@ -207,6 +226,10 @@
         {
           "name": "voter",
           "type": "address"
+        },
+        {
+          "name": "_staticFee",
+          "type": "uint256"
         }
       ],
       "name": "commitVote",
@@ -250,16 +273,16 @@
   "deployedBytecode": "0x",
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.4.24;\n\ninterface IVoting {\n\n    function pollEnded(uint _pollID) constant external returns (bool ended);\n\n    function result(uint _pollID) constant external returns (bool passed);\n\n    function isWinner(uint _pollId, address voter) external view returns (bool);\n\n    function getOverallStake(uint _pollId) external view returns (uint);\n\n    function getNumTokens(address _voter, uint _pollID) constant external returns (uint numTokens);\n\n    function getTotalNumberOfTokensForWinningOption(uint _pollID) constant external returns (uint numTokens);\n\n    function pollInfo(uint _pollID) external view returns\n        (uint commitEndDate,\n        uint revealEndDate,\n        uint voteQuorum,\n        uint votesFor,\n        uint votesAgainst,\n        bool commitPeriodActive,\n        bool revealPeriodActive);\n\n    /**\n    @dev Initiates a poll with canonical configured parameters at pollID emitted by PollCreated event\n    @param _itemId - item for voting\n    @param _commitDuration Length of desired commit period in seconds\n    @param _revealDuration Length of desired reveal period in seconds\n    */\n    function startPoll(uint _itemId, uint _commitDuration, uint _revealDuration) external returns (uint pollID);\n\n    /**\n    @notice Commits vote using hash of choice and secret salt to conceal vote until reveal\n    @param _pollID Integer identifier associated with target poll\n    @param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)\n    */\n    function commitVote(uint _pollID, bytes32 _secretHash, address voter) external;\n\n    /**\n    @notice Reveals vote with choice and secret salt used in generating commitHash to attribute committed tokens\n    @param _pollID Integer identifier associated with target poll\n    @param _voteOption Vote choice used to generate commitHash for associated poll. 0 - down, 1 - up\n    @param _salt Secret number used to generate commitHash for associated poll\n    */\n    function revealVote(uint _pollID, uint _voteOption, uint _voteStake, uint _salt, address _voter) external;\n}\n",
+  "source": "pragma solidity ^0.4.24;\n\ninterface IVoting {\n\n    function pollEnded(uint _pollID) constant external returns (bool ended);\n\n    function result(uint _pollID) constant external returns (bool passed);\n\n    function isWinner(uint _pollId, address voter) external view returns (bool);\n\n    function getOverallStake(uint _pollId) external view returns (uint);\n\n    function getNumTokens(address _voter, uint _pollID) constant external returns (uint numTokens);\n\n    function getTotalNumberOfTokensForWinningOption(uint _pollID) constant external returns (uint numTokens);\n\n    function getStaticFees(uint _pollID) constant external returns (uint);\n\n    function pollInfo(uint _pollID) external view returns\n        (uint commitEndDate,\n        uint revealEndDate,\n        uint voteQuorum,\n        uint votesFor,\n        uint votesAgainst,\n        bool commitPeriodActive,\n        bool revealPeriodActive);\n\n    /**\n    @dev Initiates a poll with canonical configured parameters at pollID emitted by PollCreated event\n    @param _itemId - item for voting\n    @param _commitDuration Length of desired commit period in seconds\n    @param _revealDuration Length of desired reveal period in seconds\n    */\n    function startPoll(uint _itemId, uint _commitDuration, uint _revealDuration) external returns (uint pollID);\n\n    /**\n    @notice Commits vote using hash of choice and secret salt to conceal vote until reveal\n    @param _pollID Integer identifier associated with target poll\n    @param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)\n    */\n    function commitVote(uint _pollID, bytes32 _secretHash, address voter, uint _staticFee) external;\n\n    /**\n    @notice Reveals vote with choice and secret salt used in generating commitHash to attribute committed tokens\n    @param _pollID Integer identifier associated with target poll\n    @param _voteOption Vote choice used to generate commitHash for associated poll. 0 - down, 1 - up\n    @param _salt Secret number used to generate commitHash for associated poll\n    */\n    function revealVote(uint _pollID, uint _voteOption, uint _voteStake, uint _salt, address _voter) external;\n}\n",
   "sourcePath": "/home/algys/sources/dapp-tcr/contracts/IVoting.sol",
   "ast": {
     "absolutePath": "/home/algys/sources/dapp-tcr/contracts/IVoting.sol",
     "exportedSymbols": {
       "IVoting": [
-        266
+        275
       ]
     },
-    "id": 267,
+    "id": 276,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -279,9 +302,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 266,
+        "id": 275,
         "linearizedBaseContracts": [
-          266
+          275
         ],
         "name": "IVoting",
         "nodeType": "ContractDefinition",
@@ -363,7 +386,7 @@
               ],
               "src": "110:12:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "51:72:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -446,7 +469,7 @@
               ],
               "src": "185:13:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "129:70:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -555,7 +578,7 @@
               ],
               "src": "274:6:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "205:76:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -638,7 +661,7 @@
               ],
               "src": "348:6:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "287:68:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -747,7 +770,7 @@
               ],
               "src": "439:16:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "361:95:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -830,7 +853,7 @@
               ],
               "src": "550:16:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "462:105:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -839,12 +862,12 @@
           {
             "body": null,
             "documentation": null,
-            "id": 232,
+            "id": 220,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
             "modifiers": [],
-            "name": "pollInfo",
+            "name": "getStaticFees",
             "nodeType": "FunctionDefinition",
             "parameters": {
               "id": 216,
@@ -855,8 +878,8 @@
                   "id": 215,
                   "name": "_pollID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "591:12:2",
+                  "scope": 220,
+                  "src": "596:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -867,7 +890,7 @@
                     "id": 214,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "591:4:2",
+                    "src": "596:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -877,20 +900,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "590:14:2"
+              "src": "595:14:2"
             },
             "payable": false,
             "returnParameters": {
-              "id": 231,
+              "id": 219,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
                   "id": 218,
-                  "name": "commitEndDate",
+                  "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "636:18:2",
+                  "scope": 220,
+                  "src": "637:4:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -901,7 +924,7 @@
                     "id": 217,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "636:4:2",
+                    "src": "637:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -909,40 +932,37 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 220,
-                  "name": "revealEndDate",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "664:18:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 219,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "664:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
+                }
+              ],
+              "src": "636:6:2"
+            },
+            "scope": 275,
+            "src": "573:70:2",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 239,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "pollInfo",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 223,
+              "nodeType": "ParameterList",
+              "parameters": [
                 {
                   "constant": false,
                   "id": 222,
-                  "name": "voteQuorum",
+                  "name": "_pollID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "692:15:2",
+                  "scope": 239,
+                  "src": "667:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -953,7 +973,7 @@
                     "id": 221,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "692:4:2",
+                    "src": "667:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -961,14 +981,22 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
+                }
+              ],
+              "src": "666:14:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 238,
+              "nodeType": "ParameterList",
+              "parameters": [
                 {
                   "constant": false,
-                  "id": 224,
-                  "name": "votesFor",
+                  "id": 225,
+                  "name": "commitEndDate",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "717:13:2",
+                  "scope": 239,
+                  "src": "712:18:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -976,10 +1004,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 223,
+                    "id": 224,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "717:4:2",
+                    "src": "712:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -990,11 +1018,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 226,
-                  "name": "votesAgainst",
+                  "id": 227,
+                  "name": "revealEndDate",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "740:17:2",
+                  "scope": 239,
+                  "src": "740:18:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1002,7 +1030,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 225,
+                    "id": 226,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "740:4:2",
@@ -1016,11 +1044,89 @@
                 },
                 {
                   "constant": false,
-                  "id": 228,
+                  "id": 229,
+                  "name": "voteQuorum",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 239,
+                  "src": "768:15:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 228,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "768:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 231,
+                  "name": "votesFor",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 239,
+                  "src": "793:13:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 230,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "793:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 233,
+                  "name": "votesAgainst",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 239,
+                  "src": "816:17:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 232,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "816:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 235,
                   "name": "commitPeriodActive",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "767:23:2",
+                  "scope": 239,
+                  "src": "843:23:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1028,10 +1134,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 227,
+                    "id": 234,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "767:4:2",
+                    "src": "843:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -1042,11 +1148,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 230,
+                  "id": 237,
                   "name": "revealPeriodActive",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "800:23:2",
+                  "scope": 239,
+                  "src": "876:23:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1054,10 +1160,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 229,
+                    "id": 236,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "800:4:2",
+                    "src": "876:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -1067,10 +1173,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "635:189:2"
+              "src": "711:189:2"
             },
-            "scope": 266,
-            "src": "573:252:2",
+            "scope": 275,
+            "src": "649:252:2",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
@@ -1078,7 +1184,7 @@
           {
             "body": null,
             "documentation": "@dev Initiates a poll with canonical configured parameters at pollID emitted by PollCreated event\n@param _itemId - item for voting\n@param _commitDuration Length of desired commit period in seconds\n@param _revealDuration Length of desired reveal period in seconds",
-            "id": 243,
+            "id": 250,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -1086,102 +1192,16 @@
             "name": "startPoll",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 239,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 234,
-                  "name": "_itemId",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 243,
-                  "src": "1144:12:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 233,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1144:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 236,
-                  "name": "_commitDuration",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 243,
-                  "src": "1158:20:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 235,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1158:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 238,
-                  "name": "_revealDuration",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 243,
-                  "src": "1180:20:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 237,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1180:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1143:58:2"
-            },
-            "payable": false,
-            "returnParameters": {
-              "id": 242,
+              "id": 246,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
                   "id": 241,
-                  "name": "pollID",
+                  "name": "_itemId",
                   "nodeType": "VariableDeclaration",
-                  "scope": 243,
-                  "src": "1220:11:2",
+                  "scope": 250,
+                  "src": "1220:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1200,37 +1220,40 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                }
-              ],
-              "src": "1219:13:2"
-            },
-            "scope": 266,
-            "src": "1125:108:2",
-            "stateMutability": "nonpayable",
-            "superFunction": null,
-            "visibility": "external"
-          },
-          {
-            "body": null,
-            "documentation": "@notice Commits vote using hash of choice and secret salt to conceal vote until reveal\n@param _pollID Integer identifier associated with target poll\n@param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)",
-            "id": 252,
-            "implemented": false,
-            "isConstructor": false,
-            "isDeclaredConst": false,
-            "modifiers": [],
-            "name": "commitVote",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 250,
-              "nodeType": "ParameterList",
-              "parameters": [
+                },
+                {
+                  "constant": false,
+                  "id": 243,
+                  "name": "_commitDuration",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 250,
+                  "src": "1234:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 242,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1234:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
                 {
                   "constant": false,
                   "id": 245,
-                  "name": "_pollID",
+                  "name": "_revealDuration",
                   "nodeType": "VariableDeclaration",
-                  "scope": 252,
-                  "src": "1534:12:2",
+                  "scope": 250,
+                  "src": "1256:20:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1241,7 +1264,90 @@
                     "id": 244,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1534:4:2",
+                    "src": "1256:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1219:58:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 249,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 248,
+                  "name": "pollID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 250,
+                  "src": "1296:11:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 247,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1296:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1295:13:2"
+            },
+            "scope": 275,
+            "src": "1201:108:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Commits vote using hash of choice and secret salt to conceal vote until reveal\n@param _pollID Integer identifier associated with target poll\n@param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)",
+            "id": 261,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "commitVote",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 259,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 252,
+                  "name": "_pollID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 261,
+                  "src": "1610:12:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 251,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1610:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1252,11 +1358,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 247,
+                  "id": 254,
                   "name": "_secretHash",
                   "nodeType": "VariableDeclaration",
-                  "scope": 252,
-                  "src": "1548:19:2",
+                  "scope": 261,
+                  "src": "1624:19:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1264,10 +1370,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 246,
+                    "id": 253,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1548:7:2",
+                    "src": "1624:7:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -1278,11 +1384,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 249,
+                  "id": 256,
                   "name": "voter",
                   "nodeType": "VariableDeclaration",
-                  "scope": 252,
-                  "src": "1569:13:2",
+                  "scope": 261,
+                  "src": "1645:13:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1290,95 +1396,13 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 248,
+                    "id": 255,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1569:7:2",
+                    "src": "1645:7:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1533:50:2"
-            },
-            "payable": false,
-            "returnParameters": {
-              "id": 251,
-              "nodeType": "ParameterList",
-              "parameters": [],
-              "src": "1592:0:2"
-            },
-            "scope": 266,
-            "src": "1514:79:2",
-            "stateMutability": "nonpayable",
-            "superFunction": null,
-            "visibility": "external"
-          },
-          {
-            "body": null,
-            "documentation": "@notice Reveals vote with choice and secret salt used in generating commitHash to attribute committed tokens\n@param _pollID Integer identifier associated with target poll\n@param _voteOption Vote choice used to generate commitHash for associated poll. 0 - down, 1 - up\n@param _salt Secret number used to generate commitHash for associated poll",
-            "id": 265,
-            "implemented": false,
-            "isConstructor": false,
-            "isDeclaredConst": false,
-            "modifiers": [],
-            "name": "revealVote",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 263,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 254,
-                  "name": "_pollID",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "1993:12:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 253,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1993:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 256,
-                  "name": "_voteOption",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "2007:16:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 255,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "2007:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
                     }
                   },
                   "value": null,
@@ -1387,10 +1411,10 @@
                 {
                   "constant": false,
                   "id": 258,
-                  "name": "_voteStake",
+                  "name": "_staticFee",
                   "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "2025:15:2",
+                  "scope": 261,
+                  "src": "1660:15:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1401,7 +1425,7 @@
                     "id": 257,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2025:4:2",
+                    "src": "1660:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1409,14 +1433,44 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
+                }
+              ],
+              "src": "1609:67:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 260,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1685:0:2"
+            },
+            "scope": 275,
+            "src": "1590:96:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Reveals vote with choice and secret salt used in generating commitHash to attribute committed tokens\n@param _pollID Integer identifier associated with target poll\n@param _voteOption Vote choice used to generate commitHash for associated poll. 0 - down, 1 - up\n@param _salt Secret number used to generate commitHash for associated poll",
+            "id": 274,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "revealVote",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 272,
+              "nodeType": "ParameterList",
+              "parameters": [
                 {
                   "constant": false,
-                  "id": 260,
-                  "name": "_salt",
+                  "id": 263,
+                  "name": "_pollID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "2042:10:2",
+                  "scope": 274,
+                  "src": "2086:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1424,10 +1478,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 259,
+                    "id": 262,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2042:4:2",
+                    "src": "2086:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -1438,11 +1492,89 @@
                 },
                 {
                   "constant": false,
-                  "id": 262,
+                  "id": 265,
+                  "name": "_voteOption",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 274,
+                  "src": "2100:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 264,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2100:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 267,
+                  "name": "_voteStake",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 274,
+                  "src": "2118:15:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 266,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2118:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 269,
+                  "name": "_salt",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 274,
+                  "src": "2135:10:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 268,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2135:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 271,
                   "name": "_voter",
                   "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "2054:14:2",
+                  "scope": 274,
+                  "src": "2147:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -1450,10 +1582,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 261,
+                    "id": 270,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2054:7:2",
+                    "src": "2147:7:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -1463,36 +1595,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1992:77:2"
+              "src": "2085:77:2"
             },
             "payable": false,
             "returnParameters": {
-              "id": 264,
+              "id": 273,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2078:0:2"
+              "src": "2171:0:2"
             },
-            "scope": 266,
-            "src": "1973:106:2",
+            "scope": 275,
+            "src": "2066:106:2",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 267,
-        "src": "26:2055:2"
+        "scope": 276,
+        "src": "26:2148:2"
       }
     ],
-    "src": "0:2082:2"
+    "src": "0:2175:2"
   },
   "legacyAST": {
     "absolutePath": "/home/algys/sources/dapp-tcr/contracts/IVoting.sol",
     "exportedSymbols": {
       "IVoting": [
-        266
+        275
       ]
     },
-    "id": 267,
+    "id": 276,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -1512,9 +1644,9 @@
         "contractKind": "interface",
         "documentation": null,
         "fullyImplemented": false,
-        "id": 266,
+        "id": 275,
         "linearizedBaseContracts": [
-          266
+          275
         ],
         "name": "IVoting",
         "nodeType": "ContractDefinition",
@@ -1596,7 +1728,7 @@
               ],
               "src": "110:12:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "51:72:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -1679,7 +1811,7 @@
               ],
               "src": "185:13:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "129:70:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -1788,7 +1920,7 @@
               ],
               "src": "274:6:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "205:76:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -1871,7 +2003,7 @@
               ],
               "src": "348:6:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "287:68:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -1980,7 +2112,7 @@
               ],
               "src": "439:16:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "361:95:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -2063,7 +2195,7 @@
               ],
               "src": "550:16:2"
             },
-            "scope": 266,
+            "scope": 275,
             "src": "462:105:2",
             "stateMutability": "view",
             "superFunction": null,
@@ -2072,12 +2204,12 @@
           {
             "body": null,
             "documentation": null,
-            "id": 232,
+            "id": 220,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": true,
             "modifiers": [],
-            "name": "pollInfo",
+            "name": "getStaticFees",
             "nodeType": "FunctionDefinition",
             "parameters": {
               "id": 216,
@@ -2088,8 +2220,8 @@
                   "id": 215,
                   "name": "_pollID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "591:12:2",
+                  "scope": 220,
+                  "src": "596:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2100,7 +2232,7 @@
                     "id": 214,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "591:4:2",
+                    "src": "596:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2110,20 +2242,20 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "590:14:2"
+              "src": "595:14:2"
             },
             "payable": false,
             "returnParameters": {
-              "id": 231,
+              "id": 219,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
                   "id": 218,
-                  "name": "commitEndDate",
+                  "name": "",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "636:18:2",
+                  "scope": 220,
+                  "src": "637:4:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2134,7 +2266,7 @@
                     "id": 217,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "636:4:2",
+                    "src": "637:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2142,40 +2274,37 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 220,
-                  "name": "revealEndDate",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "664:18:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 219,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "664:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
+                }
+              ],
+              "src": "636:6:2"
+            },
+            "scope": 275,
+            "src": "573:70:2",
+            "stateMutability": "view",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": null,
+            "id": 239,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": true,
+            "modifiers": [],
+            "name": "pollInfo",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 223,
+              "nodeType": "ParameterList",
+              "parameters": [
                 {
                   "constant": false,
                   "id": 222,
-                  "name": "voteQuorum",
+                  "name": "_pollID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "692:15:2",
+                  "scope": 239,
+                  "src": "667:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2186,7 +2315,7 @@
                     "id": 221,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "692:4:2",
+                    "src": "667:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2194,14 +2323,22 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
+                }
+              ],
+              "src": "666:14:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 238,
+              "nodeType": "ParameterList",
+              "parameters": [
                 {
                   "constant": false,
-                  "id": 224,
-                  "name": "votesFor",
+                  "id": 225,
+                  "name": "commitEndDate",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "717:13:2",
+                  "scope": 239,
+                  "src": "712:18:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2209,10 +2346,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 223,
+                    "id": 224,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "717:4:2",
+                    "src": "712:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2223,11 +2360,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 226,
-                  "name": "votesAgainst",
+                  "id": 227,
+                  "name": "revealEndDate",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "740:17:2",
+                  "scope": 239,
+                  "src": "740:18:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2235,7 +2372,7 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 225,
+                    "id": 226,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
                     "src": "740:4:2",
@@ -2249,11 +2386,89 @@
                 },
                 {
                   "constant": false,
-                  "id": 228,
+                  "id": 229,
+                  "name": "voteQuorum",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 239,
+                  "src": "768:15:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 228,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "768:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 231,
+                  "name": "votesFor",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 239,
+                  "src": "793:13:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 230,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "793:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 233,
+                  "name": "votesAgainst",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 239,
+                  "src": "816:17:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 232,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "816:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 235,
                   "name": "commitPeriodActive",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "767:23:2",
+                  "scope": 239,
+                  "src": "843:23:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2261,10 +2476,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 227,
+                    "id": 234,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "767:4:2",
+                    "src": "843:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -2275,11 +2490,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 230,
+                  "id": 237,
                   "name": "revealPeriodActive",
                   "nodeType": "VariableDeclaration",
-                  "scope": 232,
-                  "src": "800:23:2",
+                  "scope": 239,
+                  "src": "876:23:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2287,10 +2502,10 @@
                     "typeString": "bool"
                   },
                   "typeName": {
-                    "id": 229,
+                    "id": 236,
                     "name": "bool",
                     "nodeType": "ElementaryTypeName",
-                    "src": "800:4:2",
+                    "src": "876:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bool",
                       "typeString": "bool"
@@ -2300,10 +2515,10 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "635:189:2"
+              "src": "711:189:2"
             },
-            "scope": 266,
-            "src": "573:252:2",
+            "scope": 275,
+            "src": "649:252:2",
             "stateMutability": "view",
             "superFunction": null,
             "visibility": "external"
@@ -2311,7 +2526,7 @@
           {
             "body": null,
             "documentation": "@dev Initiates a poll with canonical configured parameters at pollID emitted by PollCreated event\n@param _itemId - item for voting\n@param _commitDuration Length of desired commit period in seconds\n@param _revealDuration Length of desired reveal period in seconds",
-            "id": 243,
+            "id": 250,
             "implemented": false,
             "isConstructor": false,
             "isDeclaredConst": false,
@@ -2319,102 +2534,16 @@
             "name": "startPoll",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 239,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 234,
-                  "name": "_itemId",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 243,
-                  "src": "1144:12:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 233,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1144:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 236,
-                  "name": "_commitDuration",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 243,
-                  "src": "1158:20:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 235,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1158:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 238,
-                  "name": "_revealDuration",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 243,
-                  "src": "1180:20:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 237,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1180:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1143:58:2"
-            },
-            "payable": false,
-            "returnParameters": {
-              "id": 242,
+              "id": 246,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
                   "id": 241,
-                  "name": "pollID",
+                  "name": "_itemId",
                   "nodeType": "VariableDeclaration",
-                  "scope": 243,
-                  "src": "1220:11:2",
+                  "scope": 250,
+                  "src": "1220:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2433,37 +2562,40 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                }
-              ],
-              "src": "1219:13:2"
-            },
-            "scope": 266,
-            "src": "1125:108:2",
-            "stateMutability": "nonpayable",
-            "superFunction": null,
-            "visibility": "external"
-          },
-          {
-            "body": null,
-            "documentation": "@notice Commits vote using hash of choice and secret salt to conceal vote until reveal\n@param _pollID Integer identifier associated with target poll\n@param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)",
-            "id": 252,
-            "implemented": false,
-            "isConstructor": false,
-            "isDeclaredConst": false,
-            "modifiers": [],
-            "name": "commitVote",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 250,
-              "nodeType": "ParameterList",
-              "parameters": [
+                },
+                {
+                  "constant": false,
+                  "id": 243,
+                  "name": "_commitDuration",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 250,
+                  "src": "1234:20:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 242,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1234:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
                 {
                   "constant": false,
                   "id": 245,
-                  "name": "_pollID",
+                  "name": "_revealDuration",
                   "nodeType": "VariableDeclaration",
-                  "scope": 252,
-                  "src": "1534:12:2",
+                  "scope": 250,
+                  "src": "1256:20:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2474,7 +2606,90 @@
                     "id": 244,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1534:4:2",
+                    "src": "1256:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1219:58:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 249,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 248,
+                  "name": "pollID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 250,
+                  "src": "1296:11:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 247,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1296:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1295:13:2"
+            },
+            "scope": 275,
+            "src": "1201:108:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Commits vote using hash of choice and secret salt to conceal vote until reveal\n@param _pollID Integer identifier associated with target poll\n@param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)",
+            "id": 261,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "commitVote",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 259,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 252,
+                  "name": "_pollID",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 261,
+                  "src": "1610:12:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 251,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1610:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2485,11 +2700,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 247,
+                  "id": 254,
                   "name": "_secretHash",
                   "nodeType": "VariableDeclaration",
-                  "scope": 252,
-                  "src": "1548:19:2",
+                  "scope": 261,
+                  "src": "1624:19:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2497,10 +2712,10 @@
                     "typeString": "bytes32"
                   },
                   "typeName": {
-                    "id": 246,
+                    "id": 253,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1548:7:2",
+                    "src": "1624:7:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_bytes32",
                       "typeString": "bytes32"
@@ -2511,11 +2726,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 249,
+                  "id": 256,
                   "name": "voter",
                   "nodeType": "VariableDeclaration",
-                  "scope": 252,
-                  "src": "1569:13:2",
+                  "scope": 261,
+                  "src": "1645:13:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2523,95 +2738,13 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 248,
+                    "id": 255,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "1569:7:2",
+                    "src": "1645:7:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                }
-              ],
-              "src": "1533:50:2"
-            },
-            "payable": false,
-            "returnParameters": {
-              "id": 251,
-              "nodeType": "ParameterList",
-              "parameters": [],
-              "src": "1592:0:2"
-            },
-            "scope": 266,
-            "src": "1514:79:2",
-            "stateMutability": "nonpayable",
-            "superFunction": null,
-            "visibility": "external"
-          },
-          {
-            "body": null,
-            "documentation": "@notice Reveals vote with choice and secret salt used in generating commitHash to attribute committed tokens\n@param _pollID Integer identifier associated with target poll\n@param _voteOption Vote choice used to generate commitHash for associated poll. 0 - down, 1 - up\n@param _salt Secret number used to generate commitHash for associated poll",
-            "id": 265,
-            "implemented": false,
-            "isConstructor": false,
-            "isDeclaredConst": false,
-            "modifiers": [],
-            "name": "revealVote",
-            "nodeType": "FunctionDefinition",
-            "parameters": {
-              "id": 263,
-              "nodeType": "ParameterList",
-              "parameters": [
-                {
-                  "constant": false,
-                  "id": 254,
-                  "name": "_pollID",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "1993:12:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 253,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "1993:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
-                    }
-                  },
-                  "value": null,
-                  "visibility": "internal"
-                },
-                {
-                  "constant": false,
-                  "id": 256,
-                  "name": "_voteOption",
-                  "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "2007:16:2",
-                  "stateVariable": false,
-                  "storageLocation": "default",
-                  "typeDescriptions": {
-                    "typeIdentifier": "t_uint256",
-                    "typeString": "uint256"
-                  },
-                  "typeName": {
-                    "id": 255,
-                    "name": "uint",
-                    "nodeType": "ElementaryTypeName",
-                    "src": "2007:4:2",
-                    "typeDescriptions": {
-                      "typeIdentifier": "t_uint256",
-                      "typeString": "uint256"
                     }
                   },
                   "value": null,
@@ -2620,10 +2753,10 @@
                 {
                   "constant": false,
                   "id": 258,
-                  "name": "_voteStake",
+                  "name": "_staticFee",
                   "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "2025:15:2",
+                  "scope": 261,
+                  "src": "1660:15:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2634,7 +2767,7 @@
                     "id": 257,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2025:4:2",
+                    "src": "1660:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2642,14 +2775,44 @@
                   },
                   "value": null,
                   "visibility": "internal"
-                },
+                }
+              ],
+              "src": "1609:67:2"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 260,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "1685:0:2"
+            },
+            "scope": 275,
+            "src": "1590:96:2",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "external"
+          },
+          {
+            "body": null,
+            "documentation": "@notice Reveals vote with choice and secret salt used in generating commitHash to attribute committed tokens\n@param _pollID Integer identifier associated with target poll\n@param _voteOption Vote choice used to generate commitHash for associated poll. 0 - down, 1 - up\n@param _salt Secret number used to generate commitHash for associated poll",
+            "id": 274,
+            "implemented": false,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "revealVote",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 272,
+              "nodeType": "ParameterList",
+              "parameters": [
                 {
                   "constant": false,
-                  "id": 260,
-                  "name": "_salt",
+                  "id": 263,
+                  "name": "_pollID",
                   "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "2042:10:2",
+                  "scope": 274,
+                  "src": "2086:12:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2657,10 +2820,10 @@
                     "typeString": "uint256"
                   },
                   "typeName": {
-                    "id": 259,
+                    "id": 262,
                     "name": "uint",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2042:4:2",
+                    "src": "2086:4:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint256",
                       "typeString": "uint256"
@@ -2671,11 +2834,89 @@
                 },
                 {
                   "constant": false,
-                  "id": 262,
+                  "id": 265,
+                  "name": "_voteOption",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 274,
+                  "src": "2100:16:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 264,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2100:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 267,
+                  "name": "_voteStake",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 274,
+                  "src": "2118:15:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 266,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2118:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 269,
+                  "name": "_salt",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 274,
+                  "src": "2135:10:2",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 268,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2135:4:2",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 271,
                   "name": "_voter",
                   "nodeType": "VariableDeclaration",
-                  "scope": 265,
-                  "src": "2054:14:2",
+                  "scope": 274,
+                  "src": "2147:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -2683,10 +2924,10 @@
                     "typeString": "address"
                   },
                   "typeName": {
-                    "id": 261,
+                    "id": 270,
                     "name": "address",
                     "nodeType": "ElementaryTypeName",
-                    "src": "2054:7:2",
+                    "src": "2147:7:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_address",
                       "typeString": "address"
@@ -2696,27 +2937,27 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "1992:77:2"
+              "src": "2085:77:2"
             },
             "payable": false,
             "returnParameters": {
-              "id": 264,
+              "id": 273,
               "nodeType": "ParameterList",
               "parameters": [],
-              "src": "2078:0:2"
+              "src": "2171:0:2"
             },
-            "scope": 266,
-            "src": "1973:106:2",
+            "scope": 275,
+            "src": "2066:106:2",
             "stateMutability": "nonpayable",
             "superFunction": null,
             "visibility": "external"
           }
         ],
-        "scope": 267,
-        "src": "26:2055:2"
+        "scope": 276,
+        "src": "26:2148:2"
       }
     ],
-    "src": "0:2082:2"
+    "src": "0:2175:2"
   },
   "compiler": {
     "name": "solc",
@@ -2724,5 +2965,5 @@
   },
   "networks": {},
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-10-28T06:09:45.471Z"
+  "updatedAt": "2018-10-28T10:19:18.474Z"
 }
