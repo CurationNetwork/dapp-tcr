@@ -12,6 +12,8 @@ interface IVoting {
 
     function getNumTokens(address _voter, uint _pollID) constant external returns (uint numTokens);
 
+    function getTotalNumberOfTokensForWinningOption(uint _pollID) constant external returns (uint numTokens);
+
     function pollInfo(uint _pollID) external view returns
         (uint commitEndDate,
         uint revealEndDate,

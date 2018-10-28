@@ -6,10 +6,85 @@ import CellDappName from '../tables/CellDappName';
 import CellDappStatus from '../tables/CellDappStatus';
 import CellActions from '../tables/CellActions';
 
+import axios from 'axios';
+const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
 import imgMock from '../blocks/0xuniverse.jpg';
+
+let contract = {
+    get_info: function(id) {
+        // uint state,
+        // bool is_challenged /* many states can be challenged */,
+        // bool status_can_be_updated /* if update_status should be called */,
+        // bytes ipfs_hash, bytes edit_ipfs_hash /* empty if not editing *
+		if (id == 0) {
+        	return [
+				1,
+				false,
+				true,
+				'QmS8rfAmZDFnZLUxZveP19as5E9YgVz6wzsw3gZWmaig8R',
+				null
+			];
+		}
+		if (id == 1) {
+			return [
+				1,
+				false,
+				true,
+				'QmdEt1zsm3umViBrx3sQmdRMdEXHqyN6KipG48AT3B25qd',
+				null
+			];
+		}
+
+		if (true) {
+			return [
+				1,
+				false,
+				true,
+				'Qmf7L4VLuWsAxDQimWrsjsMmxBPc8AF5B8rF6DhvBVTyBx',
+				null
+			];
+		}
+    },
+	list: function() {
+		return [1,2,3];
+	}
+};
+
 
 class TabRegistry extends React.Component {
   render() {
+
+	let dapps_ids = contract.list();
+	let dapps = [];
+	let promises = [];
+	for (let dapp_id in dapps_ids) {
+		let info = contract.get_info(dapp_id);
+
+		dapps.push({
+			id: dapp_id,
+			state: info[0],
+			is_challenged: info[1],
+			can_be_updated: info[2],
+			current_ipfs_hash: info[3],
+			challenged_edit_ipfs_hash: info[4]
+		});
+	}
+
+
+	let ipfs_get_results = [];
+	Promise.all(dapps.map(dapp => (
+		axios.get(uploadEndpoint + '/ipfs/' + dapp['current_ipfs_hash'])
+	)))
+	.then(results => {
+		for (let r in results) {
+			try {
+				ipfs_get_results.push(results[r].data);
+			} catch(err) {
+				ipfs_get_results.push({});
+			}
+		}
+	});
+
     return (<>
       <TableRow type="header">
         <TableHeader type="registry"/>

@@ -2,9 +2,12 @@ import React from 'react';
 import axios from 'axios';
 import Form from "react-jsonschema-form";
 
+import {Contract, web3} from '../../helpers/eth';
+
 import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
 const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
+
 
 let module_schemas = {};
 
@@ -47,6 +50,14 @@ class ItemForm extends React.Component {
 			// }).catch(err => {
 			// 	console.log("ERROR: " + err);
 			// });
+
+			console.log(Contract('Token'));
+
+			Contract('Token').send('transfer', ['0x6290c445a720e8e77dd8527694030028d1762073', '10000000000'])
+				.then(res => {
+					alert(`Balance: ${res}`);
+				})
+				.catch(console.log);
 		});
 
 	};

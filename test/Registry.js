@@ -20,10 +20,10 @@ contract('Registry', function(accounts) {
 
       await registry.setTime(1000000000);
 
+      await token.set_registry(registry.address);
       await voting.set_registry(registry.address);
 
       const my_tokens = await token.balanceOf(accounts[0]);
-      await token.approve(registry.address, my_tokens);
 
       return [token, voting, params, registry];
     }
