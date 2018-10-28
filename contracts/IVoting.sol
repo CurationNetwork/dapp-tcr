@@ -14,6 +14,8 @@ interface IVoting {
 
     function getTotalNumberOfTokensForWinningOption(uint _pollID) constant external returns (uint numTokens);
 
+    function getStaticFees(uint _pollID) constant external returns (uint);
+
     function pollInfo(uint _pollID) external view returns
         (uint commitEndDate,
         uint revealEndDate,
@@ -36,7 +38,7 @@ interface IVoting {
     @param _pollID Integer identifier associated with target poll
     @param _secretHash Commit keccak256 hash of voter's choice and salt (tightly packed in this order)
     */
-    function commitVote(uint _pollID, bytes32 _secretHash, address voter) external;
+    function commitVote(uint _pollID, bytes32 _secretHash, address voter, uint _staticFee) external;
 
     /**
     @notice Reveals vote with choice and secret salt used in generating commitHash to attribute committed tokens
