@@ -8,6 +8,10 @@ import FormChallenge from '../forms/FormChallenge';
 import './ModalDapp.scss';
 
 class ModalDapp extends React.Component {
+  shouldComponentUpdate() {
+    return !this.props.isOpen;
+  }
+
   render() {
     const {isOpen, onClose, action, item} = this.props;
     return (
