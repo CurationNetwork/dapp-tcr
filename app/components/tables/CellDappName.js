@@ -1,4 +1,5 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import './CellDappName.scss';
 import {Contract} from "../../helpers/eth";
@@ -20,7 +21,9 @@ class CellDappName extends React.Component {
       <div>
         <div className="name">{name}</div>
         <div className="desc-short">{desc}</div>
-        <div className="update" onClick={() => this.updateStatus()}>update status</div>
+        <div className="update" onClick={() => this.updateStatus()}>
+          <FontAwesomeIcon icon="sync-alt"/> update status
+        </div>
       </div>
     </div>);        
   }
