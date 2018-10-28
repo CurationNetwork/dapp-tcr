@@ -41,7 +41,7 @@ class TabRegistry extends React.Component {
         <TableRow key={idx}>
           <CellDappName icon={imgMock} name={item.ipfsData.metadata.name} desc={item.ipfsData.metadata.short_description}/>
           <CellDappStatus type="registry"/>
-          <CellActions type="registry" item={item}/>
+          <CellActions type="registry" subtype={item.state} item={item}/>
         </TableRow>
 			)}
     </>);

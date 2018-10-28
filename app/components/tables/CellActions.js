@@ -79,7 +79,12 @@ class CellActions extends React.Component {
               <FontAwesomeIcon icon="pen"/> Decline Update
             </div>
           }
-          {(subtype === 'APPLICATION') &&
+          {(subtype === 'EXISTS') &&
+            <div className="approve" onClick={this.togglePopup.bind(this, 'update')}>
+              <FontAwesomeIcon icon="pen"/> Update
+            </div>
+          }
+          {(subtype === 'APPLICATION' || subtype === 'EXISTS') &&
             <div className="reject" onClick={this.togglePopup.bind(this, 'challenge')}>
               <FontAwesomeIcon icon="ban"/> Remove
             </div>
