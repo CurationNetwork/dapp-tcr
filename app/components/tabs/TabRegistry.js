@@ -37,7 +37,7 @@ class TabRegistry extends React.Component {
       <TableRow type="header">
         <TableHeader type="registry"/>
       </TableRow>
-      {this.props.data.map((item, idx) =>
+      {this.props.data.filter(item => item[0] === 2).map((item, idx) =>
         <TableRow key={idx}>
           <CellDappName icon={imgMock} name={item.ipfs_data.data.metadata.name} desc={item.ipfs_data.data.metadata.short_description}/>
           <CellDappStatus type="registry"/>

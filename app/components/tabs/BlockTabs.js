@@ -17,18 +17,7 @@ class Block extends React.Component {
     
     this.state = {
       tabActive: Number(localStorage.getItem('tabActive')) || 0
-    }
-
-    this.tabHeaders = [
-      <>Dapps in Registry&nbsp;&mdash; {React.Children.count(children)}</>,
-      <span className="applications">
-        <FontAwesomeIcon icon="pen"/> Applications&nbsp;&mdash; {React.Children.count(applications)}
-      </span>,
-      <span className="challenges">
-        <FontAwesomeIcon icon="ban"/> Challenges&nbsp;&mdash; {React.Children.count(challenges)}
-      </span>
-    ];
-
+    };
 
     this.switchTab = this.switchTab.bind(this);
   }
@@ -41,6 +30,15 @@ class Block extends React.Component {
   render() {
     this.tabContent = [<TabRegistry {...this.props}/>, <TabApplications {...this.props}/>, <TabChallenges {...this.props}/>];
 
+    this.tabHeaders = [
+      <>Dapps in Registry&nbsp;&mdash; {this.props.data.filter(item => item[0] === 2).length}</>,
+      <span className="applications">
+        <FontAwesomeIcon icon="pen"/> Applications&nbsp;&mdash; {this.props.data.filter(item => item[0] in [1, 3]).length}
+      </span>,
+      <span className="challenges">
+        <FontAwesomeIcon icon="ban"/> Challenges&nbsp;&mdash; {this.props.data.filter(item => item[1]).length}
+      </span>
+    ];
     const { tabActive } = this.state;
 
     return (<div className="block with-tabs">

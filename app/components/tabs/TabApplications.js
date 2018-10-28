@@ -14,16 +14,13 @@ class TabApplications extends React.Component {
       <TableRow type="header">
         <TableHeader type="submitted"/>
       </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="submitted" passedPercent={35}/>
-        <CellActions type="challenge"/>
-      </TableRow>
-      <TableRow>
-        <CellDappName icon={imgMock} name="0xUniverse" desc="Conquering the Universe"/>
-        <CellDappStatus type="updated" passedPercent={59}/>
-        <CellActions type="challenge"/>
-      </TableRow>
+      {this.props.data.filter(item => item[0] in [1, 3]).map((item, idx) =>
+        <TableRow key={idx}>
+          <CellDappName icon={imgMock} name={item.ipfs_data.data.metadata.name} desc={item.ipfs_data.data.metadata.short_description}/>
+          <CellDappStatus type="registry"/>
+          <CellActions type="registry"/>
+        </TableRow>
+      )}
     </>);
   }
 }
