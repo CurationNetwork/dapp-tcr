@@ -1,10 +1,4 @@
-# dapp-tcr
-Decentralized DApp list based on TCR
+## Community curated DApp registry [WIP]
+*Status #cryptolife hackathon project*
 
-## Build & run
-
-```bash
-npm i
-
-./node_modules/.bin/embark run
-```
+More details about project: https://devpost.com/software/community-curated-dapp-registry
