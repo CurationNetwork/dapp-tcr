@@ -72,7 +72,12 @@ module.exports = (env) => {
                         options: removeEmpty({
                             babelrc: false,
                             presets: ['@babel/preset-env', '@babel/preset-react'],
-                            plugins: ifDevelopment(["react-hot-loader/babel"]),
+                            plugins: removeEmpty([
+                              ifDevelopment(["react-hot-loader/babel"]),
+                              ["@babel/plugin-proposal-decorators", { "legacy": true }],
+                              ["@babel/plugin-proposal-class-properties", { "loose": true }],
+                              ["@babel/plugin-syntax-dynamic-import"],
+                            ]),
                             cacheDirectory: ifDevelopment(true),
                             compact: ifProduction(true),
                         }),

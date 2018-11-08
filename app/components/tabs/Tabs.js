@@ -2,13 +2,13 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 
-import TabRegistry from './TabRegistry';
-import TabApplications from './TabApplications';
-import TabChallenges from './TabChallenges';
+import TabRegistry from './tab-registry/TabRegistry';
+import TabApplications from './tab-applications/TabApplications';
+import TabChallenges from './tab-challenges/TabChallenges';
 
-import './Block.scss';
+import './Tabs.scss';
 
-class Block extends React.Component {
+export default class Tabs extends React.Component {
   constructor(props) {
     super(props);
 
@@ -57,5 +57,3 @@ class Block extends React.Component {
     </div>);
   }
 }
-
-export default Block;

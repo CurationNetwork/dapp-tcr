@@ -8,22 +8,22 @@
 
   "properties": {
     "spec_version": {
-	  "title": "Current DApp specification version",
-	  "$description": "Version number of JSON schema specifications for DApps",
+      "title": "Current DApp specification version",
+      "$description": "Version number of JSON schema specifications for DApps",
       "$comment": "version of DApp metadata specification to use",
       "$ref": "#/definitions/semver"
     },
 
     "prev_meta": {
-	  "title": "IPFS multihash of previous DApp metadata",
-	  "$description": "IPFS multihash of previous version of JSON schema",
+      "title": "IPFS multihash of previous DApp metadata",
+      "$description": "IPFS multihash of previous version of JSON schema",
       "$comment": "hash of previous version of this DApp metadata",
       "$ref": "#/definitions/ipfs_hash"
     },
 
     "metadata": {
       "$comment": "metainfo details",
-	  "title": "Main DApp metadata",
+	    "title": "Main DApp metadata",
       "type": "object",
       "required": ["name"],
       "additionalProperties": false,
@@ -31,26 +31,25 @@
       "properties": {
 
         "name": {
-		  "type": "string",
+		      "type": "string",
           "$comment": "Official display name of DApp",
           "title": "Name of the DApp",
           "$description": "Official display name of DApp"
-		},
+		    },
 
         "description": {
-		  "type": "string",
-		  "$comment": "Full description of DApp",
+          "type": "string",
+          "$comment": "Full description of DApp",
           "title": "Full description of the DApp",
           "$description": "Description of the DApp"
-		},
-
+	    	},
 
         "short_description": {
-		  "type": "string",
-		  "$comment": "Short descriptionof DApp",
+          "type": "string",
+          "$comment": "Short descriptionof DApp",
           "title": "Short description of the DApp",
           "$description": "Short description of the DApp"
-		},
+    		},
 
         "url": {
           "title": "Official website of the DApp",
@@ -81,26 +80,25 @@
           "items": {"$ref": "#/definitions/ipfs_hash"}
         },
 
-		"languages": {
-		  "title": "Languages of DApp interface",
-		  "$comment": "DApp languages",
-		  "type": "array",
-		  "items": {"$ref": "#/definitions/eth_address"}
-		},
+        "languages": {
+          "title": "Languages of DApp interface",
+          "$comment": "DApp languages",
+          "type": "array",
+          "items": {"$ref": "#/definitions/eth_address"}
+        },
 
         "networks": {
           "title": "Networks, where DApp is presented",
           "$comment": "Platform of the DApp",
           "type": "array",
-		  "items": {"$ref": "#/definitions/network"}
+	    	  "items": {"$ref": "#/definitions/network"}
         }
-
       }
     },
 
     "addresses": {
-	  "title": "Addresses of DApp smart-contracts",
-	  "$description": "Array of DApp smart-contracts addresses",
+      "title": "Addresses of DApp smart-contracts",
+      "$description": "Array of DApp smart-contracts addresses",
       "$comment": "DApp smart contact addresses",
       "type": "array",
       "items": {"$ref": "#/definitions/eth_address"}
@@ -123,6 +121,7 @@
     "$ref": "#/definitions/module"
   },
 
+
   "definitions": {
     "semver": {
       "$comment": "semantic versioning",
@@ -133,15 +132,14 @@
     "ipfs_hash": {
       "type": "string",
       "maxLength": 80,
-	  "patternProperties": {
+	    "patternProperties": {
       	"ipfs_hash": "^Qm[1-9A-HJ-NP-Za-km-z]{44}$"
       }
     },
 
-	"network": {
+  	"network": {
       "type": "string"
     },
-
 
     "eth_address": {
       "type": "string",

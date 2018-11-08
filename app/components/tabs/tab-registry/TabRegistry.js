@@ -1,10 +1,10 @@
 import React from 'react';
 
-import TableRow from '../tables/TableRow';
-import TableHeader from '../tables/TableHeader';
-import CellDappName from '../tables/CellDappName';
-import CellDappStatus from '../tables/CellDappStatus';
-import CellActions from '../tables/CellActions';
+import TableRow from '../../tables/TableRow';
+import TableHeader from '../../tables/TableHeader';
+import CellDappName from '../../tables/CellDappName';
+import CellDappStatus from '../../tables/CellDappStatus';
+import CellActions from '../../tables/CellActions';
 
 import axios from 'axios';
 const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
