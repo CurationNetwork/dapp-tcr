@@ -46,6 +46,7 @@
     "classnames": "^2.2.6",
     "ethjs-abi": "^0.2.1",
     "history": "^4.7.2",
+    "lodash": "^4.17.11",
     "mobx": "^5.6.0",
     "mobx-react": "^5.3.6",
     "mobx-react-router": "^4.0.5",

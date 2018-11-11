@@ -13,10 +13,12 @@ export default class ContractsStore {
 
   @action
   initContracts() {
-    if (web3 && contractsConfig) {
+    const { web3, web3Status } = this.rootStore.web3Store;
+
+    if (web3Status === 'web3-ok') {
       Object.keys(contractsConfig).forEach((name) => {
         this.contracts.set(name, {
-          ...this.contracts[name],
+          ...contractsConfig[name],
           instance: web3.eth.contract(contractsConfig[name].abi).at(contractsConfig[name].address),
           call: function(method, args = []) {
             return new Promise((resolve, reject) => {
@@ -37,7 +39,7 @@ export default class ContractsStore {
       });
 
     } else {
-      rej('Error in initContracts');
+      log('Bad web3 status, contracts not initialized.');
     }
   }
 

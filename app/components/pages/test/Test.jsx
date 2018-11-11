@@ -15,6 +15,8 @@ export default class Test extends React.Component {
     if (!list.length) {
       fetchRegistry();      
     }
+
+    this.props.stores.subscriptionsStore.subscribe('tcrStore', 'fetchRegistry');
   }
 
   render() {

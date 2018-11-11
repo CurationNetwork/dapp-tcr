@@ -76,9 +76,12 @@ export default class Web3Store {
       this.checkNetwork();
       this.checkDefaultAccount();
 
-      if (!this.rootStore.contractsStore.contracts.size) {
-        this.rootStore.contractsStore.initContracts();
-      }
+      const {contracts, initContracts} = this.rootStore.contractsStore;
+      if (!contracts.size) initContracts();
+
+      const {blockSubscription, initSubscription} = this.rootStore.subscriptionsStore;
+      if (!blockSubscription) initSubscription();
+      
     }
   }
 

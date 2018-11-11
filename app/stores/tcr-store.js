@@ -18,6 +18,9 @@ export default class TcrStore {
     const { contracts } = this.rootStore.contractsStore;
     let tempList;
 
+    console.log("!");
+    
+
     if (web3 && contracts && contracts.has('Registry')) {      
       contracts.get('Registry').call('list')
       .then(ids => {
