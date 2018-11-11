@@ -6,12 +6,7 @@ import CellDappName from '../../tables/CellDappName';
 import CellDappStatus from '../../tables/CellDappStatus';
 import CellActions from '../../tables/CellActions';
 
-import axios from 'axios';
-const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
-import imgMock from '../blocks/0xuniverse.jpg';
-
-import { Contract, afterInit } from '../../helpers/eth';
-
+import imgMock from '../../blocks/0xuniverse.jpg';
 
 class TabRegistry extends React.Component {
 
@@ -30,8 +25,6 @@ class TabRegistry extends React.Component {
 		// 		challenged_edit_ipfs_hash: info[4]
 		// 	});
 		// }
-
-		console.log(this.props.data);
 
     return (<>
       <TableRow type="header">

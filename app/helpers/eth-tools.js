@@ -1,10 +1,3 @@
-export const getNetworkId = cb => {
-  web3.version.getNetwork((err, netId) => {
-    err && console.error(err);
-    netId && cb(netId);
-  });
-};
-
 export const getTxReceipt = (txHash, cb) => {
   web3.eth.getTransactionReceipt(txHash, (err, receipt) => {
     if (null == receipt)
@@ -16,34 +9,71 @@ export const getTxReceipt = (txHash, cb) => {
 };
 
 export const getNetworkName = netId => {
-  switch (netId.toString()) {
-    case "1":
-      return "Mainnet";
-    case "3":
-      return "Ropsten";
-    case "4":
-      return "Rinkeby";
-    case "42":
-      return "Kovan";
-    default:
-      return "Error! Unknown or deprecated network";
-  }
+  const n = Number(netId);
+
+  if (!n || Number.isNaN(n))
+    return undefined;
+  
+  const m = new Map([
+    [1, 'Ethereum'],
+    [2, 'Morden'],
+    [3, 'Ropsten'],
+    [4, 'Rinkeby'],
+    [8, 'Ubiq'],
+    [42, 'Kovan'],
+    [77, 'POA Sokol'],
+    [99, 'POA Core'],
+    [100, 'xDai'],
+    [401697, 'Tobalaba'],
+    [7762959, 'Musicoin'],
+    [61717561, 'Aquachain']
+  ]);
+
+  if (m.has(n)) return m.get(n);
+  else return 'Unknown network';
 };
 
-export const getNetworkEtherscanAddress = netId => {
-  switch (netId.toString()) {
-    case "1":
-      return "https://etherscan.io";
-    case "3":
-      return "https://ropsten.etherscan.io";
-    case "4":
-      return "https://rinkeby.etherscan.io";
-    case "42":
-      return "https://kovan.etherscan.io";
-    default:
-      return "Error! Unknown or deprecated network";
-  }
+export const getNetworkExplorerAddress = netId => {
+  const n = Number(netId);
+
+  const m = new Map([
+    [1, 'https://etherscan.io'],
+    [3, 'https://ropsten.etherscan.io'],
+    [4, 'https://rinkeby.etherscan.io'],
+    [8, 'https://ubiqscan.io'],
+    [42, 'https://kovan.etherscan.io'],
+    [77, 'https://blockscout.com/poa/sokol'],
+    [99, 'https://blockscout.com/poa/core'],
+    [100, 'https://blockscout.com/poa/dai'],
+    [401697, 'https://tobalaba.etherscan.com'],
+    [7762959, 'https://explorer.musicoin.org']
+  ]);
+
+  if (m.has(n)) return m.get(n);
+  else return undefined;
 };
+
+export const detectWallet = () => {
+  if (window.ethereum){
+    return "modern_metamask"
+  }
+  if (window.web3){
+    if (window.web3.currentProvider && window.web3.currentProvider.isMetaMask){
+      return "metamask"
+    }
+    if (window.web3.currentProvider && window.web3.currentProvider.isTrust === true) {
+      return "trust"
+    }
+    if ((!!window.__CIPHER__) && (window.web3.currentProvider && window.web3.currentProvider.constructor && window.web3.currentProvider.constructor.name === "CipherProvider")) {
+      return "cipher"
+    }
+    if (window.web3.isDAppBrowser && window.web3.isDAppBrowser()) {
+      return "dapp"
+    }
+    return "unknown"
+  }
+  return "non_web3"
+}
 
 export const isAddress = (hash) => {
   if (typeof hash === 'string') {

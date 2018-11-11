@@ -55,7 +55,45 @@ export default class Main extends React.Component {
 
   fetch_data() {
     afterInit.then(() => {
+      let contract = Contract('Registry');
 
+      let list = null;
+      let listIds = null;
+
+      contract.call('list')
+        .then(ids => {
+          listIds = ids;
+          return Promise.all(ids.map(id => {
+            return contract.call('get_info', [id])
+          }))
+        })
+        .then(res => {
+          list = res;
+          return Promise.all(list.map(item => {
+            return axios.get('https://ipfs.io' + '/ipfs/' + Buffer.from(item[3].substr(2), 'hex').toString())
+          }))
+        })
+        .then(res => {
+          res.forEach((data, idx) => {
+            list[idx].ipfs_data = data;
+          });
+
+          const newList = list.map((l, i) => {
+            const res = {};
+            res.id = listIds[i];
+            res.state = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'][+l[0].toString()];
+            res.isChallenged = l[1];
+            res.canBeUpdated = l[2];
+            res.ipfsHash = l[3];
+            res.proposedIpfsHash = l[4];
+            res.ipfsData = l.ipfs_data.data;
+            return res;
+          });
+
+          this.state.list = newList;
+          //this.setState({list: newList});
+          this.fetch_challenge_statuses()
+        });
     });
   }
 

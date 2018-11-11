@@ -1,11 +1,10 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { inject, observer } from 'mobx-react';
 
 import './Form.scss';
 
-import { Contract } from "../../helpers/eth";
-
-
+@inject('stores')
+@observer
 class FormChallenge extends React.Component {
   constructor(props) {
     super(props);
@@ -13,14 +12,14 @@ class FormChallenge extends React.Component {
 
   stateToInt(state) {
     let states = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'];
-
     return states.findIndex(s => s === state);
   }
 
   doChallenge() {
+    const { challenge } = this.props.stores.tcrStore;
+
     console.log([this.props.item.id, this.stateToInt(this.props.item.state)]);
-    Contract('Registry').send('challenge', [this.props.item.id, this.stateToInt(this.props.item.state)])
-      .then()
+    challenge(this.props.item.id, this.stateToInt(this.props.item.state));
   }
 
   render() {

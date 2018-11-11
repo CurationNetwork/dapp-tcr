@@ -6,7 +6,7 @@ import CellDappName from '../../tables/CellDappName';
 import CellDappStatus from '../../tables/CellDappStatus';
 import CellActions from '../../tables/CellActions';
 
-import imgMock from '../blocks/0xuniverse.jpg';
+import imgMock from '../../blocks/0xuniverse.jpg';
 
 class TabChallenges extends React.Component {
   render() {

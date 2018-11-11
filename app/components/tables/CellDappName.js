@@ -1,18 +1,18 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { inject, observer } from 'mobx-react';
 
 import './CellDappName.scss';
-import {Contract} from "../../helpers/eth";
 import poa from '../../assets/poa.png';
 import ethereum from '../../assets/ethereum.png';
 
+@inject('stores')
+@observer
 class CellDappName extends React.Component {
 
   updateStatus() {
-    let contract = Contract('Registry');
-
-    contract.send('update_status', [this.props.item.id])
-      .then(console.log());
+    const { updateStatus } = this.props.stores.tcrStore;
+    updateStatus(this.props.item.id);
   }
 
   render() {

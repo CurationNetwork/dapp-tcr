@@ -9,19 +9,21 @@ export default class TcrStore {
     this.rootStore = rootStore;
 
     this.fetchRegistry = this.fetchRegistry.bind(this);
+    this.fetchChallengeStatuses = this.fetchChallengeStatuses.bind(this);
   }
 
   @action
   fetchRegistry() {
-    const { web3, contracts } = this.rootStore.web3Store;
+    const { web3 } = this.rootStore.web3Store;
+    const { contracts } = this.rootStore.contractsStore;
     let tempList;
 
-    if (web3 && contracts && contracts['Registry']) {      
-      contracts['Registry'].call('list')
+    if (web3 && contracts && contracts.has('Registry')) {      
+      contracts.get('Registry').call('list')
       .then(ids => {
         this.listIds = ids;
         return Promise.all(ids.map(id => {
-          return contracts['Registry'].call('get_info', [id])
+          return contracts.get('Registry').call('get_info', [id])
         }))
       })
       .then(res => {
@@ -47,10 +49,77 @@ export default class TcrStore {
           return res;
         });
 
-        // this.fetch_challenge_statuses()
+        this.fetchChallengeStatuses();
       });
     } else {
       setTimeout(this.fetchRegistry, 200);
     }
   }
+
+  @action
+  fetchChallengeStatuses() {
+    const { web3, contracts } = this.rootStore.web3Store;
+
+    if (!web3 || !contracts || !contracts.has('Registry')) return null;
+
+    Promise.all(this.list.map(item => {
+      if (item.isChallenged)
+        return contracts.get('Registry').call('challenge_status', [item.id]);
+      else
+        return null;
+    })).then(res => {
+      res.forEach((data, i) => {
+        if (data !== null) {
+          this.list[i].challengeStatus = {
+            phase: data[1] === 0 ? 'commit' : 'reveal',
+            challengeId: data[0],
+            votesFor: data[3],
+            votesAgainst: data[4],
+            commitEndDate: data[5],
+            revealEndDate: data[6]
+          }
+        }
+        else {
+          this.list[i].challengeStatus = null;
+        }
+      });
+    });
+  }
+
+  @action
+  apply(bytesHash) {
+    const { web3, contracts } = this.rootStore.web3Store;
+
+    if (!web3 || !contracts || !contracts.has('Registry')) return null;
+
+    contracts.get('Registry').send('apply', [bytesHash])
+      .then(res => {
+        console.log(`tx hash: ${res}`);
+      })
+      .catch(console.error);
+  }
+
+  @action
+  challenge(id, state) {
+    const { web3, contracts } = this.rootStore.web3Store;
+
+    if (!web3 || !contracts || !contracts.has('Registry')) return null;
+
+    contracts.get('Registry')
+      .send('challenge', [id, state])
+      .then();
+  }
+
+  @action
+  updateStatus(id) {
+    const { web3, contracts } = this.rootStore.web3Store;
+
+    if (!web3 || !contracts || !contracts.has('Registry')``) return null;
+
+    contracts.get('Registry')
+      .send('update_status', [id])
+      .then();
+  }
+
+
 }

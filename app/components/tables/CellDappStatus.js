@@ -4,8 +4,6 @@ import classNames from 'classnames';
 
 import './CellDappStatus.scss';
 
-import { Contract, afterInit } from '../../helpers/eth';
-
 function Stage(props) {
   const { type, status, subtype } = props;
 
@@ -100,7 +98,6 @@ class CellDappStatus extends React.Component {
     }
 
     else if (type === 'registry') {
-      console.log(this.props);
       paylo = (<div className="dapp-status registry">
         {(item.isChallenged && item.state === 'EDIT') &&
           <Stage type="challenged-update" status="active "/>
