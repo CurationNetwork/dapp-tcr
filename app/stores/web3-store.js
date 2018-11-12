@@ -1,8 +1,6 @@
 import { action, observable, runInAction } from 'mobx';
 
 import { getNetworkName } from '../helpers/eth-tools';
-import { initContracts as initC } from '../helpers/eth-contracts';
-import contractsConfig from '../contracts';
 
 export default class Web3Store {
   @observable web3;
@@ -14,9 +12,8 @@ export default class Web3Store {
   constructor(rootStore) {
     this.rootStore = rootStore;
 
-    this.initWeb3 = this.initWeb3.bind(this);
-    this.initContracts = this.initContracts.bind(this);
     this.checkWeb3Status = this.checkWeb3Status.bind(this);
+    this.initWeb3 = this.initWeb3.bind(this);
     this.checkNetwork = this.checkNetwork.bind(this);
     this.checkDefaultAccount = this.checkDefaultAccount.bind(this);
 
@@ -29,35 +26,10 @@ export default class Web3Store {
   }
 
   @action
-  initWeb3() {
-    if (!this.web3 && window.ethereum) {
-      window.ethereum.enable()
-        .then(() => {
-          runInAction(() => {        
-            this.web3 = new window.Web3(window.ethereum);
-          });
-        })
-        .catch(() => this.web3 = 'not-authorized');      
-  
-    } else if (!this.web3 && window.web3) {
-      this.web3 = new window.Web3(window.web3.currentProvider);
-  
-    }
-  
-    // this.initContracts();
-  }
-
-  // TODO get rid of contracts helper
-  @action
-  initContracts() {
-    initC(this.web3, contractsConfig).then((cs) => {
-      runInAction(() => {        
-        this.contracts = cs;
-      });  
-    });
-  }
-
-  @action
+  /** 
+   * Checks window.web3 object status changes by time interval,
+   * initializes contracts and subscriptions.
+   */
   checkWeb3Status() {
     let s = this.web3Status;
 
@@ -86,6 +58,24 @@ export default class Web3Store {
   }
 
   @action
+  /** Gets web3 provider from environment and bring web3 to work. */
+  initWeb3() {
+    if (!this.web3 && window.ethereum) {
+      window.ethereum.enable()
+        .then(() => {
+          runInAction(() => {        
+            this.web3 = new window.Web3(window.ethereum);
+          });
+        })
+        .catch(() => this.web3 = 'not-authorized');      
+  
+    } else if (!this.web3 && window.web3) {
+      this.web3 = new window.Web3(window.web3.currentProvider);
+  
+    }
+  }
+
+@action
   checkNetwork() {
     this.web3.version.getNetwork((err, netId) => {
       if (netId && this.networkId !== netId) {

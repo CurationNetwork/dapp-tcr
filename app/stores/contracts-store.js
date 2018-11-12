@@ -12,6 +12,7 @@ export default class ContractsStore {
   }
 
   @action
+  // TODO: generate named functions for contract methods
   initContracts() {
     const { web3, web3Status } = this.rootStore.web3Store;
 
