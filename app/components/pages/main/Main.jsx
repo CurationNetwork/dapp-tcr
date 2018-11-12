@@ -9,18 +9,8 @@ import logo from '../../../assets/logo-horisontal.svg';
 @inject('stores')
 @observer
 export default class Main extends React.Component {
-  componentWillMount() {
-    const { list, fetchRegistry } = this.props.stores.tcrStore;
-
-    if (!list.length) {
-      fetchRegistry();      
-    }
-
-    this.props.stores.subscriptionsStore.subscribe('tcrStore', 'fetchRegistry');
-  }
-
   render() {
-    const { list } = this.props.stores.tcrStore;
+    const { registry } = this.props.stores.tcrStore;
 
     return (
       <div className="dapp-container">
@@ -36,7 +26,7 @@ export default class Main extends React.Component {
             </div>
           </div>
         </div>
-        <Tabs data={list}/>
+        <Tabs data={registry}/>
       </div>
     );
   }

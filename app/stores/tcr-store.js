@@ -2,35 +2,35 @@ import { action, observable } from 'mobx';
 import axios from 'axios';
 
 export default class TcrStore {
-  @observable list = [];
-  @observable listIds = [];
+  @observable registry = [];
+  @observable registryIds = [];
 
   constructor(rootStore) {
     this.rootStore = rootStore;
 
     this.fetchRegistry = this.fetchRegistry.bind(this);
     this.fetchChallengeStatuses = this.fetchChallengeStatuses.bind(this);
+    this.apply = this.apply.bind(this);
+    this.challenge = this.challenge.bind(this);
+    this.updateStatus = this.updateStatus.bind(this);
+    this.isReady = this.isReady.bind(this);
   }
 
   @action
   fetchRegistry() {
-    const { web3 } = this.rootStore.web3Store;
     const { contracts } = this.rootStore.contractsStore;
     let tempList;
 
-    console.log("!");
-    
-
-    if (web3 && contracts && contracts.has('Registry')) {      
+    if (this.isReady()) {      
       contracts.get('Registry').call('list')
       .then(ids => {
-        this.listIds = ids;
+        this.registryIds = ids;
         return Promise.all(ids.map(id => {
-          return contracts.get('Registry').call('get_info', [id])
-        }))
+          return contracts.get('Registry').call('get_info', [id]);
+        }));
       })
       .then(res => {
-        tempList = res;
+        tempList = res;        
         return Promise.all(tempList.map(item => {
           return axios.get('https://ipfs.io' + '/ipfs/' + Buffer.from(item[3].substr(2), 'hex').toString())
         }))
@@ -40,9 +40,9 @@ export default class TcrStore {
           tempList[idx].ipfs_data = data;
         });
 
-        this.list = tempList.map((l, i) => {
+        this.registry = tempList.map((l, i) => {
           const res = {};
-          res.id = this.listIds[i];
+          res.id = this.registryIds[i];
           res.state = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'][+l[0].toString()];
           res.isChallenged = l[1];
           res.canBeUpdated = l[2];
@@ -51,9 +51,9 @@ export default class TcrStore {
           res.ipfsData = l.ipfs_data.data;
           return res;
         });
-
+        
         this.fetchChallengeStatuses();
-      });
+      })
     } else {
       setTimeout(this.fetchRegistry, 200);
     }
@@ -61,11 +61,11 @@ export default class TcrStore {
 
   @action
   fetchChallengeStatuses() {
-    const { web3, contracts } = this.rootStore.web3Store;
+    const { contracts } = this.rootStore.contractsStore;
 
-    if (!web3 || !contracts || !contracts.has('Registry')) return null;
+    if (!this.isReady()) return null;
 
-    Promise.all(this.list.map(item => {
+    Promise.all(this.registry.map(item => {
       if (item.isChallenged)
         return contracts.get('Registry').call('challenge_status', [item.id]);
       else
@@ -73,7 +73,7 @@ export default class TcrStore {
     })).then(res => {
       res.forEach((data, i) => {
         if (data !== null) {
-          this.list[i].challengeStatus = {
+          this.registry[i].challengeStatus = {
             phase: data[1] === 0 ? 'commit' : 'reveal',
             challengeId: data[0],
             votesFor: data[3],
@@ -83,7 +83,7 @@ export default class TcrStore {
           }
         }
         else {
-          this.list[i].challengeStatus = null;
+          this.registry[i].challengeStatus = null;
         }
       });
     });
@@ -91,9 +91,9 @@ export default class TcrStore {
 
   @action
   apply(bytesHash) {
-    const { web3, contracts } = this.rootStore.web3Store;
+    const { contracts } = this.rootStore.contractsStore;
 
-    if (!web3 || !contracts || !contracts.has('Registry')) return null;
+    if (!this.isReady()) return null;
 
     contracts.get('Registry').send('apply', [bytesHash])
       .then(res => {
@@ -104,9 +104,9 @@ export default class TcrStore {
 
   @action
   challenge(id, state) {
-    const { web3, contracts } = this.rootStore.web3Store;
+    const { contracts } = this.rootStore.contractsStore;
 
-    if (!web3 || !contracts || !contracts.has('Registry')) return null;
+    if (!this.isReady()) return null;
 
     contracts.get('Registry')
       .send('challenge', [id, state])
@@ -115,13 +115,24 @@ export default class TcrStore {
 
   @action
   updateStatus(id) {
-    const { web3, contracts } = this.rootStore.web3Store;
+    const { contracts } = this.rootStore.contractsStore;
 
-    if (!web3 || !contracts || !contracts.has('Registry')``) return null;
+    if (!this.isReady()) return null;
 
     contracts.get('Registry')
       .send('update_status', [id])
       .then();
+  }
+
+  isReady(fName = undefined) {
+    const { web3 } = this.rootStore.web3Store;
+    const { contracts } = this.rootStore.contractsStore;
+
+    const isR = web3 && contracts && contracts.has('Registry');
+    if (!isR && fName) {
+      console.log(`tcrStore.${fName} failed`);
+    }
+    return isR;
   }
 
 

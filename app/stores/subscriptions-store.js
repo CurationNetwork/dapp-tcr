@@ -1,8 +1,6 @@
 import { action, observable, runInAction } from 'mobx';
 
 export default class SubscriptionsStore {
-  // @observable blockSubscription;
-
   constructor(rootStore) {
     this.rootStore = rootStore;
     this.blockInterval = undefined;
@@ -22,11 +20,9 @@ export default class SubscriptionsStore {
       this.blockInterval = setInterval(() => {
         web3.eth.getBlockNumber((err, res) => {
           if (err) console.error(err);
-          else {
-            if (res !== this.currentBlock) {
-              this.currentBlock = res;
-              this.onNewBlock();
-            }
+          else if (res !== this.currentBlock) {
+            this.currentBlock = res;
+            this.onNewBlock();
           }
         });
       }, 3000);
@@ -41,7 +37,7 @@ export default class SubscriptionsStore {
 
   // TODO: unsubscribe function
   @action
-  subscribe(storeName, funcName, ...args) {
+  subscribe(storeName, funcName, args = []) {
     this.subscriptions.push(() => {
       this.rootStore[storeName][funcName](...args);
     });

@@ -4,22 +4,24 @@ import { getNetworkName } from '../helpers/eth-tools';
 
 export default class Web3Store {
   @observable web3;
-  @observable contracts;
   @observable web3Status;
+  @observable contracts;
   @observable networkId;
   @observable defaultAccount;
 
   constructor(rootStore) {
     this.rootStore = rootStore;
+    this.dependentSet = false;
 
     this.checkWeb3Status = this.checkWeb3Status.bind(this);
-    this.initWeb3 = this.initWeb3.bind(this);
-    this.checkNetwork = this.checkNetwork.bind(this);
-    this.checkDefaultAccount = this.checkDefaultAccount.bind(this);
+    this.initWeb3 = this.setWeb3.bind(this);
+    this.checkNetwork = this.setNetwork.bind(this);
+    this.checkDefaultAccount = this.setDefaultAccount.bind(this);
+    this.setDependents = this.setDependents.bind(this);
 
     window.addEventListener('load', () => {
       this.checkWeb3Status();
-      this.interval1 = setInterval(() => {
+      this.intervalBlockCheck = setInterval(() => {
         this.checkWeb3Status();
       }, 200);
     });
@@ -38,28 +40,27 @@ export default class Web3Store {
     if (window.web3 && !window.web3.eth.defaultAccount) s = 'web3-locked';
     if (!window.Web3) s = 'no-web3';
 
-    if (s !== this.web3Status) {
+    if (s === undefined || s !== this.web3Status) {
       console.log('web3Status: ' + this.web3Status + ' -> ' + s);
       this.web3Status = s;
-      this.initWeb3();
+      this.setWeb3();
     }
 
     if (s === 'web3-ok') {
-      this.checkNetwork();
-      this.checkDefaultAccount();
+      // Cyclic wallet status check
+      this.setNetwork();
+      this.setDefaultAccount();
 
-      const {contracts, initContracts} = this.rootStore.contractsStore;
-      if (!contracts.size) initContracts();
-
-      const {blockSubscription, initSubscription} = this.rootStore.subscriptionsStore;
-      if (!blockSubscription) initSubscription();
-      
+      // Web3-depending state init
+      if (!this.dependentSet) {
+        this.setDependents();
+      }
     }
   }
 
   @action
-  /** Gets web3 provider from environment and bring web3 to work. */
-  initWeb3() {
+  /** Gets web3 provider by method depending on environment, setsWeb3. */
+  setWeb3() {
     if (!this.web3 && window.ethereum) {
       window.ethereum.enable()
         .then(() => {
@@ -71,12 +72,11 @@ export default class Web3Store {
   
     } else if (!this.web3 && window.web3) {
       this.web3 = new window.Web3(window.web3.currentProvider);
-  
     }
   }
 
-@action
-  checkNetwork() {
+  @action
+  setNetwork() {
     this.web3.version.getNetwork((err, netId) => {
       if (netId && this.networkId !== netId) {
         console.log(
@@ -88,11 +88,28 @@ export default class Web3Store {
   }
 
   @action
-  checkDefaultAccount() { 
+  setDefaultAccount() { 
     if (this.defaultAccount !== window.web3.eth.defaultAccount) {
       console.log('defaultAccount: ' + this.defaultAccount + ' -> ' + window.web3.eth.defaultAccount);
       this.defaultAccount = window.web3.eth.defaultAccount;
     }
+  }
+
+  /** Web3-depending state init */
+  setDependents() {    
+    const {contracts, setContracts} = this.rootStore.contractsStore; // contracts abi
+    if (!contracts.size) setContracts();
+
+    const {registry, fetchRegistry} = this.rootStore.tcrStore; // tcr contract
+    if (!registry.length) {
+      fetchRegistry();
+      this.rootStore.subscriptionsStore.subscribe('tcrStore', 'fetchRegistry');
+    }
+
+    const {blockInterval, initSubscription} = this.rootStore.subscriptionsStore; // subscriptions
+    if (!blockInterval) initSubscription();
+
+    this.dependentSet = true;
   }
 
 
