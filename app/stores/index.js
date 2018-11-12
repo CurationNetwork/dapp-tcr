@@ -4,6 +4,7 @@ import TcrStore from './tcr-store';
 import Web3Store from './web3-store';
 import ContractsStore from './contracts-store';
 import SubscriptionsStore from './subscriptions-store';
+import TransactionsStore from './transactions-store';
 
 export class Stores {
   constructor() {
@@ -12,6 +13,7 @@ export class Stores {
     this.contractsStore = new ContractsStore(this);
     this.tcrStore = new TcrStore(this);
     this.subscriptionsStore = new SubscriptionsStore(this);
+    this.transactionsStore = new TransactionsStore(this);
   }
 }
 

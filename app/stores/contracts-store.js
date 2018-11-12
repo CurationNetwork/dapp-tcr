@@ -29,11 +29,15 @@ export default class ContractsStore {
               });
             });
           },
-          send: function(method, args = [], onMined = null) {
+          send: function(method, args = []) {
             return new Promise((resolve, reject) => {
               this.instance[method](...args, (err, txHash) => {
-                // if (onMined) getTxReceipt(txHash, onMined);
-                err ? reject(err) : resolve(txHash);
+                if (err) {
+                  reject(err)
+                } else if (txHash) {
+                  this.rootStore.transactionsStore.setTransaction(txHash);
+                  resolve(txHash);
+                }
               });
             });
           },
