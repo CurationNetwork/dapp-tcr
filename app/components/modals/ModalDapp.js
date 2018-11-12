@@ -1,9 +1,9 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import ModalContainer from './ModalContainer';
 import ItemForm from '../forms/ItemForm';
 import FormChallenge from '../forms/FormChallenge';
+import Modal from './Modal';
 
 import './ModalDapp.scss';
 
@@ -13,16 +13,17 @@ class ModalDapp extends React.Component {
   }
 
   render() {
-    const {isOpen, onClose, action, item} = this.props;
+    const {action, item, close} = this.props;
+    return null;
     return (
-      <ModalContainer isOpen={isOpen} onClose={onClose}>
+      <Modal close={close}>
         <div className="modal-dapp">
           {!action && <>
             <div className="modal-h"><FontAwesomeIcon icon="plus-square"/> Submit a Dapp</div>
             <ItemForm/>
           </>}
 
-          {action === 'challenge' && <>
+          {/* {action === 'challenge' && <>
             <div className="modal-h challenge"><FontAwesomeIcon icon="ban"/> Challenge a Dapp</div>
             <FormChallenge buttonText="Start challenge" item={item}/>
           </>}
@@ -50,9 +51,9 @@ class ModalDapp extends React.Component {
           {action === 'update' && <>
             <div className="modal-h update"><FontAwesomeIcon icon="pen"/> Submit an update</div>
             <ItemForm/>
-          </>}
+          </>} */}
         </div>
-      </ModalContainer>
+      </Modal>
     );
   }
 }

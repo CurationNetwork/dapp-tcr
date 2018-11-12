@@ -1,11 +1,12 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import ModalDapp from '../modals/ModalDapp';
+import Modal from '../modals/Modal';
+import ItemForm from '../forms/ItemForm';
 
 import './ButtonAddDapp.scss';
 
-class ButtonAddDapp extends React.Component {
+export default class ButtonAddDapp extends React.Component {
   constructor(props) {
     super(props);
 
@@ -24,13 +25,15 @@ class ButtonAddDapp extends React.Component {
 
   render() {
     return (<>
-      <button className="add-dapp" onClick={this.toggleModal.bind(this)}>
+      <button className="add-dapp" onClick={this.toggleModal}>
         <FontAwesomeIcon icon="plus-square"/> Submit a Dapp
       </button>
 
-      <ModalDapp isOpen={this.state.isModalOpen} onClose={this.toggleModal}/>
+      {this.state.isModalOpen &&
+        <Modal header="Submit a Dapp" icon="plus-square" close={this.toggleModal}>
+          <ItemForm/>
+        </Modal>
+      }
     </>);
   }
 }
-
-export default ButtonAddDapp;
