@@ -1,9 +1,9 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import ItemForm from '../forms/ItemForm';
+import FormDapp from '../forms/FormDapp';
 import FormChallenge from '../forms/FormChallenge';
-import Modal from './Modal';
+import Modal from '../common/Modal';
 
 import './ModalDapp.scss';
 
@@ -20,7 +20,7 @@ class ModalDapp extends React.Component {
         <div className="modal-dapp">
           {!action && <>
             <div className="modal-h"><FontAwesomeIcon icon="plus-square"/> Submit a Dapp</div>
-            <ItemForm/>
+            <FormDapp/>
           </>}
 
           {/* {action === 'challenge' && <>

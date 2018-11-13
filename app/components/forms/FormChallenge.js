@@ -1,7 +1,7 @@
 import React from 'react';
 import { inject, observer } from 'mobx-react';
 
-import './Form.scss';
+import './FormChallenge.scss';
 
 @inject('stores')
 @observer

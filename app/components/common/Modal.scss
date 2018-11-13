@@ -19,21 +19,23 @@
     top: 50%;
     transform: translateY(-50%);
     width: 600px;
-    min-height: 30vh; 
     max-height: 58vh;
-    padding: 26px;
+    display: flex;
+    flex-direction: column;
    
     .modal-h {
       color: #0E1418;
       font-family: $f-bold;
       font-size: 24px;
-      padding-bottom: 26px;
+      padding: 26px;
     }
 
     .modal-content {
       font-family: $f-regular;
+      flex-grow: 1;
       overflow: scroll;
-      max-height: calc(58vh - 50px);
+      max-height: calc(58vh - 102px);
+      margin-bottom: 26px;
     }
 
     .close-cross {

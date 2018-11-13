@@ -4,6 +4,9 @@ import Form from "react-jsonschema-form";
 import { inject, observer } from 'mobx-react';
 
 import IPFSUploadWebGatewayWidget from './IPFSUploadWebGateway.jsx'
+
+import './FormDapp.scss';
+
 const main_schema = require('../../../schema/main-spec-v0.1.0.json');
 const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
 
@@ -15,7 +18,7 @@ const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
 
 @inject('stores')
 @observer
-class ItemForm extends React.Component {
+class FormDapp extends React.Component {
   render() {
 	// MERGING SCHEMAS (if any modules)
 	// for (module in module_schemas) {
@@ -64,10 +67,15 @@ class ItemForm extends React.Component {
 	main_schema.properties.metadata.properties.name['default'] = 'Default Name';
 	main_schema.properties.prev_meta['default'] = '';
 
-    return (<div>
-      <Form schema={main_schema} uiSchema={uiSchema} widgets={widgets} onSubmit={onSubmit} />
-    </div>);
+    return (
+      <Form
+        schema={main_schema}
+        uiSchema={uiSchema}
+        widgets={widgets}
+        onSubmit={onSubmit}
+      />
+    );
   }
 }
 
-export default ItemForm;
+export default FormDapp;
