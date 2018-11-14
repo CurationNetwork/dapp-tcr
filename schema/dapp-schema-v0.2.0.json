@@ -10,7 +10,7 @@
 
   "properties": {
     "version": {
-	    "title": "Dapp version",
+      "title": "Dapp version",
 
       "type": "object",
       "required": [
@@ -39,7 +39,7 @@
     },
 
     "metadata": {
-	    "title": "DApp metadata",
+      "title": "DApp metadata",
       "description": "Descriptional information about the DApp",
 
       "type": "object",
@@ -51,15 +51,15 @@
         "name": {
           "title": "Name",
           "description": "Official display name of the DApp",
-		      "type": "string"
-		    },
+          "type": "string"
+        },
 
         "shortDescription": {
           "title": "Short description",
           "description": "Short description of the DApp (up to 80 characters)",
           "type": "string",
           "maxLength": 80
-    		},
+        },
 
         "description": {
           "title": "Description",
