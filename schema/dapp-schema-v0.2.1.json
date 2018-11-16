@@ -7,35 +7,13 @@
  
   "type": "object",
   "required": ["version", "metadata", "smartContracts"],
+  "additionalProperties": false,
 
   "properties": {
-    "version": {
-      "title": "Dapp version",
-
-      "type": "object",
-      "required": [
-        "current"
-      ],
-
-      "properties": {
-        "current": {
-          "title": "Current version",
-          "description": "Version of DApp specification. Semantic versioning is mandatory",
-          "$ref": "#/definitions/semver"
-        },
-
-        "releaseNotes": {
-          "title": "Release notes",
-          "description": "Short description of major updates, link to details is recommended",
-          "type": "string"
-        },
-
-        "previous": {
-          "title": "Previous version",
-          "description": "IPFS hash of previous DApp specification",
-          "$ref": "#/definitions/ipfsHash"
-        }
-      }
+    "previousSchema": {
+      "title": "Previous schema",
+      "description": "IPFS hash of previous DApp specification schema",
+      "$ref": "#/definitions/ipfsHash"
     },
 
     "metadata": {
@@ -43,9 +21,8 @@
       "description": "Descriptional information about the DApp",
 
       "type": "object",
-      "required": [
-        "name"
-      ],
+      "required": ["name"],
+      "additionalProperties": false,
 
       "properties": {
         "name": {
@@ -67,6 +44,18 @@
           "type": "string"
         },
         
+        "version": {
+          "title": "Current DApp version",
+          "description": "Version of DApp, semantic versioning is mandatory",
+          "$ref": "#/definitions/semver"
+        },
+
+        "releaseNotes": {
+          "title": "Release notes",
+          "description": "Short description of major updates, link to details is recommended",
+          "type": "string"
+        },
+
         "categories": {
           "title": "Categories of Dapp",
           "type": "array",
@@ -133,10 +122,8 @@
 
       "items": {
         "type": "object",
-        "required": [
-          "network",
-          "address"
-        ],
+        "required": ["network", "address"],
+        "additionalProperties": false,
 
         "properties": {
           "network": {
@@ -185,8 +172,7 @@
     },
 
     "standard": {
-      "type": "integer",
-      "enum": [20, 721]
+      "type": "integer"
     }
   }
 }
