@@ -1,0 +1,20 @@
+.form-dapp-hash {
+  display: flex;
+  margin-bottom: 20px;
+
+  div {
+    flex-grow: 1;
+  }
+
+  &.modal-form > p {
+    display: inline-block;
+    padding: 0;
+    margin-top: 6px;
+
+    button {
+      padding-top: 13px;
+      padding-bottom: 12px;
+      cursor: pointer;
+    }
+  }
+}

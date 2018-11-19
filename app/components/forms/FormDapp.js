@@ -13,19 +13,23 @@ const uploadEndpoint = 'https://ipfs.dapplist-hackathon.curation.network';
 
 @inject('stores')
 @observer
-class FormDapp extends React.Component {
-  onSubmit(formData) {    
+export default class FormDapp extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.handleFormSubmit = this.handleFormSubmit.bind(this);
+  }
+
+  handleFormSubmit(formData) {    
     axios.post(uploadEndpoint + '/ipfs/', JSON.stringify(formData))
       .then(resp => {
         const uploadedIPFSHash = resp.headers['ipfs-hash'];
         const bytesHash = '0x' + Buffer.from(uploadedIPFSHash).toString('hex');
-        apply(bytesHash);
+        this.props.stores.tcrStore.apply(bytesHash);
       });
   };
 
   render() {
-    const { apply } = this.props.stores.tcrStore;
-
     const widgets = {
       ipfsUploadWidget: IpfsUploadWidget,
     };
@@ -90,14 +94,8 @@ class FormDapp extends React.Component {
       }
     };
 
-    // const formData = {
-    //   metadata: {
-    //     tags: [
-    //       'test1',
-    //       'test2'
-    //     ]
-    //   },
-    // };
+    const formData = this.props.stores.formsStore.formsData.get('form-dapp');
+    console.log(formData);
 
     return (
       <Form
@@ -105,12 +103,11 @@ class FormDapp extends React.Component {
         uiSchema={uiSchema}
         widgets={widgets}
         fields={fields}
-        onSubmit={this.onSubmit.bind(this)}
-        onError={this.onSubmit.bind(this)}
+        formData={formData}
+        onSubmit={this.handleFormSubmit}
+        onError={this.handleFormSubmit}
         showErrorList={false}
       />
     );
   }
 }
-
-export default FormDapp;

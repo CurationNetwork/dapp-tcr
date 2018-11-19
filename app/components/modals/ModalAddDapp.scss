@@ -1,0 +1,10 @@
+.submit-dapp {
+  & > p {
+    margin-bottom: 8px;
+    line-height: 20px;
+  }
+
+  & > p:first-child {
+    margin-bottom: 20px;
+  }
+}

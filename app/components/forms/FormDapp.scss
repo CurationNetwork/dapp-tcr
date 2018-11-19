@@ -1,8 +1,13 @@
 @import '../../styles/variables.scss';
 
-.rjsf {
+.submit-dapp {
+  padding: 0 26px;
+}
+
+.rjsf,
+.modal-form {
   & > p {
-    padding: 14px 26px 26px;
+    padding: 14px 26px;
 
     button {
       color: white;
@@ -216,22 +221,22 @@
         // color: white;
       }
     }
-  }
-}
 
-.btn-add {
-  height: 20px;
-  line-height: 20px;
-  border: 0;
-  margin-top: 6px;
-  font-size: 12px;
-  cursor: pointer;
-
-  i {
-    display: none;
-  }
-
-  &:after {
-    content: '\FF0B add';
+    .btn-add {
+      height: 20px;
+      line-height: 20px;
+      border: 0;
+      margin-top: 6px;
+      font-size: 12px;
+      cursor: pointer;
+    
+      i {
+        display: none;
+      }
+    
+      &:after {
+        content: '\FF0B add';
+      }
+    }    
   }
 }

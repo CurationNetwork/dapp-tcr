@@ -71,6 +71,7 @@ export default class Tags extends React.Component {
             handleDrag={this.handleDrag}
             delimiters={delimiters}
             placeholder={'Add new'}
+            autofocus={false}
           />
         </div>
       </>

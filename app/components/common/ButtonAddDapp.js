@@ -2,7 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import Modal from './Modal';
-import FormDapp from '../forms/FormDapp';
+import ModalAddDapp from '../modals/ModalAddDapp';
 
 import './ButtonAddDapp.scss';
 
@@ -31,7 +31,7 @@ export default class ButtonAddDapp extends React.Component {
 
       {this.state.isModalOpen &&
         <Modal header="Submit a Dapp" icon="plus-square" close={this.toggleModal}>
-          <FormDapp/>
+          <ModalAddDapp/>
         </Modal>
       }
     </>);

@@ -45,7 +45,7 @@ export default class ContractsStore {
       });
 
     } else {
-      log('Bad web3 status, contracts not initialized.');
+      console.error('Bad web3 status, contracts not initialized.');
     }
   }
 
