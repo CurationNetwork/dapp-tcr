@@ -1,0 +1,16 @@
+.ReactTags__tags {
+  margin-top: 5px;
+
+  .ReactTags__tag {
+    display: inline-block;
+    margin-right: 6px;
+    cursor: move;
+    padding: 5px 8px;
+    background: rgba(229, 233, 240, .7);
+  }
+
+  .ReactTags__remove {
+    margin-left: 5px;
+    cursor: pointer;
+  }
+}

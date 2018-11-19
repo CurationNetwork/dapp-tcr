@@ -1,6 +1,8 @@
 import React, { Component, PureComponent } from 'react';
 import axios from 'axios';
 
+import './IpfsUploadWidget.scss';
+
 export default class IPFSUploadWebGatewayWidget extends PureComponent {
   constructor(props) {
     super(props);
@@ -8,9 +10,10 @@ export default class IPFSUploadWebGatewayWidget extends PureComponent {
     this.state = {
       msg: '',
       url: null,
-	  uploadEndpoint: 'https://ipfs.dapplist-hackathon.curation.network',
+	    uploadEndpoint: 'https://ipfs.smartz.io',
     }
-	this.onChange = this.onChange.bind(this);
+
+    this.onChange = this.onChange.bind(this);
   }
 
   readFile(file) {
@@ -41,29 +44,25 @@ export default class IPFSUploadWebGatewayWidget extends PureComponent {
           return this.uploadIpfs(data)
         })
         .then(resp => {
-		  //this.inputRef.type="text";
-		  this.setState({ipfs_hash: resp.headers['ipfs-hash']});
+          const hash = resp.headers['ipfs-hash'];
+          this.setState({ipfs_hash: hash});
           let url = this.state.uploadEndpoint + resp.headers.location;
-          this.setState({ msg: url }, onChange(this.state.ipfs_hash));
+          this.setState({ msg: `Upload success, hash: ${hash}` }, onChange(this.state.ipfs_hash));
         });
     }
   };
 
   render() {
-
     return (
-      <div>
-        <p>
-          <input
-            ref={ ref => { this.inputRef = ref }}
-            type="file"
-            multiple={false}
-            className={"form-control"}
-            onChange={this.onChange}
-          />
-        </p>
+      <div className="ipfs-upload">
+        <input
+          type="file"
+          multiple={false}
+          className={"form-control"}
+          onChange={this.onChange}
+        />
         {this.state.url ? (<p>{this.state.url}</p>) : null}
-        <p>{this.state.msg}</p>
+        <p className="ipfs-upload__message">{this.state.msg}</p>
       </div>
     );
   }
