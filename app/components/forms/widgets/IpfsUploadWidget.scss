@@ -1,8 +1,36 @@
 .ipfs-upload {
   margin-top: 6px;
+  width: 100%;
+  max-width: inherit;
+  overflow: scroll;
 
   .ipfs-upload__message {
     font-size: 12px;
     margin-top: 6px;
+  }
+
+  input[type="file"] { 
+    visibility: hidden;
+    position: absolute;
+    top: 0;
+  }
+
+  label {
+    display: inline-block;
+    color: rgb(198, 201, 207);
+    background: #E5E9F0;
+    border: 0;
+    height: 50px;
+    padding: 0 20px;
+    box-sizing: border-box;
+    line-height: 50px;
+    width: 100%;
+    margin-top: 6px;
+    font-size: 20px;
+
+    &.active {
+      color: #0E1418;
+      font-size: 16px;
+    }
   }
 }

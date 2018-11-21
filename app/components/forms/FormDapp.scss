@@ -6,6 +6,10 @@
 
 .rjsf,
 .modal-form {
+  & > div {
+    margin-bottom: 0 !important;
+  }
+
   & > p {
     padding: 14px 26px;
 
@@ -26,6 +30,33 @@
   & > .form-group {
     margin-left: 26px;
     margin-right: 26px;
+  }
+
+  & > div.submit-status {
+    padding: 14px 26px;
+
+    .success, .failure {
+      display: inline-block;
+      padding: 10px;
+      border-radius: 2px;
+      background: rgb(183, 233, 183);
+    }
+
+    .success {
+      background: rgb(183, 233, 183);
+    }
+
+    .failure {
+      background: rgb(233, 183, 183);
+    }
+
+    .close-window {
+      display: inline-block;
+      margin-left: 20px;
+      font-size: 14px;
+      border-bottom: 1px dashed black;
+      cursor: pointer;
+    }
   }
 
   #root__title,
@@ -84,6 +115,7 @@
   
   .field-description {
     font-size: 12px;
+    line-height: 14px;
     color: rgba(0,0,0,.6);
   }
 
@@ -222,21 +254,22 @@
       }
     }
 
-    .btn-add {
-      height: 20px;
-      line-height: 20px;
-      border: 0;
-      margin-top: 6px;
-      font-size: 12px;
-      cursor: pointer;
-    
-      i {
-        display: none;
-      }
-    
-      &:after {
-        content: '\FF0B add';
-      }
-    }    
   }
+
+  .btn-add {
+    height: 20px;
+    line-height: 20px;
+    border: 0;
+    margin-top: 6px;
+    font-size: 12px;
+    cursor: pointer;
+  
+    i {
+      display: none;
+    }
+  
+    &:after {
+      content: '\FF0B add';
+    }
+  }    
 }

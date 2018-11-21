@@ -104,11 +104,12 @@
 
         "images": {
           "title": "Additional images",
-          "description": "IPFS hashes of additional images fro DApp (screenshots, schemas, etc.)",
+          "description": "IPFS hashes of additional images for DApp (screenshots, schemas, etc.)",
           "type": "array",
           "items": {
             "$ref": "#/definitions/ipfsHash"
-          }
+          },
+          "uniqueItems": true
         }
       }
     },

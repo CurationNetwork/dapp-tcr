@@ -8,9 +8,9 @@ export default class IPFSUploadWebGatewayWidget extends PureComponent {
     super(props);
 
     this.state = {
-      msg: '',
+      msg: props.value || 'Choose file',
       url: null,
-	    uploadEndpoint: 'https://ipfs.smartz.io',
+      uploadEndpoint: 'https://ipfs.smartz.io',
     }
 
     this.onChange = this.onChange.bind(this);
@@ -45,24 +45,35 @@ export default class IPFSUploadWebGatewayWidget extends PureComponent {
         })
         .then(resp => {
           const hash = resp.headers['ipfs-hash'];
-          this.setState({ipfs_hash: hash});
-          let url = this.state.uploadEndpoint + resp.headers.location;
-          this.setState({ msg: `Upload success, hash: ${hash}` }, onChange(this.state.ipfs_hash));
+          this.setState({
+            msg: hash,
+            ipfs_hash: hash
+          }, onChange(this.state.ipfs_hash));
         });
     }
   };
 
   render() {
+    const { msg } = this.state;
+    const { id } = this.props;
+
     return (
       <div className="ipfs-upload">
         <input
           type="file"
+          id={id}
           multiple={false}
           className={"form-control"}
           onChange={this.onChange}
         />
+
+        <label
+          htmlFor={id}
+          className={(msg === 'Choose file') ? '' : 'active'}>
+          {msg}
+        </label>
+
         {this.state.url ? (<p>{this.state.url}</p>) : null}
-        <p className="ipfs-upload__message">{this.state.msg}</p>
       </div>
     );
   }

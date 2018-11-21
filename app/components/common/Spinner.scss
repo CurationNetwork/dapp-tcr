@@ -1,8 +1,37 @@
-.spinner {
-  animation: spin 2s linear infinite;
+.spinner-wrapper {
+  display: inline-flex;
+  align-items: center; 
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+.spinner {
+  position: relative;
+}
+
+.a1, .a2 {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #247f92;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+  
+  animation: pulsate 1.6s infinite ease-in-out;
+}
+
+.a2 {
+  animation-delay: -0.8s;
+}
+
+@keyframes pulsate {
+  0%, 100% { 
+    transform: scale(0.0);
+  } 50% { 
+    transform: scale(1.0);
+  }
+}
+
+.spinner-text {
+  margin-left: 6px;
 }

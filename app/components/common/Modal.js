@@ -1,9 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { inject } from 'mobx-react';
+
 
 import './Modal.scss';
 
+@inject('stores')
 export default class Modal extends React.Component {
   constructor(props) {
     super(props);
@@ -26,6 +29,8 @@ export default class Modal extends React.Component {
 
     document.addEventListener('keydown', this.onEsc); // catch ESC key
     document.body.classList.add('modal-disable-scroll'); // disable scroll
+
+    this.props.stores.modalStore.setModalClose(this.closeModal);
   }
 
   componentWillUnmount() {
@@ -33,6 +38,7 @@ export default class Modal extends React.Component {
     document.removeEventListener('keydown', this.onEsc);
     this.app.style.filter = `blur(0px)`;
     document.body.removeChild(this.node);
+    this.props.stores.modalStore.setModalClose(null);
   }
 
   onEsc(e) {

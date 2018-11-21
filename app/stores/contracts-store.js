@@ -15,7 +15,8 @@ export default class ContractsStore {
   // TODO: generate named functions for contract methods
   setContracts() {
     const { web3, web3Status } = this.rootStore.web3Store;
-
+    const setTx = this.rootStore.transactionsStore.setTransaction;
+    
     if (web3Status === 'web3-ok') {
       Object.keys(contractsConfig).forEach((name) => {
         this.contracts.set(name, {
@@ -34,8 +35,8 @@ export default class ContractsStore {
               this.instance[method](...args, (err, txHash) => {
                 if (err) {
                   reject(err)
-                } else if (txHash) {
-                  this.rootStore.transactionsStore.setTransaction(txHash);
+                } else if (txHash) {                  
+                  setTx(txHash);
                   resolve(txHash);
                 }
               });
@@ -43,7 +44,6 @@ export default class ContractsStore {
           },
         });
       });
-
     } else {
       console.error('Bad web3 status, contracts not initialized.');
     }

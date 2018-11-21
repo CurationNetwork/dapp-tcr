@@ -61,7 +61,9 @@ export default class Tags extends React.Component {
     return (
       <>
         <label className="control-label" htmlFor="">{this.props.schema.title}</label>
-        <p className="field-description">{this.props.schema.description}</p>
+        <p className="field-description">
+          {this.props.uiSchema['ui:description'] || this.props.schema.description}
+        </p>
         <div>
           <ReactTags
             tags={tags}
@@ -73,6 +75,13 @@ export default class Tags extends React.Component {
             placeholder={'Add new'}
             autofocus={false}
           />
+        </div>
+        <div>
+          <ul className="error-detail">
+            <li className="text-danger">
+              {this.props.errorSchema[0] && this.props.errorSchema[0]['__errors'][0]}
+            </li>
+          </ul>
         </div>
       </>
     );

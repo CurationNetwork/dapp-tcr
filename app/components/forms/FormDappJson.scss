@@ -4,6 +4,28 @@
 
   div {
     flex-grow: 1;
+
+    input[type="file"] { 
+      visibility: hidden;
+      position: absolute;
+    }
+  
+    label {
+      display: inline-block;
+      color: rgb(198, 201, 207);
+      background: #E5E9F0;
+      border: 0;
+      height: 50px;
+      padding: 0 20px;
+      line-height: 50px;
+      width: 100%;
+      margin-top: 6px;
+      font-size: 20px;
+
+      &.active {
+        color: #0E1418;
+      }
+    }
   }
 
   &.modal-form > p {
@@ -16,16 +38,5 @@
       padding-bottom: 12px;
       cursor: pointer;
     }
-  }
-
-  input[type="file"] {
-    color: #0E1418;
-    background: #E5E9F0;
-    border: 0;
-    height: 50px;
-    padding: 16px 20px 0;
-    line-height: 50px;
-    width: 100%;
-    margin-top: 6px;
   }
 }

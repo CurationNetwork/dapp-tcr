@@ -21,7 +21,7 @@ export default class TcrStore {
     const { contracts } = this.rootStore.contractsStore;
     let tempList;
 
-    if (this.isReady()) {      
+    if (this.isReady('fetchRegistry')) {      
       contracts.get('Registry').call('list')
       .then(ids => {
         this.registryIds = ids;
@@ -63,7 +63,7 @@ export default class TcrStore {
   fetchChallengeStatuses() {
     const { contracts } = this.rootStore.contractsStore;
 
-    if (!this.isReady()) return null;
+    if (!this.isReady('fetchChallengeStatuses')) return null;
 
     Promise.all(this.registry.map(item => {
       if (item.isChallenged)
@@ -90,23 +90,26 @@ export default class TcrStore {
   }
 
   @action
-  apply(bytesHash) {
+  apply(bytesHash, cb) {
     const { contracts } = this.rootStore.contractsStore;
 
-    if (!this.isReady()) return null;
+    if (!this.isReady('apply')) return null;
 
     contracts.get('Registry').send('apply', [bytesHash])
       .then(res => {
-        console.log(`tx hash: ${res}`);
-      })
-      .catch(console.error);
+        if (cb) cb(res);
+      }) 
+      .catch(err => {
+        console.error(err);
+        if (cb) cb(err);
+      });
   }
 
   @action
   challenge(id, state) {
     const { contracts } = this.rootStore.contractsStore;
 
-    if (!this.isReady()) return null;
+    if (!this.isReady('challenge')) return null;
 
     contracts.get('Registry')
       .send('challenge', [id, state])
@@ -117,7 +120,7 @@ export default class TcrStore {
   updateStatus(id) {
     const { contracts } = this.rootStore.contractsStore;
 
-    if (!this.isReady()) return null;
+    if (!this.isReady('updateStatus')) return null;
 
     contracts.get('Registry')
       .send('update_status', [id])

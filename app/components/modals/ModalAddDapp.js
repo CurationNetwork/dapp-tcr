@@ -11,11 +11,11 @@ export default class ModalAddDapp extends React.Component {
     return (<>
       <div className="submit-dapp">
         <p>You can do this in 3 ways:</p>
-        <p>1. Submit an IPFS-hash of a DApp JSON Schema and send it to TCR at once:</p>
+        <p>1. If you already have uploaded your DApp Schema to IPFS, just submit it's IPFS-hash and send an application to the TCR at once:</p>
         <FormDappHash/>
-        <p>2. Upload a completed or partially completed DApp JSON Schema to following form, finalize it if necessary and then submit:</p>
+        <p>2. If you have a completed or partially completed DApp Schema, upload it to the following form, finalize it if necessary and submit:</p>
         <FormDappJson/>
-        <p>3. Fill the following form step by step and submit:</p>
+        <p>3. Start you DApp Schema from scratch in the following form, complete it step by step and submit. It will be uploaded to the IPFS and IPFS-hash will be automatically sent to the TCR in the application.</p>
       </div>
       <FormDapp/>
     </>);
