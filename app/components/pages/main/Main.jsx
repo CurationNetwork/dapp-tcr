@@ -10,8 +10,6 @@ import logo from '../../../assets/logo-horisontal.svg';
 @observer
 export default class Main extends React.Component {
   render() {
-    const { registry } = this.props.stores.tcrStore;
-
     return (
       <div className="dapp-container">
         <div className="top-line">
@@ -26,7 +24,7 @@ export default class Main extends React.Component {
             </div>
           </div>
         </div>
-        <Tabs data={registry}/>
+        <Tabs/>
       </div>
     );
   }

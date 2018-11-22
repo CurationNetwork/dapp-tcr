@@ -1,13 +1,14 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
+import { inject, observer } from 'mobx-react';
 
-import TabRegistry from './tab-registry/TabRegistry';
-import TabApplications from './tab-applications/TabApplications';
-import TabChallenges from './tab-challenges/TabChallenges';
+import Tab from './Tab';
 
 import './Tabs.scss';
 
+@inject('stores')
+@observer
 export default class Tabs extends React.Component {
   constructor(props) {
     super(props);
@@ -25,34 +26,35 @@ export default class Tabs extends React.Component {
   }
 
   render() {
-    this.tabContent = [
-      <TabRegistry {...this.props}/>,
-      <TabApplications {...this.props}/>,
-      <TabChallenges {...this.props}/>
-    ];
+    const { registry } = this.props.stores.tcrStore;
 
-    this.tabHeaders = [
+    const existing = registry.filter(item => (item.state === 'EXISTS' || item.state === 'EDIT'));
+    const applications = registry.filter(item => item.state === 'APPLICATION');
+    const challenges = registry.filter(item => item.isChallenged);
+
+    const tabHeaders = [
       <>
-        Dapps in Registry&nbsp;&mdash;&nbsp;
-        {this.props.data.filter(item => item.state === 'EXISTS').length}
+        Dapps in Registry&nbsp;&mdash; {existing.length}
       </>,
       <span className="applications">
-        <FontAwesomeIcon icon="pen"/> Applications&nbsp;&mdash;&nbsp;
-        {this.props.data.filter(
-          item => (item.state === 'APPLICATION' || item.state === 'EDIT')).length
-        }
+        <FontAwesomeIcon icon="pen"/> Applications&nbsp;&mdash; {applications.length}
       </span>,
       <span className="challenges">
-        <FontAwesomeIcon icon="ban"/> Challenges&nbsp;&mdash;&nbsp;
-        {this.props.data.filter(item => item.isChallenged).length}
+        <FontAwesomeIcon icon="ban"/> Challenges&nbsp;&mdash; {challenges.length}
       </span>
+    ];
+
+    const tabsContent = [
+      <Tab data={existing} slice="registry"/>,
+      <Tab data={applications} slice="applications"/>,
+      <Tab data={challenges} slice="challenges"/>
     ];
 
     const { tabActive } = this.state;
 
     return (<div className="block with-tabs">
       <div className="block-tabs">
-        {this.tabHeaders.map((header, i) => (
+        {tabHeaders.map((header, i) => (
           <div
             className={classNames('name', {active: i === tabActive})}
             key={`${i}_tab`} onClick={this.switchTab.bind(this, i)}
@@ -64,7 +66,7 @@ export default class Tabs extends React.Component {
         <div className="name last"></div>
       </div>
 
-      {this.tabContent[this.state.tabActive]}
+      {tabsContent[tabActive]}
     </div>);
   }
 }

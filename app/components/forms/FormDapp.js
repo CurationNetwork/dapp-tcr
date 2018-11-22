@@ -6,10 +6,10 @@ import { inject, observer } from 'mobx-react';
 import IpfsUploadWidget from './widgets/IpfsUploadWidget.jsx';
 import TagsWidget from './widgets/TagsWidget.jsx';
 import Spinner from '../common/Spinner';
+import { dappSchema } from '../../helpers/get-schema';
 
 import './FormDapp.scss';
 
-const dappSchema = require('../../../schema/dapp-schema-v0.2.1.json');
 const uploadEndpoint = 'https://ipfs.smartz.io';
 
 @inject('stores')
@@ -44,9 +44,7 @@ export default class FormDapp extends React.Component {
       });
   };
 
-  handleApplyResult(res) {
-    console.log(typeof res, res.name);
-    
+  handleApplyResult(res) {    
     if (typeof res === 'object' && res.name === 'Error') {
       this.setState({formStatus: 'failure'});
     } else {
@@ -133,8 +131,6 @@ export default class FormDapp extends React.Component {
     if (tx) {
       formStatus = transactions.get(tx).status;
     }
-
-    console.log(formStatus, ipfsHash, tx, formStatus === 'success');
 
     return (
       <Form

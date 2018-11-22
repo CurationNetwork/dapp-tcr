@@ -10,7 +10,7 @@ class TableHeader extends React.Component {
       <div className="dapp-name-header">
         {type === 'registry'
           ? 'Name'
-          : type === 'submitted'
+          : type === 'applications'
             ? 'Applicant'
             : 'Defendant'}
       </div>
