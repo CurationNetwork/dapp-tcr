@@ -59,6 +59,15 @@
     }
   }
 
+  & > div.submit-results {
+    padding: 14px 26px;
+    font-size: 12px;
+
+    p {
+      margin-bottom: 5px;
+    }
+  }
+
   #root__title,
   #root__description {
     display: none;

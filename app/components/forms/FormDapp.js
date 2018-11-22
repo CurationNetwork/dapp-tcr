@@ -33,11 +33,13 @@ export default class FormDapp extends React.Component {
 
     axios.post(uploadEndpoint + '/ipfs/', JSON.stringify(formData))
       .then(resp => {
-        this.setState({formStatus: 'sending-tx'});
-
         const uploadedIPFSHash = resp.headers['ipfs-hash'];
-        const bytesHash = '0x' + Buffer.from(uploadedIPFSHash).toString('hex');
-        
+        this.setState({
+          formStatus: 'sending-tx',
+          ipfsHash: uploadedIPFSHash
+        });
+
+        const bytesHash = '0x' + Buffer.from(uploadedIPFSHash).toString('hex');        
         this.props.stores.tcrStore.apply(bytesHash, res => this.handleApplyResult(res));
       });
   };
@@ -46,9 +48,12 @@ export default class FormDapp extends React.Component {
     console.log(typeof res, res.name);
     
     if (typeof res === 'object' && res.name === 'Error') {
-      this.setState({formStatus: 'filling'});
+      this.setState({formStatus: 'failure'});
     } else {
-      this.setState({tx: res});
+      this.setState({
+        tx: res,
+        formStatus: 'success'
+      });
     }
   }
 
@@ -122,12 +127,14 @@ export default class FormDapp extends React.Component {
     };
 
     const formData = this.props.stores.formsStore.formsData.get('form-dapp');
-    let { formStatus } = this.state;
+    let { formStatus, tx, ipfsHash } = this.state;
 
     const { transactions } = this.props.stores.transactionsStore;
-    if (this.state.tx) {
-      formStatus = transactions.get(this.state.tx).status;
+    if (tx) {
+      formStatus = transactions.get(tx).status;
     }
+
+    console.log(formStatus, ipfsHash, tx, formStatus === 'success');
 
     return (
       <Form
@@ -140,34 +147,49 @@ export default class FormDapp extends React.Component {
         onError={(e) => console.error(e)}
         showErrorList={false}
       >
-        {formStatus === 'filling' &&
+        {(formStatus === 'filling' || formStatus === 'failure') &&
           <p><button type="submit" className="btn btn-info">Submit</button></p>
         }
+
+        {(ipfsHash || tx) &&
+          <div className="submit-results">
+            {ipfsHash &&
+              <p>IPFS hash: {ipfsHash}</p>
+            }
+            {tx &&
+              <p>Transaction: {tx}</p>
+            }
+          </div>
+        }
+
         {formStatus !== 'filling' &&
           <div className="submit-status">
             {formStatus === 'uploading-to-ipfs' &&
-              <Spinner text="Uploading scheme to IPFS"/>
+              <Spinner text="Uploading scheme to IPFS..."/>
             }
             {formStatus === 'sending-tx' &&
-              <Spinner text="Sending transaction to the TCR contract"/>
+              <Spinner text="Sending transaction to the TCR contract..."/>
             }
             {formStatus === 'pending' &&
-              <Spinner text="Pending transaction"/>
+              <Spinner text="Pending transaction..."/>
             }
-            {formStatus === 'success' || formStatus === 'failure' &&
+            {(formStatus === 'success' || formStatus === 'failure') &&
               <>
                 <span className={formStatus}>
                   {formStatus === 'success' 
                     ? 'Application successfully submitted to the TCR.'
-                    : 'Transaction failure'
+                    : 'Transaction failure :-('
                   }
                 </span>
-                <span
-                  className="close-window"
-                  onClick={this.props.stores.modalStore.modalClose}
-                >
-                  &times; Close window
-                </span>
+
+                {formStatus === 'success' && 
+                  <span
+                    className="close-window"
+                    onClick={this.props.stores.modalStore.modalClose}
+                  >
+                    &times; Close window
+                  </span>
+                }
               </>
             }
           </div>
