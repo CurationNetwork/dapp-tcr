@@ -2,6 +2,7 @@ import TokenABI from './abi/Token.abi.json';
 import VotingABI from './abi/Voting.abi.json';
 import FaucetABI from './abi/Faucet.abi.json';
 import RegistryABI from './abi/Registry.abi.json';
+import ParametrizerABI from './abi/Parametrizer.abi.json';
 
 const contracts = {
   Token: {
@@ -20,6 +21,10 @@ const contracts = {
     address: '0xe26bf826d13914e4217b10bc027e1553cdf9e1a2',
     abi: RegistryABI
   },
+  Parametrizer: {
+    address: '0x3ea047b3994a10873876c7589607280cb31bde97',
+    abi: ParametrizerABI
+  }
 };
 
 export default contracts;
