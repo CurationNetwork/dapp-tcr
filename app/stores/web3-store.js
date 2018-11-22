@@ -97,16 +97,24 @@ export default class Web3Store {
 
   /** Web3-depending state init */
   setDependents() {    
-    const {contracts, setContracts} = this.rootStore.contractsStore; // contracts abi
+    // contracts ABI
+    const { contracts, setContracts } = this.rootStore.contractsStore;
     if (!contracts.size) setContracts();
 
-    const {registry, fetchRegistry} = this.rootStore.tcrStore; // tcr contract
+    // TCR contract listings data and states
+    const { registry, fetchRegistry } = this.rootStore.tcrStore;
     if (!registry.length) {
       fetchRegistry();
       this.rootStore.subscriptionsStore.subscribe('tcrStore', 'fetchRegistry');
     }
 
-    const {blockInterval, initSubscription} = this.rootStore.subscriptionsStore; // subscriptions
+    // TCR parameters
+    const { tcrParameters, fetchParameters } = this.rootStore.parametrizerStore;
+    
+    if (!tcrParameters.size) fetchParameters();
+
+    // subscriptions
+    const { blockInterval, initSubscription } = this.rootStore.subscriptionsStore; 
     if (!blockInterval) initSubscription();
 
     this.dependentSet = true;

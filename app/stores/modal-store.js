@@ -11,6 +11,6 @@ export default class ModalStore {
   @action
   setModalClose(close) {
     this.modalClose = close;
-  };
+  }
   
 }

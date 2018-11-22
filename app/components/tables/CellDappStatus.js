@@ -49,7 +49,7 @@ class CellDappStatus extends React.Component {
   render() {
     const { state, isChallenged, passedPercent } = this.props;
 
-    console.log(state, isChallenged, passedPercent);
+    // console.log(state, isChallenged, passedPercent);
     
 
     let paylo = <div className="dapp-status"></div>;

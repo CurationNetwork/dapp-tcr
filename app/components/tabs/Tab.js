@@ -1,5 +1,6 @@
 import React from 'react';
 import Ajv from 'ajv';
+import { inject, observer } from 'mobx-react';
 
 import TableRow from '../tables/TableRow';
 import TableHeader from '../tables/TableHeader';
@@ -8,7 +9,14 @@ import CellDappStatus from '../tables/CellDappStatus';
 import CellActions from '../tables/CellActions';
 import { dappSchema } from '../../helpers/get-schema';
 
+@inject('stores')
+@observer
 class Tab extends React.Component {
+  constructor(props) {
+    super(props);
+
+  }
+
   render() {
     const { slice, data } = this.props;
     const ajv = new Ajv();
