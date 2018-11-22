@@ -27,7 +27,6 @@ export default class Tags extends React.Component {
   onChange(tags) {
     tags = tags.map(e => e.text);
     this.props.onChange(tags);
-    console.log(tags);
   }
 
   handleDelete(i) {

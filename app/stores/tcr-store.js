@@ -22,20 +22,20 @@ export default class TcrStore {
     let tempList;
 
     if (this.isReady('fetchRegistry')) {      
-      contracts.get('Registry').call('list')
-      .then(ids => {
+      contracts.get('Registry').call('list') // get items list
+      .then(ids => { // get items details
         this.registryIds = ids;
         return Promise.all(ids.map(id => {
           return contracts.get('Registry').call('get_info', [id]);
         }));
       })
-      .then(res => {
+      .then(res => { // get more details from IPFS
         tempList = res;        
         return Promise.all(tempList.map(item => {
           return axios.get('https://ipfs.io' + '/ipfs/' + Buffer.from(item[3].substr(2), 'hex').toString())
         }))
       })
-      .then(res => {
+      .then(res => { // process data into convenient format
         res.forEach((data, idx) => {
           tempList[idx].ipfs_data = data;
         });

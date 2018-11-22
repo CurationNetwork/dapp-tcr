@@ -26,7 +26,7 @@ export default class FormDapp extends React.Component {
     this.handleApplyResult = this.handleApplyResult.bind(this);
   }
 
-  handleFormSubmit(formData) {
+  handleFormSubmit({ formData }) {
     this.setState({formStatus: 'uploading-to-ipfs'});
 
     this.props.stores.formsStore.setFormData(formData);

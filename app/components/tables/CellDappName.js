@@ -23,12 +23,12 @@ class CellDappName extends React.Component {
       <div>
         <div className="name">
           {name}
-          {(item.ipfsData.metadata.networks && item.ipfsData.metadata.networks.indexOf('POA Network') !== -1) &&
+          {/* {(item.ipfsData.metadata.networks && item.ipfsData.metadata.networks.indexOf('POA Network') !== -1) &&
             <img src={poa} alt="POA Network" style={{height: '16px', marginLeft: '6px'}} />
           }
           {(item.ipfsData.metadata.networks && item.ipfsData.metadata.networks.indexOf('Ethereum') !== -1) &&
             <img src={ethereum} alt="Ethereum" style={{height: '14px', marginLeft: '6px'}} />
-          }
+          } */}
         </div>
         <div className="desc-short">{desc}</div>
         <div className="update" onClick={() => this.updateStatus()}>
