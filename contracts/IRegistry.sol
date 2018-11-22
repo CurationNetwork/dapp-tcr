@@ -35,7 +35,8 @@ interface IRegistry {
     function get_info(bytes32 listing_id) external view returns
         (uint state, bool is_challenged /* many states can be challenged */,
         bool status_can_be_updated /* if update_status should be called */,
-        bytes ipfs_hash, bytes proposed_ipfs_hash /* empty if not editing */);
+        bytes ipfs_hash, bytes proposed_ipfs_hash, /* empty if not editing */
+        address owner /*dapp owner*/);
 
 
     // MAINTENANCE

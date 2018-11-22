@@ -5,19 +5,19 @@ import RegistryABI from './abi/Registry.abi.json';
 
 const contracts = {
   Token: {
-    address: '0x81f7cff4e30d8878114111b211f8bcc6c7fa31ae',
+    address: '0xc4ae75d112a8a87c3cab55f018b2f6aae5658109',
     abi: TokenABI
   },
   Voting: {
-    address: '0x675e30a1c9c7dadfe9f650958338866ade0952e9',
+    address: '0x539216c323f18a7f07879ee2e19e41f8f6e98a64',
     abi: VotingABI
   },
   Faucet: {
-    address: '0x93c405df3680dc317b42fe044cc88c2db8026b7c',
+    address: '0xd9f4f3f0b8205c69ddd86765e98cef3abd660df9',
     abi: FaucetABI
   },
   Registry: {
-    address: '0x663e8bd1450b30b400afcff6c73bdd7afbc5d331',
+    address: '0xe26bf826d13914e4217b10bc027e1553cdf9e1a2',
     abi: RegistryABI
   },
 };

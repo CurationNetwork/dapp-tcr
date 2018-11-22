@@ -15,8 +15,9 @@ contract Faucet {
     StandardToken token;
     uint256 public faucetSize;
 
-    constructor(uint256 _faucetSize) public {
+    constructor(address _tokenAddress, uint256 _faucetSize) public {
         faucetSize = _faucetSize;
+        token = StandardToken(_tokenAddress);
     }
 
     function getBalance()

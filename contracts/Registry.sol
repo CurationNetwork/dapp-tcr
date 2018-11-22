@@ -211,7 +211,8 @@ contract Registry is IRegistry {
     function get_info(bytes32 listing_id) external view returns
             (uint state, bool is_challenged /* many states can be challenged */,
             bool status_can_be_updated /* if update_status should be called */,
-            bytes ipfs_hash, bytes proposed_ipfs_hash /* empty if not editing */) {
+            bytes ipfs_hash, bytes proposed_ipfs_hash, /* empty if not editing */
+            address owner /* item owner*/) {
         checkDAppInvariant(listing_id);
 
         state = uint(dappState(listing_id));
@@ -219,6 +220,7 @@ contract Registry is IRegistry {
         status_can_be_updated = this.can_update_status(listing_id);
         ipfs_hash = listings[listing_id].ipfs_hash;
         proposed_ipfs_hash = listings[listing_id].proposed_ipfs_hash;
+        owner = listings[listing_id].owner;
     }
 
     // -----------------------

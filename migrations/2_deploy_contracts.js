@@ -14,14 +14,14 @@ const initialTokenHolders = [
     '0xfF20387Dd4dbfA3e72AbC7Ee9B03393A941EE36E'
 ];
 const initialApplications = [
-	'Qmf7L4VLuWsAxDQimWrsjsMmxBPc8AF5B8rF6DhvBVTyBx',
-	'QmS8rfAmZDFnZLUxZveP19as5E9YgVz6wzsw3gZWmaig8R',
-	'QmdEt1zsm3umViBrx3sQmdRMdEXHqyN6KipG48AT3B25qd',
-	'QmYgNZ2XaRMDtUFxyqMwAJXckCoxoBuSzx2HnfczMKAEXn', // DopeRaider
-	'QmfPVD1BMuMKwrwrutXTeWRxpEBnY4bvfWz87nh9MtZusT', // Aragon
+ //   'Qmf7L4VLuWsAxDQimWrsjsMmxBPc8AF5B8rF6DhvBVTyBx',
+ //   'QmS8rfAmZDFnZLUxZveP19as5E9YgVz6wzsw3gZWmaig8R',
+//    'QmdEt1zsm3umViBrx3sQmdRMdEXHqyN6KipG48AT3B25qd',
+//    'QmYgNZ2XaRMDtUFxyqMwAJXckCoxoBuSzx2HnfczMKAEXn', // DopeRaider
+//    'QmfPVD1BMuMKwrwrutXTeWRxpEBnY4bvfWz87nh9MtZusT', // Aragon
 ];
 
-const initialTokens = 1000;
+const initialTokens = 100000;
 const totalSupply = 1000000;
 
 
@@ -37,7 +37,7 @@ module.exports = function(deployer, network) {
     return deployer.deploy(Voting);
   }).then(function (ret) {
     voting = ret;
-    return deployer.deploy(Faucet, [web3.toWei(100)]);
+    return deployer.deploy(Faucet, token.address, web3.toWei(100));
   }).then(function (ret) {
     faucet = ret;
     return deployer.deploy(Parameterizer, [web3.toWei(100, 'ether'), 60, 60, 60, 50, 50, 60, 60]);
@@ -54,15 +54,15 @@ module.exports = function(deployer, network) {
   }).then(function () {
       return Promise.all(
           initialTokenHolders.map(addr => {
-            token.transfer(addr, web3.toWei(initialTokens))
+            return token.transfer(addr, web3.toWei(initialTokens))
           })
       );
   }).then(function () {
       return Promise.all(
           initialApplications.map(ipfs_hash => {
-			let bytes_hash = '0x' + Buffer.from(ipfs_hash).toString('hex');
-            registry.apply(bytes_hash);
-			console.log("applied hash: " + ipfs_hash);
+            let bytes_hash = '0x' + Buffer.from(ipfs_hash).toString('hex');
+            console.log("applied hash: " + ipfs_hash);
+            return registry.apply(bytes_hash);
           })
       );
   });
