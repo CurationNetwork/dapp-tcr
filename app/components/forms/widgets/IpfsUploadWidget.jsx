@@ -28,7 +28,7 @@ export default class IPFSUploadWebGatewayWidget extends React.PureComponent {
           this.setState({
             msg: hash,
             ipfs_hash: hash
-          }, onChange(this.state.ipfs_hash));
+          }, onChange(hash));
         })
         .catch((err) => {
           console.error(err);
