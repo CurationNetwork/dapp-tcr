@@ -45,9 +45,9 @@ export default class Tabs extends React.Component {
     ];
 
     const tabsContent = [
-      <Tab data={existing} slice="registry"/>,
-      <Tab data={applications} slice="applications"/>,
-      <Tab data={challenges} slice="challenges"/>
+      <Tab itemsData={existing} slice="registry"/>,
+      <Tab itemsData={applications} slice="applications"/>,
+      <Tab itemsData={challenges} slice="challenges"/>
     ];
 
     const { tabActive } = this.state;

@@ -4,12 +4,14 @@ import axios from 'axios';
 export default class TcrStore {
   @observable registry = [];
   @observable registryIds = [];
+  newRegistry = [];
 
   constructor(rootStore) {
     this.rootStore = rootStore;
 
     this.fetchRegistry = this.fetchRegistry.bind(this);
     this.fetchChallengeStatuses = this.fetchChallengeStatuses.bind(this);
+    this.fetchApplicationEndDates = this.fetchApplicationEndDates.bind(this);
     this.apply = this.apply.bind(this);
     this.challenge = this.challenge.bind(this);
     this.updateStatus = this.updateStatus.bind(this);
@@ -40,7 +42,7 @@ export default class TcrStore {
           tempList[idx].ipfs_data = data;
         });
 
-        this.registry = tempList.map((l, i) => {
+        this.newRegistry = tempList.map((l, i) => {
           const res = {};
           res.id = this.registryIds[i];
           res.state = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'][+l[0].toString()];
@@ -50,9 +52,18 @@ export default class TcrStore {
           res.proposedIpfsHash = l[4];
           res.ipfsData = l.ipfs_data.data;
           return res;
-        });
+        });        
+
+        if (!this.registry.length) this.registry = this.newRegistry; // first time render instantly
         
-        this.fetchChallengeStatuses();
+        Promise.all([ // to prevent blinking render newRegistry after all fetches
+          this.fetchChallengeStatuses(),
+          this.fetchApplicationEndDates()
+        ])
+        .then(() => {
+          this.registry = this.newRegistry;
+        })
+        .catch(console.error);
       })
     } else {
       setTimeout(this.fetchRegistry, 200);
@@ -61,29 +72,70 @@ export default class TcrStore {
 
   @action
   fetchChallengeStatuses() {
-    const { contracts } = this.rootStore.contractsStore;
+    return new Promise((resolve, reject) => {
+      if (!this.isReady('fetchChallengeStatuses'))
+        reject(new Error('No web3 or contract object'));
 
-    if (!this.isReady('fetchChallengeStatuses')) return null;
-
-    Promise.all(this.registry.map(item => {
-      if (item.isChallenged)
-        return contracts.get('Registry').call('challenge_status', [item.id]);
-      else
-        return null;
-    })).then(res => {
-      res.forEach((data, i) => {
-        if (data !== null) {
-          this.registry[i].challengeStatus = {
-            phase: data[1] === 0 ? 'commit' : 'reveal',
-            challengeId: data[0],
-            votesFor: data[3],
-            votesAgainst: data[4],
-            commitEndDate: data[5],
-            revealEndDate: data[6]
+      const { contracts } = this.rootStore.contractsStore;
+      Promise.all(this.newRegistry.map(item => {
+        if (item.isChallenged)
+          return contracts.get('Registry').call('challenge_status', [item.id]);
+        else
+          return null;
+      }))
+      .then(res => {
+        res.forEach((data, i) => {
+          if (data !== null) {
+            this.newRegistry[i].challengeStatus = {
+              phase: data[1] === 0 ? 'commit' : 'reveal',
+              challengeId: data[0],
+              votesFor: data[3],
+              votesAgainst: data[4],
+              commitEndDate: data[5],
+              revealEndDate: data[6]
+            }
           }
-        }
+          else {
+            this.newRegistry[i].challengeStatus = null;
+          }
+        });
+        resolve();
+      });
+    });
+  }
+
+  @action
+  fetchApplicationEndDates() {
+    return new Promise((resolve, reject) => {
+      if (!this.isReady('fetchApplicationEndDates'))
+        reject(new Error('No web3 or contract object'));
+
+      const { contracts } = this.rootStore.contractsStore;
+
+      const applicationIds = this.newRegistry.reduce((apps, item) => {
+        if (item.state === 'APPLICATION') apps.push(item.id);
+        return apps;
+      }, []);
+
+      const eventFilter1 = {
+        listingHash: applicationIds
+      };
+      const eventFilter2 = {
+        fromBlock: 0,
+        toBlock: 'latest'
+      };
+      const event = contracts.get('Registry').instance._Application(eventFilter1, eventFilter2);
+
+      event.get((err, res) => {
+        if (err) reject(err);
         else {
-          this.registry[i].challengeStatus = null;
+          res = Array.isArray(res) ? res : [res];
+          res.forEach(e => {
+            const { listingHash, appEndDate } = e.args;
+            this.newRegistry.find(ee => ee.id === listingHash)
+              .appEndDate = appEndDate.toNumber();
+          });
+          resolve();
         }
       });
     });

@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
 
+import ProgressBar from './ProgressBar';
 import './CellDappStatus.scss';
 
 function Stage(props) {
@@ -20,19 +21,6 @@ function Stage(props) {
   </div>);
 }
 
-function ProgressBar(props) {
-  const { passedPercent } = props;
-
-  return (<div className="progress-bar">
-    {passedPercent > 0 &&
-      <div className="filled" style={{flexGrow: passedPercent}}></div>
-    }
-    {passedPercent < 100 &&
-      <div className="empty" style={{flexGrow: 100 - passedPercent}}></div>
-    }
-  </div>);
-}
-
 function ProgressBarFork(props) {
   const { status } = props;
 
@@ -44,13 +32,8 @@ function ProgressBarFork(props) {
 }
 
 class CellDappStatus extends React.Component {
-
-
   render() {
-    const { state, isChallenged, passedPercent } = this.props;
-
-    // console.log(state, isChallenged, passedPercent);
-    
+    const { state, isChallenged, stageEndTime } = this.props;
 
     let paylo = <div className="dapp-status"></div>;
 
@@ -58,7 +41,7 @@ class CellDappStatus extends React.Component {
       paylo = (
         <div className="dapp-status">
           <Stage type="application" status="active"/>
-          <ProgressBar passedPercent={35}/>
+          <ProgressBar stageEndTime={stageEndTime}/>
           <Stage type="in-registry" status="future"/>
         </div>
       );

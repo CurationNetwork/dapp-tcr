@@ -5,7 +5,7 @@ import { inject, observer } from 'mobx-react';
 import TableRow from '../tables/TableRow';
 import TableHeader from '../tables/TableHeader';
 import CellDappName from '../tables/CellDappName';
-import CellDappStatus from '../tables/CellDappStatus';
+import CellDappStatus from '../tables/cell-dapp-status/CellDappStatus';
 import CellActions from '../tables/CellActions';
 import { dappSchema } from '../../helpers/get-schema';
 
@@ -18,20 +18,27 @@ class Tab extends React.Component {
   }
 
   render() {
-    const { slice, data } = this.props;
+    const { stores, slice, itemsData } = this.props;
     const ajv = new Ajv();
+    const applyStageLen = stores.parametrizerStore.tcrParameters.get('applyStageLen');
 
     return (<>
       <TableRow type="header">
         <TableHeader type={slice}/>
       </TableRow>
-      {data.map((item, idx) => {
-        const valid = ajv.validate(dappSchema, item.ipfsData);
-        const { id, canBeUpdated, state, isChallenged } = item;
-        const { logo, name, shortDescription } = valid ? item.ipfsData.metadata : {};
 
-        // { type, passedPercent, item } = this.props;
-        // item.challengeStatus; item.state item.isChallenged
+      {itemsData.map((item, idx) => {
+        const { ipfsData } = item;
+        const isValid = ajv.validate(dappSchema, ipfsData);
+        const { logo, name, shortDescription } = isValid
+          ? item.ipfsData.metadata
+          : {name: 'Invalid DApp schema'};
+        const { id, canBeUpdated, state, isChallenged } = item;
+
+        let stageEndTime = null;
+        if (slice === 'applications' && item.appEndDate) {
+          stageEndTime = item.appEndDate;
+        }
 
         return (
           <TableRow key={idx}>
@@ -40,12 +47,13 @@ class Tab extends React.Component {
               logo={logo}
               name={name}
               desc={shortDescription}
-              valid={valid}
+              valid={isValid}
               canBeUpdated={canBeUpdated}
             />
             <CellDappStatus
               state={state}
               isChallenged={isChallenged}
+              stageEndTime={stageEndTime}
             />
             <CellActions type="registry" item={item} subtype={item.state}/>
           </TableRow>

@@ -25,7 +25,7 @@ class CellDappName extends React.Component {
       </div>
       <div>
         <div className="name">
-          {valid ? name : 'Invalid DApp schema'}
+          {name}
           {/* {(item.ipfsData.metadata.networks && item.ipfsData.metadata.networks.indexOf('POA Network') !== -1) &&
             <img src={poa} alt="POA Network" style={{height: '16px', marginLeft: '6px'}} />
           }

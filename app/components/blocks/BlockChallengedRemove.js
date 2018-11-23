@@ -4,7 +4,7 @@ import Block from './Block';
 import TableRow from '../tables/TableRow';
 import TableHeader from '../tables/TableHeader';
 import CellDappName from '../tables/CellDappName';
-import CellDappStatus from '../tables/CellDappStatus';
+import CellDappStatus from '../tables/cell-dapp-status/CellDappStatus';
 import CellActions from '../tables/CellActions';
 
 import imgMock from './0xuniverse.jpg';
