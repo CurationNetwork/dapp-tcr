@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
+import Modal from '../common/Modal';
 import ModalDapp from '../modals/ModalDapp';
 
 import './CellActions.scss';
@@ -9,24 +10,24 @@ class CellActions extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {isPopup: false, action: null};
+    this.state = {isModalOpen: false, action: null};
 
-    this.togglePopup = this.togglePopup.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
   }
 
-  togglePopup(action = null) {
-    this.setState({isPopup: !this.state.isPopup, action})
+  toggleModal(action = null) {
+    this.setState({isModalOpen: !this.state.isModalOpen, action})
   }
 
   render() {
     const { type, challenges, item, subtype } = this.props;
-    const { isPopup, action } = this.state;
+    const { isModalOpen, action } = this.state;
 
     return (<div className="actions">
       {type === 'challenge' && 
         <div className="challenge">
           <div className="border"></div>
-          <div className="reject" onClick={this.togglePopup.bind(this, 'challenge')}>
+          <div className="reject" onClick={this.toggleModal.bind(this, 'challenge')}>
             <FontAwesomeIcon icon="ban"/> Challenge
           </div>
         </div>
@@ -35,11 +36,11 @@ class CellActions extends React.Component {
       {type === 'commit' && 
         <div className="commit">
           <div className="border"></div>
-          <div className="approve" onClick={this.togglePopup.bind(this, 'approve')}>
+          <div className="approve" onClick={this.toggleModal.bind(this, 'approve')}>
             <FontAwesomeIcon icon="check"/> Approve
             </div>
           <div className="border"></div>
-          <div className="reject" onClick={this.togglePopup.bind(this, 'reject')}>
+          <div className="reject" onClick={this.toggleModal.bind(this, 'reject')}>
             <FontAwesomeIcon icon="ban"/> Reject
           </div>
         </div>
@@ -47,17 +48,17 @@ class CellActions extends React.Component {
 
       {type == 'reveal' &&
         <div className="reveal">
-          <div className="reveal-inner" onClick={this.togglePopup.bind(this, 'reveal')}>
+          <div className="reveal-inner" onClick={this.toggleModal.bind(this, 'reveal')}>
             <FontAwesomeIcon icon={['far', 'eye']}/> Reveal
             &nbsp;<span className="time-left">14:01 left</span>
           </div>
         </div>
       }
 
-      {type === 'get-reward' && 
+      {/* {type === 'get-reward' && 
         <div className="commit">
           <div className="border"></div>
-          <div className="approve" onClick={this.togglePopup.bind(this, 'get-reward')}>
+          <div className="approve" onClick={this.toggleModal.bind(this, 'get-reward')}>
             <FontAwesomeIcon icon="coins"/> Get reward
           </div>
         </div>
@@ -69,30 +70,38 @@ class CellActions extends React.Component {
           <div className="loose">You loose :(</div>
           <div className="close">&times; close</div>
         </div>
-      }
+      } */}
 
       {type === 'registry' &&
         <div className="commit">
           <div className="border"></div>
           {(subtype === 'EDIT') &&
-            <div className="approve" onClick={this.togglePopup.bind(this, 'update')}>
+            <div className="approve" onClick={this.toggleModal.bind(this, 'update')}>
               <FontAwesomeIcon icon="pen"/> Decline Update
             </div>
           }
           {(subtype === 'EXISTS') &&
-            <div className="approve" onClick={this.togglePopup.bind(this, 'update')}>
+            <div className="approve" onClick={this.toggleModal.bind(this, 'update')}>
               <FontAwesomeIcon icon="pen"/> Update
             </div>
           }
           {(subtype === 'APPLICATION' || subtype === 'EXISTS') &&
-            <div className="reject" onClick={this.togglePopup.bind(this, 'challenge')}>
-              <FontAwesomeIcon icon="ban"/> Remove
+            <div className="reject" onClick={this.toggleModal.bind(this, 'challenge')}>
+              <FontAwesomeIcon icon="ban"/> Challenge
             </div>
           }
         </div>
       }
 
-      <ModalDapp isOpen={this.state.isPopup} onClose={this.togglePopup} action={action} item={item}/>
+      {this.state.isModalOpen &&
+        <Modal header="Challenge DApp" icon="ban" close={this.toggleModal} type="big">
+          {action === 'challenge' &&
+            <p>Hello world</p>
+          }
+        </Modal>
+      }
+      
+      {/* <ModalDapp isOpen={this.state.isModalOpen} onClose={this.toggleModal} action={action} item={item}/> */}
     </div>);        
   }
 }

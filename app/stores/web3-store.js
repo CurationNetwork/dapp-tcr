@@ -2,28 +2,37 @@ import { action, observable, runInAction } from 'mobx';
 
 import { getNetworkName } from '../helpers/eth-tools';
 
+/**  */
 export default class Web3Store {
   @observable web3;
   @observable web3Status;
-  @observable contracts;
   @observable networkId;
   @observable defaultAccount;
 
+  WEB3_CHECK_INTERVAL = 200;
+  WEB3_STATUS = Object.freeze({
+    OK: 'web3 OK',
+    NOT_AUTH: 'web3 not authorized',
+    LOCKED: 'web3 locked',
+    NO: 'web3 not found',
+  });
+
   constructor(rootStore) {
     this.rootStore = rootStore;
-    this.dependentSet = false;
+    this.isDependentsSet = false;
 
     this.checkWeb3Status = this.checkWeb3Status.bind(this);
     this.initWeb3 = this.setWeb3.bind(this);
     this.checkNetwork = this.setNetwork.bind(this);
     this.checkDefaultAccount = this.setDefaultAccount.bind(this);
-    this.setDependents = this.setDependents.bind(this);
+    this.setDependents = this.initDepencies.bind(this);
+    this.isWeb3Available = this.isWeb3Available.bind(this);
 
     window.addEventListener('load', () => {
       this.checkWeb3Status();
-      this.intervalBlockCheck = setInterval(() => {
+      this.web3CheckInterval = setInterval(() => {
         this.checkWeb3Status();
-      }, 200);
+      }, this.WEB3_CHECK_INTERVAL);
     });
   }
 
@@ -33,27 +42,37 @@ export default class Web3Store {
    * initializes contracts and subscriptions.
    */
   checkWeb3Status() {
-    let s = this.web3Status;
+    let { web3Status } = this;
+    const { WEB3_STATUS } = this;
 
-    if (this.web3 && typeof this.web3 === 'object') s = 'web3-ok';
-    if (this.web3 === 'not-authorized') s = 'web3-not-authorized';
-    if (window.web3 && !window.web3.eth.defaultAccount) s = 'web3-locked';
-    if (!window.Web3) s = 'no-web3';
-
-    if (s === undefined || s !== this.web3Status) {
-      console.log('web3Status: ' + this.web3Status + ' -> ' + s);
-      this.web3Status = s;
+    if (!this.web3 && (window.ethereum || window.web3)) {
       this.setWeb3();
     }
 
-    if (s === 'web3-ok') {
+    if (this.web3 && typeof this.web3 === 'object') {
+      web3Status = WEB3_STATUS.OK;
+    } else if (this.web3 === 'not-authorized') {
+      web3Status = WEB3_STATUS.NOT_AUTH;
+    }
+    if (window.web3 && !window.web3.eth.defaultAccount) {
+      web3Status = WEB3_STATUS.LOCKED;
+    } else if (!window.web3) {
+      web3Status = WEB3_STATUS.NO;
+    }
+
+    if (web3Status !== this.web3Status) {
+      console.log('web3Status: ' + this.web3Status + ' -> ' + web3Status);
+      this.web3Status = web3Status;
+    }
+
+    if (web3Status === WEB3_STATUS.OK) {
       // Cyclic wallet status check
       this.setNetwork();
       this.setDefaultAccount();
 
-      // Web3-depending state init
-      if (!this.dependentSet) {
-        this.setDependents();
+      // One-time Web3 dependencies state init
+      if (!this.isDependentsSet) {
+        this.initDepencies();
       }
     }
   }
@@ -61,28 +80,30 @@ export default class Web3Store {
   @action
   /** Gets web3 provider by method depending on environment, setsWeb3. */
   setWeb3() {
-    if (!this.web3 && window.ethereum) {
+    if (window.ethereum) {
       window.ethereum.enable()
         .then(() => {
           runInAction(() => {        
             this.web3 = new window.Web3(window.ethereum);
           });
         })
-        .catch(() => this.web3 = 'not-authorized');      
+        .catch(() => this.web3 = WEB3_STATUS.NOT_AUTH);      
   
-    } else if (!this.web3 && window.web3) {
+    } else if (window.web3) {
       this.web3 = new window.Web3(window.web3.currentProvider);
     }
   }
 
   @action
   setNetwork() {
-    this.web3.version.getNetwork((err, netId) => {
+    this.web3.version.getNetwork((e, netId) => {
       if (netId && this.networkId !== netId) {
         console.log(
           'networkId: ' + getNetworkName(this.networkId) + ' -> ' + getNetworkName(netId)
         );
-        this.networkId = netId;
+        runInAction(() => {
+          this.networkId = netId;
+        });
       }
     });
   }
@@ -96,29 +117,25 @@ export default class Web3Store {
   }
 
   /** Web3-depending state init */
-  setDependents() {    
-    // contracts ABI
-    const { contracts, setContracts } = this.rootStore.contractsStore;
-    if (!contracts.size) setContracts();
+  initDepencies() {    
+    // contracts ABI load
+    this.rootStore.contractsStore.setContracts();
 
     // TCR contract listings data and states
-    const { registry, fetchRegistry } = this.rootStore.tcrStore;
-    if (!registry.length) {
-      fetchRegistry();
-      this.rootStore.subscriptionsStore.subscribe('tcrStore', 'fetchRegistry');
-    }
+    this.rootStore.tcrStore.fetchRegistry();
 
     // TCR parameters
-    const { tcrParameters, fetchParameters } = this.rootStore.parametrizerStore;
-    
-    if (!tcrParameters.size) fetchParameters();
+    this.rootStore.parametrizerStore.fetchParameters();
 
     // subscriptions
-    const { blockInterval, initSubscription } = this.rootStore.subscriptionsStore; 
-    if (!blockInterval) initSubscription();
+    this.rootStore.subscriptionsStore.initSubscriptions();
 
-    this.dependentSet = true;
+    this.isDependentsSet = true;
   }
 
+  isWeb3Available() {
+    const { web3Status, WEB3_STATUS } = this;
+    return web3Status === WEB3_STATUS.OK;
+  }
 
 }

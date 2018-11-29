@@ -7,26 +7,32 @@ export default class SubscriptionsStore {
     this.currentBlock = undefined;
     this.subscriptions = [];
 
-    this.initSubscription = this.initSubscription.bind(this);
+    this.initSubscriptions = this.initSubscriptions.bind(this);
     this.onNewBlock = this.onNewBlock.bind(this);
     this.subscribe = this.subscribe.bind(this);
   }
 
   @action
-  initSubscription() {
-    const { web3, web3Status } = this.rootStore.web3Store;
-
-    if (web3Status === 'web3-ok') {
-      this.blockInterval = setInterval(() => {
-        web3.eth.getBlockNumber((err, res) => {
-          if (err) console.error(err);
-          else if (res !== this.currentBlock) {
-            this.currentBlock = res;
-            this.onNewBlock();
-          }
-        });
-      }, 3000);
+  initSubscriptions() {
+    if (this.blockInterval) {
+      return;
     }
+
+    const { isWeb3Available } = this.rootStore.web3Store;
+    if (!isWeb3Available()) {
+      console.error('Block subscription init failed');
+      return;
+    }
+
+    this.blockInterval = setInterval(() => {
+      web3.eth.getBlockNumber((err, res) => {
+        if (err) console.error(err);
+        else if (res !== this.currentBlock) {
+          this.currentBlock = res;
+          this.onNewBlock();
+        }
+      });
+    }, 3000);
   }
 
   @action
@@ -42,6 +48,5 @@ export default class SubscriptionsStore {
       this.rootStore[storeName][funcName](...args);
     });
   }
-
 
 }

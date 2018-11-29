@@ -18,9 +18,8 @@ class Tab extends React.Component {
   }
 
   render() {
-    const { stores, slice, itemsData } = this.props;
+    const { slice, itemsData } = this.props;
     const ajv = new Ajv();
-    const applyStageLen = stores.parametrizerStore.tcrParameters.get('applyStageLen');
 
     return (<>
       <TableRow type="header">

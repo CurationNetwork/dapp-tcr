@@ -1,4 +1,4 @@
-import { action, observable } from 'mobx';
+import { action, observable, runInAction } from 'mobx';
 
 export default class ParametrizerStore {
   @observable tcrParameters = new Map();
@@ -22,29 +22,33 @@ export default class ParametrizerStore {
 
   @action
   fetchParameters() {
-    const { contracts } = this.rootStore.contractsStore;
-
-    if (this.isReady('fetchParameters')) {
-      const paramContract = contracts.get('Parametrizer');
-      
-      this.paramNames.forEach(p => {        
-        paramContract.call('get', [p])
-          .then(value => {this.tcrParameters.set(p, value.toNumber())})
-          .catch(console.error);
-      })
+    if (!this.isReady('fetchParameters') || this.tcrParameters.size) {
+      return;
     }
+
+    const { contracts } = this.rootStore.contractsStore;
+    const paramContract = contracts.get('Parametrizer');
+    
+    this.paramNames.forEach(p => {        
+      paramContract.call('get', [p])
+        .then(value => {
+          runInAction(() => {
+            this.tcrParameters.set(p, value.toNumber())
+          });
+        })
+        .catch(console.error);
+    })
   }
 
   isReady(fName = undefined) {
-    const { web3 } = this.rootStore.web3Store;
+    const { isWeb3Available } = this.rootStore.web3Store;
     const { contracts } = this.rootStore.contractsStore;
 
-    const isR = web3 && contracts && contracts.has('Parametrizer');
+    const isR = isWeb3Available() && contracts && contracts.has('Parametrizer');
     if (!isR && fName) {
       console.log(`parametrizerStore.${fName} failed`);
     }
     return isR;
   }
-
 
 }

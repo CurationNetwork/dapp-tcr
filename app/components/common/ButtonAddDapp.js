@@ -30,7 +30,7 @@ export default class ButtonAddDapp extends React.Component {
       </button>
 
       {this.state.isModalOpen &&
-        <Modal header="Submit a Dapp" icon="plus-square" close={this.toggleModal}>
+        <Modal header="Submit a Dapp" icon="plus-square" close={this.toggleModal} type="big">
           <ModalAddDapp/>
         </Modal>
       }

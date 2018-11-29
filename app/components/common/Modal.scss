@@ -19,9 +19,17 @@
     top: 50%;
     transform: translateY(-50%);
     width: 600px;
-    max-height: 58vh;
     display: flex;
     flex-direction: column;
+
+    &.modal-big {
+      max-height: 58vh;
+
+      .modal-content {
+        flex-grow: 1;
+        max-height: calc(58vh - 102px);
+      }
+    }
    
     .modal-h {
       color: #0E1418;
@@ -32,9 +40,7 @@
 
     .modal-content {
       font-family: $f-regular;
-      flex-grow: 1;
       overflow: scroll;
-      max-height: calc(58vh - 102px);
       margin-bottom: 26px;
     }
 

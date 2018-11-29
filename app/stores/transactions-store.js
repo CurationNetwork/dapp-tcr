@@ -23,22 +23,24 @@ export default class TransactionsStore {
 
   @action
   getTxReceipt(txHash) {
-    const { web3, web3Status } = this.rootStore.web3Store;
+    const { web3, isWeb3Available } = this.rootStore.web3Store;
 
-    if (web3Status === 'web3-ok') {
-      web3.eth.getTransactionReceipt(txHash, (err, receipt) => {
-        if (receipt) {
-          this.transactions.set(txHash, {
-            status: receipt.status === '0x0' ? 'failure' : 'success',
-            receipt,
-          })
-        } else if (!err) {
-          setTimeout(() => this.getTxReceipt(txHash), 500);
-        } else {
-          console.error(err);
-        }
-      });
+    if (!isWeb3Available()) {
+      return;
     }
+
+    web3.eth.getTransactionReceipt(txHash, (err, receipt) => {
+      if (receipt) {
+        this.transactions.set(txHash, {
+          status: receipt.status === '0x0' ? 'failure' : 'success',
+          receipt,
+        })
+      } else if (!err) {
+        setTimeout(() => this.getTxReceipt(txHash), 500);
+      } else {
+        console.error(err);
+      }
+    });
   };
   
 

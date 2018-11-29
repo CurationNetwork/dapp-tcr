@@ -2,7 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { inject } from 'mobx-react';
-
+import classNames from 'classnames';
 
 import './Modal.scss';
 
@@ -50,9 +50,10 @@ export default class Modal extends React.Component {
   }
 
   render() {
-    const { children, icon, header } = this.props;
+    const { children, icon, header, type } = this.props;
+    
     const content = (
-      <div className="modal-window">
+      <div className={classNames("modal-window", {"modal-big": type === 'big'})}>
         <div className="modal-h">
           <FontAwesomeIcon icon={icon}/> {header}
         </div>

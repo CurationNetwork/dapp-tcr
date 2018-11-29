@@ -18,63 +18,80 @@ export default class TcrStore {
     this.isReady = this.isReady.bind(this);
   }
 
+  initRegistry() {
+    if (this.registry.length) { // init once
+      return;
+    }
+
+    if (!this.isReady('fetchRegistry')) {
+      setTimeout(this.initRegistry, 200);
+      return;
+    }
+    
+    this.fetchRegistry();  
+    this.rootStore.subscriptionsStore.subscribe('tcrStore', 'fetchRegistry');
+  }
+
   @action
   fetchRegistry() {
+    if (!this.isReady('fetchRegistry')) {
+      return;
+    }
+    
     const { contracts } = this.rootStore.contractsStore;
     let tempList;
 
-    if (this.isReady('fetchRegistry')) {      
-      contracts.get('Registry').call('list') // get items list
-      .then(ids => { // get items details
-        this.registryIds = ids;
-        return Promise.all(ids.map(id => {
-          return contracts.get('Registry').call('get_info', [id]);
-        }));
-      })
-      .then(res => { // get more details from IPFS
-        tempList = res;        
-        return Promise.all(tempList.map(item => {
-          return axios.get('https://ipfs.io' + '/ipfs/' + Buffer.from(item[3].substr(2), 'hex').toString())
-        }))
-      })
-      .then(res => { // process data into convenient format
-        res.forEach((data, idx) => {
-          tempList[idx].ipfs_data = data;
-        });
+    contracts.get('Registry').call('list') // get items list
+    .then(ids => { // get items details
+      this.registryIds = ids;
+      console.log(ids);
+      
+      return Promise.all(ids.map(id => {
+        return contracts.get('Registry').call('get_info', [id]);
+      }));
+    })
+    .then(res => { // get more details from IPFS
+      tempList = res;        
+      return Promise.all(tempList.map(item => {
+        return axios.get('https://ipfs.io' + '/ipfs/' + Buffer.from(item[3].substr(2), 'hex').toString())
+      }))
+    })
+    .then(res => { // process data into convenient format
+      res.forEach((data, idx) => {
+        tempList[idx].ipfs_data = data;
+      });
 
-        this.newRegistry = tempList.map((l, i) => {
-          const res = {};
-          res.id = this.registryIds[i];
-          res.state = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'][+l[0].toString()];
-          res.isChallenged = l[1];
-          res.canBeUpdated = l[2];
-          res.ipfsHash = l[3];
-          res.proposedIpfsHash = l[4];
-          res.ipfsData = l.ipfs_data.data;
-          return res;
-        });        
+      this.newRegistry = tempList.map((l, i) => {
+        const res = {};
+        res.id = this.registryIds[i];
+        res.state = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'][+l[0].toString()];
+        res.isChallenged = l[1];
+        res.canBeUpdated = l[2];
+        res.ipfsHash = l[3];
+        res.proposedIpfsHash = l[4];
+        res.ipfsData = l.ipfs_data.data;
+        return res;
+      });        
 
-        if (!this.registry.length) this.registry = this.newRegistry; // first time render instantly
-        
-        Promise.all([ // to prevent blinking render newRegistry after all fetches
-          this.fetchChallengeStatuses(),
-          this.fetchApplicationEndDates()
-        ])
-        .then(() => {
-          this.registry = this.newRegistry;
-        })
-        .catch(console.error);
+      if (!this.registry.length) this.registry = this.newRegistry; // first time render instantly
+      
+      Promise.all([ // to prevent blinking render new registry only after all fetches
+        this.fetchChallengeStatuses(),
+        this.fetchApplicationEndDates()
+      ])
+      .then(() => {
+        this.registry = this.newRegistry;
       })
-    } else {
-      setTimeout(this.fetchRegistry, 200);
-    }
+      .catch(console.error);
+    })
   }
 
   @action
   fetchChallengeStatuses() {
     return new Promise((resolve, reject) => {
-      if (!this.isReady('fetchChallengeStatuses'))
+      if (!this.isReady('fetchChallengeStatuses')) {
         reject(new Error('No web3 or contract object'));
+      }
 
       const { contracts } = this.rootStore.contractsStore;
       Promise.all(this.newRegistry.map(item => {
@@ -107,8 +124,9 @@ export default class TcrStore {
   @action
   fetchApplicationEndDates() {
     return new Promise((resolve, reject) => {
-      if (!this.isReady('fetchApplicationEndDates'))
+      if (!this.isReady('fetchApplicationEndDates')) {
         reject(new Error('No web3 or contract object'));
+      }
 
       const { contracts } = this.rootStore.contractsStore;
 
@@ -145,7 +163,7 @@ export default class TcrStore {
   apply(bytesHash, cb) {
     const { contracts } = this.rootStore.contractsStore;
 
-    if (!this.isReady('apply')) return null;
+    if (!this.isReady('apply')) return;
 
     contracts.get('Registry').send('apply', [bytesHash])
       .then(res => {
@@ -161,7 +179,7 @@ export default class TcrStore {
   challenge(id, state) {
     const { contracts } = this.rootStore.contractsStore;
 
-    if (!this.isReady('challenge')) return null;
+    if (!this.isReady('challenge')) return;
 
     contracts.get('Registry')
       .send('challenge', [id, state])
@@ -172,7 +190,7 @@ export default class TcrStore {
   updateStatus(id) {
     const { contracts } = this.rootStore.contractsStore;
 
-    if (!this.isReady('updateStatus')) return null;
+    if (!this.isReady('updateStatus')) return;
 
     contracts.get('Registry')
       .send('update_status', [id])
@@ -180,13 +198,14 @@ export default class TcrStore {
   }
 
   isReady(fName = undefined) {
-    const { web3 } = this.rootStore.web3Store;
+    const { isWeb3Available } = this.rootStore.web3Store;
     const { contracts } = this.rootStore.contractsStore;
 
-    const isR = web3 && contracts && contracts.has('Registry');
+    const isR = isWeb3Available() && contracts && contracts.has('Registry');
     if (!isR && fName) {
       console.log(`tcrStore.${fName} failed`);
     }
+
     return isR;
   }
 
