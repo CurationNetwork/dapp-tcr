@@ -31,6 +31,15 @@
       }
     }
    
+    &.modal-small {
+      max-height: 30vh;
+
+      .modal-content {
+        flex-grow: 1;
+        max-height: calc(30vh - 102px);
+      }
+    }
+   
     .modal-h {
       color: #0E1418;
       font-family: $f-bold;

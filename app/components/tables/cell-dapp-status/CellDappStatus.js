@@ -33,7 +33,7 @@ function ProgressBarFork(props) {
 
 class CellDappStatus extends React.Component {
   render() {
-    const { state, isChallenged, stageEndTime } = this.props;
+    const { id, state, isChallenged, stageEndTime } = this.props;
 
     let paylo = <div className="dapp-status"></div>;
 

@@ -6,6 +6,14 @@ export default class TcrStore {
   @observable registryIds = [];
   newRegistry = [];
 
+  TCR_ITEM_STATUS = Object.freeze({
+    NOT_EXISTS: 'NOT_EXISTS',
+    APPLICATION: 'APPLICATION',
+    EXISTS: 'EXISTS',
+    EDIT: 'EDIT',
+    DELETING: 'DELETING'
+  });
+
   constructor(rootStore) {
     this.rootStore = rootStore;
 
@@ -61,10 +69,11 @@ export default class TcrStore {
         tempList[idx].ipfs_data = data;
       });
 
+      const { NOT_EXISTS, APPLICATION, EXISTS, EDIT, DELETING } = this.TCR_ITEM_STATUS;
       this.newRegistry = tempList.map((l, i) => {
         const res = {};
         res.id = this.registryIds[i];
-        res.state = ['NOT_EXISTS', 'APPLICATION', 'EXISTS', 'EDIT', 'DELETING'][+l[0].toString()];
+        res.state = [NOT_EXISTS, APPLICATION, EXISTS, EDIT, DELETING][+l[0].toString()];
         res.isChallenged = l[1];
         res.canBeUpdated = l[2];
         res.ipfsHash = l[3];

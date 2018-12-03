@@ -10,16 +10,21 @@ import imgEmpty from '../../assets/empty.png';
 @inject('stores')
 @observer
 class CellDappName extends React.Component {
+  constructor(props) {
+    super(props);
 
-  updateStatus() {
+    this.handleUpdateStatus = this.handleUpdateStatus.bind(this);
+  }
+
+  handleUpdateStatus() {
     const { updateStatus } = this.props.stores.tcrStore;
     updateStatus(this.props.id);
   }
 
   render() {
-    const { valid, logo, name, desc, canBeUpdated } = this.props;
+    const { id, valid, logo, name, desc, canBeUpdated } = this.props;
 
-    return (<div className="dapp-name">
+    return (<div className="dapp-name" id={id}>
       <div className="icon">
         <img src={logo ? `https://ipfs.io/ipfs/${logo}` : imgEmpty} alt={`${name} icon`}/>
       </div>
@@ -35,7 +40,7 @@ class CellDappName extends React.Component {
         </div>
         <div className="desc-short">{desc}</div>
         {canBeUpdated &&
-          <div className="update" onClick={() => this.updateStatus()}>
+          <div className="update" onClick={() => this.handleUpdateStatus()}>
             <FontAwesomeIcon icon="sync-alt"/> update status
           </div>
         }

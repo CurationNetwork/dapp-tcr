@@ -53,7 +53,11 @@ export default class Modal extends React.Component {
     const { children, icon, header, type } = this.props;
     
     const content = (
-      <div className={classNames("modal-window", {"modal-big": type === 'big'})}>
+      <div className={classNames({
+        "modal-window": 1,
+        "modal-big": type === 'big',
+        "modal-small": type === 'small',
+      })}>
         <div className="modal-h">
           <FontAwesomeIcon icon={icon}/> {header}
         </div>

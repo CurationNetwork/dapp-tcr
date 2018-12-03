@@ -2,16 +2,16 @@ import React from 'react';
 import Ajv from 'ajv';
 import { inject, observer } from 'mobx-react';
 
-import TableRow from '../tables/TableRow';
-import TableHeader from '../tables/TableHeader';
-import CellDappName from '../tables/CellDappName';
-import CellDappStatus from '../tables/cell-dapp-status/CellDappStatus';
-import CellActions from '../tables/CellActions';
+import TableRow from './TableRow';
+import TableHeader from './TableHeader';
+import CellDappName from './CellDappName';
+import CellDappStatus from './cell-dapp-status/CellDappStatus';
+import CellActions from './CellActions';
 import { dappSchema } from '../../helpers/get-schema';
 
 @inject('stores')
 @observer
-class Tab extends React.Component {
+export default class Table extends React.Component {
   constructor(props) {
     super(props);
 
@@ -26,13 +26,12 @@ class Tab extends React.Component {
         <TableHeader type={slice}/>
       </TableRow>
 
-      {itemsData.map((item, idx) => {
-        const { ipfsData } = item;
+      {itemsData.map((item, i) => {
+        const { id, canBeUpdated, state, isChallenged, ipfsData } = item;
         const isValid = ajv.validate(dappSchema, ipfsData);
         const { logo, name, shortDescription } = isValid
           ? item.ipfsData.metadata
-          : {name: 'Invalid DApp schema'};
-        const { id, canBeUpdated, state, isChallenged } = item;
+          : { name: 'Invalid DApp schema' };
 
         let stageEndTime = null;
         if (slice === 'applications' && item.appEndDate) {
@@ -40,7 +39,7 @@ class Tab extends React.Component {
         }
 
         return (
-          <TableRow key={idx}>
+          <TableRow key={i + id}>
             <CellDappName
               id={id}
               logo={logo}
@@ -61,5 +60,3 @@ class Tab extends React.Component {
     </>);
   }
 }
-
-export default Tab;

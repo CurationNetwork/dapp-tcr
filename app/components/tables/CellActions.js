@@ -94,7 +94,7 @@ class CellActions extends React.Component {
       }
 
       {this.state.isModalOpen &&
-        <Modal header="Challenge DApp" icon="ban" close={this.toggleModal} type="big">
+        <Modal header="Challenge DApp" icon="ban" close={this.toggleModal} type="small">
           {action === 'challenge' &&
             <p>Hello world</p>
           }
