@@ -8,6 +8,7 @@ import TransactionsStore from './transactions-store';
 import FormsStore from './forms-store';
 import ModalStore from './modal-store';
 import ParametrizerStore from './parametrizer-store';
+import TokenStore from './token-store';
 
 export class Stores {
   constructor() {
@@ -20,6 +21,7 @@ export class Stores {
     this.formsStore = new FormsStore(this);
     this.modalStore = new ModalStore(this);
     this.parametrizerStore = new ParametrizerStore(this);
+    this.tokenStore = new TokenStore(this);
   }
 }
 

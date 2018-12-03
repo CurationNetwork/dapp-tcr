@@ -4,9 +4,9 @@ import { inject, observer } from 'mobx-react';
 
 import TableRow from './TableRow';
 import TableHeader from './TableHeader';
-import CellDappName from './CellDappName';
+import CellDappName from './cell-dapp-name/CellDappName';
 import CellDappStatus from './cell-dapp-status/CellDappStatus';
-import CellActions from './CellActions';
+import CellActions from './cell-dapp-actions/CellActions';
 import { dappSchema } from '../../helpers/get-schema';
 
 @inject('stores')
@@ -53,7 +53,7 @@ export default class Table extends React.Component {
               isChallenged={isChallenged}
               stageEndTime={stageEndTime}
             />
-            <CellActions type="registry" item={item} subtype={item.state}/>
+            <CellActions item={item} name={name} />
           </TableRow>
         );
       })}

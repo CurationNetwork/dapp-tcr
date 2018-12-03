@@ -58,7 +58,10 @@ export default class Modal extends React.Component {
         "modal-big": type === 'big',
         "modal-small": type === 'small',
       })}>
-        <div className="modal-h">
+        <div className={classNames({
+          "modal-h": true,
+          "negative": icon === 'ban'
+        })}>
           <FontAwesomeIcon icon={icon}/> {header}
         </div>
 

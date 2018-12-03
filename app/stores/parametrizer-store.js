@@ -22,7 +22,12 @@ export default class ParametrizerStore {
 
   @action
   fetchParameters() {
-    if (!this.isReady('fetchParameters') || this.tcrParameters.size) {
+    const { isContractReady } = this.rootStore.contractsStore;
+
+    if (
+      !isContractReady('Parametrizer', 'fetchParameters')
+      || this.tcrParameters.size
+    ) {
       return;
     }
 
@@ -38,17 +43,6 @@ export default class ParametrizerStore {
         })
         .catch(console.error);
     })
-  }
-
-  isReady(fName = undefined) {
-    const { isWeb3Available } = this.rootStore.web3Store;
-    const { contracts } = this.rootStore.contractsStore;
-
-    const isR = isWeb3Available() && contracts && contracts.has('Parametrizer');
-    if (!isR && fName) {
-      console.log(`parametrizerStore.${fName} failed`);
-    }
-    return isR;
   }
 
 }

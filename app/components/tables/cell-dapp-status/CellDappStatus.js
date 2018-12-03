@@ -1,6 +1,8 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
+import { inject } from 'mobx-react';
+
 
 import ProgressBar from './ProgressBar';
 import './CellDappStatus.scss';
@@ -31,13 +33,15 @@ function ProgressBarFork(props) {
   </div>);
 }
 
-class CellDappStatus extends React.Component {
+@inject('stores')
+export default class CellDappStatus extends React.Component {
   render() {
-    const { id, state, isChallenged, stageEndTime } = this.props;
+    const { state, isChallenged, stageEndTime } = this.props;
+    const { TCR_ITEM_STATE } = this.props.stores.tcrStore;
 
     let paylo = <div className="dapp-status"></div>;
 
-    if (state === 'APPLICATION' && !isChallenged) {
+    if (state === TCR_ITEM_STATE.APPLICATION && !isChallenged) {
       paylo = (
         <div className="dapp-status">
           <Stage type="application" status="active"/>
@@ -101,5 +105,3 @@ class CellDappStatus extends React.Component {
     </>)
   }
 }
-
-export default CellDappStatus;

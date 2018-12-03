@@ -130,6 +130,9 @@ export default class Web3Store {
     // subscriptions
     this.rootStore.subscriptionsStore.initSubscriptions();
 
+    // subscriptions
+    this.rootStore.tokenStore.fetchTokenInfo();
+
     this.isDependentsSet = true;
   }
 

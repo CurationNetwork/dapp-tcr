@@ -9,6 +9,7 @@ export default class ContractsStore {
     this.rootStore = rootStore;
 
     this.setContracts = this.setContracts.bind(this);
+    this.isContractReady = this.isContractReady.bind(this);
   }
 
   @action
@@ -50,6 +51,18 @@ export default class ContractsStore {
         },
       });
     });
+  }
+
+  isContractReady(contractName, fName = undefined) {
+    const { isWeb3Available } = this.rootStore.web3Store;
+    const { contracts } = this.rootStore.contractsStore;
+
+    const isReady = isWeb3Available() && contracts && contracts.has(contractName);
+    if (!isReady && fName) {
+      console.log(`parametrizerStore.${fName} failed`);
+    }
+
+    return isReady;
   }
 
 }

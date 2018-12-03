@@ -1,30 +1,39 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { inject } from 'mobx-react';
 
-import Modal from '../common/Modal';
-import ModalDapp from '../modals/ModalDapp';
+import Modal from '../../common/Modal';
+import ModalChallenge from '../../modals/ModalChallenge';
 
 import './CellActions.scss';
 
-class CellActions extends React.Component {
+@inject('stores')
+export default class CellActions extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {isModalOpen: false, action: null};
+    this.state = {
+      isModalOpen: false,
+      action: null,
+    };
 
     this.toggleModal = this.toggleModal.bind(this);
   }
 
   toggleModal(action = null) {
-    this.setState({isModalOpen: !this.state.isModalOpen, action})
+    this.setState({
+      isModalOpen: !this.state.isModalOpen,
+      action
+    });
   }
 
   render() {
-    const { type, challenges, item, subtype } = this.props;
+    const { item, name } = this.props;
     const { isModalOpen, action } = this.state;
+    const { TCR_ITEM_STATE } = this.props.stores.tcrStore;
 
     return (<div className="actions">
-      {type === 'challenge' && 
+      {(item.state === TCR_ITEM_STATE.APPLICATION && !item.isChallenged) &&
         <div className="challenge">
           <div className="border"></div>
           <div className="reject" onClick={this.toggleModal.bind(this, 'challenge')}>
@@ -33,6 +42,17 @@ class CellActions extends React.Component {
         </div>
       }
 
+      {(isModalOpen && action === 'challenge') &&
+        <Modal
+          icon="ban" 
+          header="Challenge DApp application"
+          type="small"
+          close={this.toggleModal}
+        >
+          <ModalChallenge item={item} name={name} />
+        </Modal>
+      }
+{/* 
       {type === 'commit' && 
         <div className="commit">
           <div className="border"></div>
@@ -55,7 +75,7 @@ class CellActions extends React.Component {
         </div>
       }
 
-      {/* {type === 'get-reward' && 
+      {type === 'get-reward' && 
         <div className="commit">
           <div className="border"></div>
           <div className="approve" onClick={this.toggleModal.bind(this, 'get-reward')}>
@@ -70,7 +90,7 @@ class CellActions extends React.Component {
           <div className="loose">You loose :(</div>
           <div className="close">&times; close</div>
         </div>
-      } */}
+      } 
 
       {type === 'registry' &&
         <div className="commit">
@@ -92,18 +112,7 @@ class CellActions extends React.Component {
           }
         </div>
       }
-
-      {this.state.isModalOpen &&
-        <Modal header="Challenge DApp" icon="ban" close={this.toggleModal} type="small">
-          {action === 'challenge' &&
-            <p>Hello world</p>
-          }
-        </Modal>
-      }
-      
-      {/* <ModalDapp isOpen={this.state.isModalOpen} onClose={this.toggleModal} action={action} item={item}/> */}
+*/}
     </div>);        
   }
 }
-
-export default CellActions;

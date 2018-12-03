@@ -26,12 +26,12 @@ export default class Tabs extends React.Component {
   }
 
   render() {
-    const { registry } = this.props.stores.tcrStore;
+    const { registry, TCR_ITEM_STATE } = this.props.stores.tcrStore;
 
     const existing = registry.filter(
-      item => item.state === "EXISTS" || item.state === "EDIT"
+      item => item.state === TCR_ITEM_STATE.EXISTS || item.state === TCR_ITEM_STATE.EDIT
     );
-    const applications = registry.filter(item => item.state === "APPLICATION");
+    const applications = registry.filter(item => item.state === TCR_ITEM_STATE.APPLICATION);
     const challenges = registry.filter(item => item.isChallenged);
 
     const tabHeaders = [

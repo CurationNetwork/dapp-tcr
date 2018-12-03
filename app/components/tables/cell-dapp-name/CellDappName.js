@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { inject, observer } from 'mobx-react';
 
 import './CellDappName.scss';
-import poa from '../../assets/poa.png';
-import ethereum from '../../assets/ethereum.png';
-import imgEmpty from '../../assets/empty.png';
+import poa from '../../../assets/poa.png';
+import ethereum from '../../../assets/ethereum.png';
+import imgEmpty from '../../../assets/empty.png';
 
 @inject('stores')
 @observer
