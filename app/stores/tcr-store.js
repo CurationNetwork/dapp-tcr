@@ -47,8 +47,8 @@ export default class TcrStore {
   fetchRegistry() {
     if (!this.isContractReady('fetchRegistry')) {
       return;
-    }    
-    
+    }
+
     const { contracts } = this.rootStore.contractsStore;
     let tempList;
 

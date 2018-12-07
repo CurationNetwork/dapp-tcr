@@ -37,10 +37,7 @@ export default class Web3Store {
   }
 
   @action
-  /** 
-   * Checks window.web3 object status changes by time interval,
-   * initializes contracts and subscriptions.
-   */
+  /** Checks window.web3 object status changes by time interval */
   checkWeb3Status() {
     let { web3Status } = this;
     const { WEB3_STATUS } = this;
@@ -122,7 +119,7 @@ export default class Web3Store {
     this.rootStore.contractsStore.setContracts();
 
     // TCR contract listings data and states
-    this.rootStore.tcrStore.fetchRegistry();
+    this.rootStore.tcrStore.initRegistry();
 
     // TCR parameters
     this.rootStore.parametrizerStore.fetchParameters();
@@ -130,7 +127,7 @@ export default class Web3Store {
     // subscriptions
     this.rootStore.subscriptionsStore.initSubscriptions();
 
-    // subscriptions
+    // token parameters
     this.rootStore.tokenStore.fetchTokenInfo();
 
     this.isDependentsSet = true;

@@ -45,7 +45,7 @@ export default class SubscriptionsStore {
 
   // TODO: unsubscribe function
   @action
-  subscribe(storeName, funcName, args = []) {
+  subscribe(storeName, funcName, args = []) {    
     return this.subscriptions.push(() => {
       this.rootStore[storeName][funcName](...args);
     }) - 1;
