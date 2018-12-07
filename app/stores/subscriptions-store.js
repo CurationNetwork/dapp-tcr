@@ -38,15 +38,22 @@ export default class SubscriptionsStore {
   @action
   onNewBlock() {
     console.log('Last block: ' + this.currentBlock);
-    this.subscriptions.forEach(s => s());
+    this.subscriptions.forEach(s => {
+      if (s) s();
+    });
   }
 
   // TODO: unsubscribe function
   @action
   subscribe(storeName, funcName, args = []) {
-    this.subscriptions.push(() => {
+    return this.subscriptions.push(() => {
       this.rootStore[storeName][funcName](...args);
-    });
+    }) - 1;
+  }
+
+  @action
+  unsubscribe(index) {
+    return delete this.subscriptions[index];
   }
 
 }

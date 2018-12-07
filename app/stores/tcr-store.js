@@ -142,7 +142,8 @@ export default class TcrStore {
       const { contracts } = this.rootStore.contractsStore;
 
       const applicationIds = this.newRegistry.reduce((apps, item) => {
-        if (item.state === 'APPLICATION') apps.push(item.id);
+        if (item.state === this.TCR_ITEM_STATE.APPLICATION)
+          apps.push(item.id);
         return apps;
       }, []);
 
@@ -192,9 +193,12 @@ export default class TcrStore {
 
     if (!this.isContractReady('challenge')) return;
 
-    contracts.get('Registry')
-      .send('challenge', [id, state])
-      .then();
+    return new Promise((res, rej) => {
+      contracts.get('Registry')
+        .send('challenge', [id, state])
+        .then(txHash => res(txHash))
+        .catch(err => rej(err))
+    });
   }
 
   @action

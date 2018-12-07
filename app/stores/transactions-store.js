@@ -5,6 +5,12 @@ import { isTx } from '../helpers/eth-tools';
 export default class TransactionsStore {
   @observable transactions = new Map();
 
+  TX_STATUS = Object.freeze({
+    PENDING: 0,
+    FAILURE: 1,
+    SUCCESS: 2
+  });
+
   constructor(rootStore) {
     this.rootStore = rootStore;
     this.setTransaction = this.setTransaction.bind(this);
@@ -24,6 +30,7 @@ export default class TransactionsStore {
   @action
   getTxReceipt(txHash) {
     const { web3, isWeb3Available } = this.rootStore.web3Store;
+    const { TX_STATUS } = this;
 
     if (!isWeb3Available()) {
       return;
@@ -32,12 +39,22 @@ export default class TransactionsStore {
     web3.eth.getTransactionReceipt(txHash, (err, receipt) => {
       if (receipt) {
         this.transactions.set(txHash, {
-          status: receipt.status === '0x0' ? 'failure' : 'success',
+          status: receipt.status === '0x0' ? TX_STATUS.FAILURE : TX_STATUS.SUCCESS,
           receipt,
         })
+
       } else if (!err) {
-        setTimeout(() => this.getTxReceipt(txHash), 500);
+        this.transactions.set(txHash, {
+          status: TX_STATUS.PENDING
+        });
+        this.rootStore.subscriptionsStore
+          .subscribe('transactionsStore', 'getTxReceipt', [txHash]);
+
       } else {
+        this.transactions.set(txHash, {
+          status: TX_STATUS.FAILURE,
+          error: err
+        });
         console.error(err);
       }
     });

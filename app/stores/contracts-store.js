@@ -43,7 +43,7 @@ export default class ContractsStore {
               if (err) {
                 reject(err)
               } else if (txHash) {                  
-                that.rootStore.transactionsStore.setTransaction.setTx(txHash);
+                that.rootStore.transactionsStore.setTransaction(txHash);
                 resolve(txHash);
               }
             });
