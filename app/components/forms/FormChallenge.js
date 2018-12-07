@@ -38,7 +38,12 @@ export default class FormChallenge extends React.Component {
           txHash
         });
       })
-      .catch(console.error);
+      .catch(err => {
+        console.error(err);
+        this.setState({
+          txState: this.FORM_STATE.INITIAL
+        });
+      });
   }
 
   render() {
