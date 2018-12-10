@@ -2,11 +2,15 @@
 
 .dapp-name {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   min-height: 70px;
 
-  .icon {
+  & > div {
     padding-top: 10px;
+    padding-bottom: 10px;
+  }
+
+  .icon {
     padding-right: 5px;
   }
   
@@ -19,11 +23,10 @@
   .name {
     font-size: 14px;
     font-family: $f-medium;
-    margin-bottom: 3px;
-    padding-top: 10px;
   }
 
   .desc-short {
+    margin-top: 3px;
     font-size: 12px;
   }
 

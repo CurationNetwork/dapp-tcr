@@ -7,6 +7,18 @@ import ModalChallenge from '../../modals/ModalChallenge';
 
 import './CellActions.scss';
 
+function Action(props) {
+  const { className, onClick, icon, text } = props;
+  return (
+    <div>
+      <div className="border"></div>
+      <div className={className} onClick={onClick}>
+        <FontAwesomeIcon icon={icon}/>&nbsp;{text}
+      </div>
+    </div>
+  );
+}
+
 @inject('stores')
 export default class CellActions extends React.Component {
   constructor(props) {
@@ -18,7 +30,16 @@ export default class CellActions extends React.Component {
     };
 
     this.toggleModal = this.toggleModal.bind(this);
+    this.handleUpdateStatus = this.handleUpdateStatus.bind(this);
   }
+
+  ACTIONS = Object.freeze({
+    CHALLENGE: 0,
+    UPDATE: 1,
+    DELETE: 2,
+    VOTE_FOR: 3,
+    VOTE_AGAINST: 4,
+  });
 
   toggleModal(action = null) {
     this.setState({
@@ -27,92 +48,123 @@ export default class CellActions extends React.Component {
     });
   }
 
+  handleUpdateStatus() {
+    const { updateStatus } = this.props.stores.tcrStore;
+    updateStatus(this.props.item.id);
+  }
+
   render() {
-    const { item, name } = this.props;
+    const { item, name, stores } = this.props;
     const { isModalOpen, action } = this.state;
-    const { TCR_ITEM_STATE } = this.props.stores.tcrStore;
+    const { EXISTS } = stores.tcrStore.TCR_ITEM_STATE;
+    const userAddress = stores.web3Store.defaultAccount;
 
-    return (<div className="actions">
-      {(item.state === TCR_ITEM_STATE.APPLICATION && !item.isChallenged) &&
-        <div className="challenge">
-          <div className="border"></div>
-          <div className="reject" onClick={this.toggleModal.bind(this, 'challenge')}>
-            <FontAwesomeIcon icon="ban"/> Challenge
-          </div>
-        </div>
-      }
+    return (
+      <div className="actions">
+        {item.canBeUpdated &&
+          <Action
+            icon="sync-alt"
+            text="Update status"
+            className="update"
+            onClick={this.handleUpdateStatus}
+          />
+        }
+        {(!item.canBeUpdated && !item.isChallenged) &&
+          <>
+            <Action
+              icon="ban"
+              text="Challenge"
+              className="reject"
+              onClick={this.toggleModal.bind(this, this.ACTIONS.CHALLENGE)}
+            />
+            {(item.state === EXISTS) &&
+              <Action
+                icon="pen"
+                text="Apply update"
+                className="update"
+                onClick={this.toggleModal.bind(this, this.ACTIONS.UPDATE)}
+              />
+            }
+            {(item.owner === userAddress) &&
+              <Action
+                icon="trash-alt"
+                className="reject"
+                onClick={this.toggleModal.bind(this, this.ACTIONS.DELETE)}
+              />
+            }
+          </>
+        }
+        {(!item.canBeUpdated && item.isChallenged && item.challengeStatus) &&
+          <>
+            {item.challengeStatus.phase === 'commit' && 
+              <div className="commit">
+                <div className="border"></div>
+                <div className="approve" onClick={this.toggleModal.bind(this, 'approve')}>
+                  <FontAwesomeIcon icon="check"/> Approve
+                  </div>
+                <div className="border"></div>
+                <div className="reject" onClick={this.toggleModal.bind(this, 'reject')}>
+                  <FontAwesomeIcon icon="ban"/> Reject
+                </div>
+              </div>
+            }
 
-      {(isModalOpen && action === 'challenge') &&
-        <Modal
-          icon="ban" 
-          header="Challenge DApp application"
-          type="small"
-          close={this.toggleModal}
-        >
-          <ModalChallenge item={item} name={name} />
-        </Modal>
-      }
+            {item.challengeStatus.phase === 'reveal' &&
+              <div className="reveal">
+                <div className="reveal-inner" onClick={this.toggleModal.bind(this, 'reveal')}>
+                  <FontAwesomeIcon icon={['far', 'eye']}/> Reveal
+                  &nbsp;<span className="time-left">14:01 left</span>
+                </div>
+              </div>
+            }
+          </>
+        }
+
+        {(isModalOpen && action === this.ACTIONS.CHALLENGE) &&
+          <Modal
+            type="small"
+            icon="ban" 
+            header="Challenge DApp application"
+            close={this.toggleModal}
+          >
+            <ModalChallenge item={item} name={name} />
+          </Modal>
+        }
 {/* 
-      {type === 'commit' && 
-        <div className="commit">
-          <div className="border"></div>
-          <div className="approve" onClick={this.toggleModal.bind(this, 'approve')}>
-            <FontAwesomeIcon icon="check"/> Approve
+        {type === 'get-reward' && 
+          <div className="commit">
+            <div className="border"></div>
+            <div className="approve" onClick={this.toggleModal.bind(this, 'get-reward')}>
+              <FontAwesomeIcon icon="coins"/> Get reward
             </div>
-          <div className="border"></div>
-          <div className="reject" onClick={this.toggleModal.bind(this, 'reject')}>
-            <FontAwesomeIcon icon="ban"/> Reject
           </div>
-        </div>
-      }
+        }
 
-      {type == 'reveal' &&
-        <div className="reveal">
-          <div className="reveal-inner" onClick={this.toggleModal.bind(this, 'reveal')}>
-            <FontAwesomeIcon icon={['far', 'eye']}/> Reveal
-            &nbsp;<span className="time-left">14:01 left</span>
+        {type === 'loose' && 
+          <div className="commit">
+            <div className="border"></div>
+            <div className="loose">You loose :(</div>
+            <div className="close">&times; close</div>
           </div>
-        </div>
-      }
+        } 
 
-      {type === 'get-reward' && 
-        <div className="commit">
-          <div className="border"></div>
-          <div className="approve" onClick={this.toggleModal.bind(this, 'get-reward')}>
-            <FontAwesomeIcon icon="coins"/> Get reward
+        {type === 'registry' &&
+          <div className="commit">
+            <div className="border"></div>
+            {(subtype === 'EDIT') &&
+              <div className="approve" onClick={this.toggleModal.bind(this, 'update')}>
+                <FontAwesomeIcon icon="pen"/> Decline Update
+              </div>
+            }
+            {(subtype === 'APPLICATION' || subtype === 'EXISTS') &&
+              <div className="reject" onClick={this.toggleModal.bind(this, 'challenge')}>
+                <FontAwesomeIcon icon="ban"/> Challenge
+              </div>
+            }
           </div>
-        </div>
-      }
-
-      {type === 'loose' && 
-        <div className="commit">
-          <div className="border"></div>
-          <div className="loose">You loose :(</div>
-          <div className="close">&times; close</div>
-        </div>
-      } 
-
-      {type === 'registry' &&
-        <div className="commit">
-          <div className="border"></div>
-          {(subtype === 'EDIT') &&
-            <div className="approve" onClick={this.toggleModal.bind(this, 'update')}>
-              <FontAwesomeIcon icon="pen"/> Decline Update
-            </div>
-          }
-          {(subtype === 'EXISTS') &&
-            <div className="approve" onClick={this.toggleModal.bind(this, 'update')}>
-              <FontAwesomeIcon icon="pen"/> Update
-            </div>
-          }
-          {(subtype === 'APPLICATION' || subtype === 'EXISTS') &&
-            <div className="reject" onClick={this.toggleModal.bind(this, 'challenge')}>
-              <FontAwesomeIcon icon="ban"/> Challenge
-            </div>
-          }
-        </div>
-      }
+        }
 */}
-    </div>);        
+      </div>
+    );        
   }
 }

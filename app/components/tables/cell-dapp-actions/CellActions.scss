@@ -4,13 +4,14 @@
   margin-left: 45px;
   font-size: 14px;
   font-family: $f-medium;
+  display: flex;
 
-  .commit, .challenge, .reveal {
+  & > div {
     display: flex;
     align-items: center;
     height: 70px;
 
-    .reject, .approve, .reveal-inner, .loose {
+    .reject, .approve, .reveal-inner, .loose, .update {
       flex-grow: 1;
       padding: 0 20px;
       height: 70px;
@@ -19,17 +20,6 @@
 
       &:hover {
         cursor: pointer;
-      }
-    }
-
-    .reject, .approve, .reveal-inner {
-      &:hover {
-        cursor: pointer;
-      }
-    }
-
-    .reject, .approve, .close {
-      &:hover {
         background: #F5F9FA;
       }
     }
@@ -38,7 +28,7 @@
       color: #C73638;
     }
 
-    .approve {
+    .approve, .update {
       color: #247F92;
     }
     

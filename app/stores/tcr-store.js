@@ -69,7 +69,7 @@ export default class TcrStore {
     .then(res => { // process data into convenient format
       res.forEach((data, idx) => {
         tempList[idx].ipfs_data = data;
-      });
+      });      
 
       const { NOT_EXISTS, APPLICATION, EXISTS, EDIT, DELETING } = this.TCR_ITEM_STATE;
       this.newRegistry = tempList.map((l, i) => {
@@ -80,6 +80,7 @@ export default class TcrStore {
         res.canBeUpdated = l[2];
         res.ipfsHash = l[3];
         res.proposedIpfsHash = l[4];
+        res.owner = l[5];
         res.ipfsData = l.ipfs_data.data;
         return res;
       });        

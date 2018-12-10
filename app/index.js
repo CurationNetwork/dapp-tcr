@@ -3,12 +3,12 @@ import ReactDOM from 'react-dom';
 import { library } from '@fortawesome/fontawesome-svg-core';
 
 import { faPenSquare, faPlusSquare, faMinusSquare, faBan, faCheck, faGavel, faCoins, faPen,
-  faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+  faSyncAlt, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { faWindowMinimize, faEye, faTimesCircle }
   from '@fortawesome/free-regular-svg-icons';
 
 library.add(faWindowMinimize, faPenSquare, faPlusSquare, faMinusSquare, faBan, faCheck, faGavel,
-    faEye, faCoins, faPen, faTimesCircle, faSyncAlt);
+    faEye, faCoins, faPen, faTimesCircle, faSyncAlt, faTrashAlt);
 
 import Dapp from './components/Dapp';
 
