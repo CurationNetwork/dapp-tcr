@@ -27,7 +27,7 @@ export default class Table extends React.Component {
       </TableRow>
 
       {itemsData.map((item, i) => {
-        const { id, canBeUpdated, state, isChallenged, ipfsData } = item;
+        const { id, canBeUpdated, state, isChallenged, ipfsData, challengeStatus } = item;
         const isValid = ajv.validate(dappSchema, ipfsData);
         const { logo, name, shortDescription } = isValid
           ? item.ipfsData.metadata
@@ -52,6 +52,7 @@ export default class Table extends React.Component {
               state={state}
               isChallenged={isChallenged}
               stageEndTime={stageEndTime}
+              challengeStatus={challengeStatus}
             />
             <CellActions item={item} name={name} />
           </TableRow>

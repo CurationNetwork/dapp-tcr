@@ -54,7 +54,7 @@ export default class TcrStore {
 
     contracts.get('Registry').call('list') // get items list
     .then(ids => { // get items details
-      this.registryIds = ids;
+      this.registryIds = ids;      
       
       return Promise.all(ids.map(id => {
         return contracts.get('Registry').call('get_info', [id]);

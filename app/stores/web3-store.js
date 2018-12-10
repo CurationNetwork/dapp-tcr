@@ -25,7 +25,7 @@ export default class Web3Store {
     this.initWeb3 = this.setWeb3.bind(this);
     this.checkNetwork = this.setNetwork.bind(this);
     this.checkDefaultAccount = this.setDefaultAccount.bind(this);
-    this.setDependents = this.initDepencies.bind(this);
+    this.initDepencies = this.initDepencies.bind(this);
     this.isWeb3Available = this.isWeb3Available.bind(this);
 
     window.addEventListener('load', () => {
@@ -134,8 +134,7 @@ export default class Web3Store {
   }
 
   isWeb3Available() {
-    const { web3Status, WEB3_STATUS } = this;
-    return web3Status === WEB3_STATUS.OK;
+    return this.web3Status === this.WEB3_STATUS.OK;
   }
 
 }
