@@ -53,16 +53,10 @@ export default class ContractsStore {
     });
   }
 
-  isContractReady(contractName, fName = undefined) {
+  isContractReady(contractName) {
     const { isWeb3Available } = this.rootStore.web3Store;
     const { contracts } = this.rootStore.contractsStore;
-
-    const isReady = isWeb3Available() && contracts && contracts.has(contractName);
-    if (!isReady && fName) {
-      console.log(`parametrizerStore.${fName} failed`);
-    }
-
-    return isReady;
+    return isWeb3Available() && contracts && contracts.has(contractName);
   }
 
 }
