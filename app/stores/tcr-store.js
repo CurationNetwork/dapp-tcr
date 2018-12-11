@@ -87,7 +87,7 @@ export default class TcrStore {
 
       if (!this.registry.length) { // first time render instantly
         this.registry = this.newRegistry;
-        console.log("TCR data fetched");
+        console.log('Fetched: TCR data (shallow)');
       }
       
       Promise.all([ // to prevent blinking render new registry only after all fetches
@@ -96,7 +96,7 @@ export default class TcrStore {
       ])
       .then(() => {
         this.registry = this.newRegistry;
-        console.log("TCR data and challenges fetched");
+        console.log('Fetched: TCR data (deep)');
       })
       .catch(console.error);
     })

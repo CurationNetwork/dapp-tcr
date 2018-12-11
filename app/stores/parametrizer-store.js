@@ -34,15 +34,19 @@ export default class ParametrizerStore {
     const { contracts } = this.rootStore.contractsStore;
     const paramContract = contracts.get('Parametrizer');
     
-    this.paramNames.forEach(p => {        
-      paramContract.call('get', [p])
+    Promise.all(this.paramNames.map(p => {        
+      return new Promise((res, rej) => {
+        paramContract.call('get', [p])
         .then(value => {
-          runInAction(() => {
-            this.tcrParameters.set(p, value.toNumber())
-          });
+          value = value.toNumber();
+          runInAction(() => this.tcrParameters.set(p, value));
+          res(value);
         })
         .catch(console.error);
-    })
+      });
+    }))
+      .then(() => console.log('Fetched: TCR parameters'))
+      .catch(console.error);
   }
 
 }

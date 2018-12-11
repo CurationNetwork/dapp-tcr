@@ -10,6 +10,7 @@ export default class SubscriptionsStore {
     this.initSubscriptions = this.initSubscriptions.bind(this);
     this.onNewBlock = this.onNewBlock.bind(this);
     this.subscribe = this.subscribe.bind(this);
+    this.unsubscribe = this.unsubscribe.bind(this);
   }
 
   @action
@@ -43,16 +44,18 @@ export default class SubscriptionsStore {
     });
   }
 
-  // TODO: unsubscribe function
   @action
-  subscribe(storeName, funcName, args = []) {    
-    return this.subscriptions.push(() => {
+  subscribe(storeName, funcName, args = []) {
+    const index = this.subscriptions.push(() => {
       this.rootStore[storeName][funcName](...args);
     }) - 1;
+    console.log(`Subscribed: ${storeName}.${funcName}(${args.join(', ')}), index: ${index}`)
+    return index;
   }
 
   @action
   unsubscribe(index) {
+    console.log(`Unsubscribed: ${index}`)
     return delete this.subscriptions[index];
   }
 

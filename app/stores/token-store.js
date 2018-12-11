@@ -22,13 +22,18 @@ export default class TokenStore {
     const { contracts } = this.rootStore.contractsStore;
     const tokenContract = contracts.get('Token');
 
-    ['tokenName', 'symbol', 'decimals'].forEach(p => {        
-      tokenContract.call(p)
-        .then(v => {
-          runInAction(() => {this[p] = p === 'decimals' ? v.toNumber() : v});
-        })
-        .catch(console.error);
-    });
+    Promise.all(['tokenName', 'symbol', 'decimals'].map(p => {        
+      return new Promise((res, rej) => {
+        tokenContract.call(p)
+          .then(v => {
+            runInAction(() => {this[p] = p === 'decimals' ? v.toNumber() : v});
+            res(v);
+          })
+          .catch(console.error);
+      });
+    }))
+      .then(() => console.log('Fetched: token data'))
+      .catch(console.error);
   }
 
   weiToTokens(wei) {
