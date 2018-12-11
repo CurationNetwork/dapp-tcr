@@ -71,7 +71,7 @@ contract Parameterizer {
     @param _name the name of the param to be set
     @param _value the value to set the param to be set
     */
-    function set(string _name, uint _value) private {
+    function set(string _name, uint _value) public { // public only for tests TODO ownable or private !!!
         params[keccak256(abi.encodePacked(_name))] = _value;
     }
 }

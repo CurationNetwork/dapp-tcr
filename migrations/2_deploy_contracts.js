@@ -22,7 +22,7 @@ const initialApplications = [
 ];
 
 const initialTokens = 100000;
-const totalSupply = 1000000;
+const totalSupply = 10000000;
 
 
 module.exports = function(deployer, network) {
@@ -37,7 +37,7 @@ module.exports = function(deployer, network) {
     return deployer.deploy(Voting);
   }).then(function (ret) {
     voting = ret;
-    return deployer.deploy(Faucet, token.address, web3.toWei(100));
+    return deployer.deploy(Faucet, token.address, web3.toWei(1000));
   }).then(function (ret) {
     faucet = ret;
     return deployer.deploy(Parameterizer, [web3.toWei(100, 'ether'), 60, 60, 60, 50, 50, 60, 60]);
