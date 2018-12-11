@@ -50,7 +50,7 @@ export default class TcrStore {
     }
 
     const { contracts } = this.rootStore.contractsStore;
-    let tempList;
+    let tempList;    
 
     contracts.get('Registry').call('list') // get items list
     .then(ids => { // get items details
@@ -85,7 +85,10 @@ export default class TcrStore {
         return res;
       });        
 
-      if (!this.registry.length) this.registry = this.newRegistry; // first time render instantly
+      if (!this.registry.length) { // first time render instantly
+        this.registry = this.newRegistry;
+        console.log("TCR data fetched");
+      }
       
       Promise.all([ // to prevent blinking render new registry only after all fetches
         this.fetchChallengeStatuses(),
@@ -93,6 +96,7 @@ export default class TcrStore {
       ])
       .then(() => {
         this.registry = this.newRegistry;
+        console.log("TCR data and challenges fetched");
       })
       .catch(console.error);
     })
