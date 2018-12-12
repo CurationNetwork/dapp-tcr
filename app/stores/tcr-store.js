@@ -152,6 +152,11 @@ export default class TcrStore {
         return apps;
       }, []);
 
+      if (!applicationIds.length) {
+        resolve();
+        return;
+      }
+
       const eventFilter1 = {
         listingHash: applicationIds
       };
@@ -164,6 +169,8 @@ export default class TcrStore {
       event.get((err, res) => {
         if (err) reject(err);
         else {
+          console.log(JSON.stringify(res.args));
+          
           res = Array.isArray(res) ? res : [res];
           res.forEach(e => {
             const { listingHash, appEndDate } = e.args;
