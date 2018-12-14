@@ -23,16 +23,15 @@ export default class ProgressBar extends React.Component {
   }
 
   calcPassedPercent() {
-    const { stageEndTime, stores } = this.props;
-    const applyStageLen = stores.parametrizerStore.tcrParameters.get('applyStageLen');
+    const { stageEndTime, stageLen } = this.props;
 
     let passedPercent = 0;
-    if (stageEndTime && applyStageLen) {
+    if (stageEndTime && stageLen) {
       const timeDiff = stageEndTime - Math.round(Date.now() / 1000);
 
       passedPercent = timeDiff < 0
         ? 100
-        : Math.round(100 * (1 - timeDiff / applyStageLen));        
+        : Math.round(100 * (1 - timeDiff / stageLen));        
       if (passedPercent < 0) passedPercent = 0;
 
       if (passedPercent < 100 && !this.interval) {
@@ -41,7 +40,7 @@ export default class ProgressBar extends React.Component {
     } else {
       setTimeout(this.calcPassedPercent, 300);
     }
-
+    
     this.setState({passedPercent});
   }
 

@@ -120,7 +120,7 @@ export default class TcrStore {
         res.forEach((data, i) => {
           if (data !== null) {
             this.newRegistry[i].challengeStatus = {
-              phase: data[1] === 0 ? 'commit' : 'reveal',
+              phase: data[1] ? 'commit' : 'reveal',
               challengeId: data[0],
               votesFor: data[3],
               votesAgainst: data[4],
@@ -169,8 +169,6 @@ export default class TcrStore {
       event.get((err, res) => {
         if (err) reject(err);
         else {
-          console.log(JSON.stringify(res.args));
-          
           res = Array.isArray(res) ? res : [res];
           res.forEach(e => {
             const { listingHash, appEndDate } = e.args;

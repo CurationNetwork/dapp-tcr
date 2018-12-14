@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { inject } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 
 import Modal from '../../common/Modal';
 import ModalChallenge from '../../modals/ModalChallenge';
@@ -19,7 +19,30 @@ function Action(props) {
   );
 }
 
+class RevealLeft extends React.Component {
+  componentDidMount() {
+    this.interval = window.setInterval(() => this.forceUpdate(), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
+  render() {
+    const secondsLeft = this.props.revealEndDate - Math.floor(Date.now() / 1000);
+    if (secondsLeft <= 0) return 'finished';
+
+    let minutes = Math.floor(secondsLeft / 60);
+    let seconds = secondsLeft % 60;
+
+    if (minutes < 10) minutes = `0${minutes}`;
+    if (seconds < 10) seconds = `0${seconds}`;
+    return `${minutes}:${seconds}`;
+  }
+}
+
 @inject('stores')
+@observer
 export default class CellActions extends React.Component {
   constructor(props) {
     super(props);
@@ -112,8 +135,10 @@ export default class CellActions extends React.Component {
             {item.challengeStatus.phase === 'reveal' &&
               <div className="reveal">
                 <div className="reveal-inner" onClick={this.toggleModal.bind(this, 'reveal')}>
-                  <FontAwesomeIcon icon={['far', 'eye']}/> Reveal
-                  &nbsp;<span className="time-left">14:01 left</span>
+                  <FontAwesomeIcon icon={['far', 'eye']}/> Reveal&nbsp;
+                  <span className="time-left">
+                    <RevealLeft revealEndDate={item.challengeStatus.revealEndDate} />
+                  </span>
                 </div>
               </div>
             }

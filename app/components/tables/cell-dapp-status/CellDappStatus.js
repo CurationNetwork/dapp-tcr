@@ -1,7 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import classNames from 'classnames';
-import { inject } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 
 
 import ProgressBar from './ProgressBar';
@@ -33,10 +33,11 @@ function ProgressBarFork(props) {
 }
 
 @inject('stores')
+@observer
 export default class CellDappStatus extends React.Component {
   render() {
-    const { state, isChallenged, stageEndTime, challengeStatus } = this.props;
-    const { TCR_ITEM_STATE } = this.props.stores.tcrStore;
+    const { state, stores, isChallenged, stageEndTime, challengeStatus } = this.props;
+    const { TCR_ITEM_STATE } = stores.tcrStore;
     let phase, commitStatus, revealStatus;
 
     if (isChallenged && challengeStatus) {  
@@ -55,22 +56,34 @@ export default class CellDappStatus extends React.Component {
         {(state === TCR_ITEM_STATE.APPLICATION && !isChallenged) &&
           <>
             <Stage type="application" status="active"/>
-            <ProgressBar stageEndTime={stageEndTime}/>
+            <ProgressBar
+              stageEndTime={stageEndTime}
+              stageLen={stores.parametrizerStore.tcrParameters.get('applyStageLen')}
+            />
             <Stage type="in-registry" status="future"/>
           </>
         }
-        {(state === TCR_ITEM_STATE.APPLICATION && isChallenged && challengeStatus) &&
+        {(isChallenged && challengeStatus) &&
           <>
             <Stage type="challenged" status={commitStatus} />
-            <ProgressBar stageEndTime={challengeStatus.commitEndDate}/>
+            <ProgressBar
+              stageEndTime={challengeStatus.commitEndDate}
+              stageLen={stores.parametrizerStore.tcrParameters.get('commitStageLen')}
+            />
             <Stage type="reveal" status={revealStatus}/>
-            <ProgressBar stageEndTime={challengeStatus.revealEndDate}/>
+            <ProgressBar
+              stageEndTime={challengeStatus.revealEndDate}
+              stageLen={stores.parametrizerStore.tcrParameters.get('revealStageLen')}
+            />
             <ProgressBarFork status="future"/>
             <div className="finish">
               <Stage type="in-registry" status={phase === 'in-registry' ? 'active' : 'future'}/>
               <Stage type="rejected" status={phase === 'rejected' ? 'active' : 'future'}/>
             </div>
           </>
+        }
+        {(state === TCR_ITEM_STATE.EXISTS && !isChallenged) &&
+          <Stage type="in-registry" status="active" />
         }
       </div>
     );
