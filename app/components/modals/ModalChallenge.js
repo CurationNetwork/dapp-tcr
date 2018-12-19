@@ -51,28 +51,3 @@ export default class ModalChallenge extends React.Component {
     );
   }
 }
-
-// {action === 'approve' && <>
-//   <div className="modal-h approve"><FontAwesomeIcon icon="check"/> Vote for approve</div>
-//   <FormChallenge buttonText="Vote"/>
-// </>}
-
-// {action === 'reject' && <>
-//   <div className="modal-h reject"><FontAwesomeIcon icon="ban"/> Vote for reject</div>
-//   <FormChallenge buttonText="Vote"/>
-// </>}
-
-// {action === 'reveal' && <>
-//   <div className="modal-h reveal"><FontAwesomeIcon icon="eye"/> Reveal your vote</div>
-//   <FormChallenge buttonText="Reveal vote"/>
-// </>}
-
-// {action === 'get-reward' && <>
-//   <div className="modal-h get-reward"><FontAwesomeIcon icon="coins"/> Get reward</div>
-//   <FormChallenge buttonText="Get reward"/>
-// </>}
-
-// {action === 'update' && <>
-//   <div className="modal-h update"><FontAwesomeIcon icon="pen"/> Submit an update</div>
-//   <ItemForm/>
-// </>}

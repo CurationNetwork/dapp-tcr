@@ -25,7 +25,7 @@
         background: linear-gradient(#4FAFBF, #11596b);
       }
     }
-  } 
+  }
 
   & > .form-group {
     margin-left: 26px;
@@ -71,9 +71,10 @@
   #root__description {
     display: none;
   }
-  
+
   input[type="text"],
-  input[type="url"] {
+  input[type="url"],
+  input[type="number"] {
     font-size: 20px;
     color: #0E1418;
     background: #E5E9F0;
@@ -109,18 +110,18 @@
     width: 100%;
     margin-top: 6px;
   }
-  
+
   input[type="file"] {
     font-size: 14px;
   }
-  
+
   legend {
     color: black;
     font-family: $f-bold;
     font-size: 20px;
     margin: 32px 0 0;
   }
-  
+
   .field-description {
     font-size: 12px;
     line-height: 14px;
@@ -134,10 +135,10 @@
     margin-bottom: 3px;
     display: inline-block;
   }
-  
+
   .form-group {
     margin-bottom: 22px;
-  
+
     &.field {
       margin-top: 10px;
     }
@@ -150,7 +151,7 @@
 
   & > div {
     margin-top: 0;
-  
+
     & > fieldset {
       padding: 0;
       border: 0;
@@ -188,7 +189,7 @@
     font-size: 12px;
     color: tomato;
   }
-    
+
 }
 
 .field-string div p + p {
@@ -234,7 +235,7 @@
 
         i {
           display: none;
-        }  
+        }
 
         &:after {
           line-height: 20px;
@@ -246,14 +247,14 @@
         &.array-item-move-up:after {
           content: '\25b2';
         }
-    
+
         &.array-item-move-down:after {
           content: '\25bc';
         }
-    
+
         &.array-item-remove:after {
           content: '\2715';
-        }    
+        }
       }
 
       .btn-danger {
@@ -271,13 +272,13 @@
     margin-top: 6px;
     font-size: 12px;
     cursor: pointer;
-  
+
     i {
       display: none;
     }
-  
+
     &:after {
       content: '\FF0B add';
     }
-  }    
+  }
 }

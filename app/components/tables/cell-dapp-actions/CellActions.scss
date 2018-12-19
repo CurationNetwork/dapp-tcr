@@ -12,7 +12,7 @@
     align-items: center;
     height: 70px;
 
-    .reject, .approve, .reveal-inner, .loose, .update {
+    .reject, .approve, .reveal, .loose, .update {
       flex-grow: 1;
       padding: 0 20px;
       height: 70px;
@@ -45,7 +45,7 @@
       margin-right: -6px;
     }
 
-    .reveal-inner {
+    .reveal {
       background: linear-gradient(#4FAFBF, #17748C);
       color: white;
 

@@ -50,7 +50,7 @@ export default class Modal extends React.Component {
   }
 
   render() {
-    const { children, icon, header, type } = this.props;
+    const { children, icon, header, type, feel } = this.props;
     
     const content = (
       <div className={classNames({
@@ -60,7 +60,8 @@ export default class Modal extends React.Component {
       })}>
         <div className={classNames({
           "modal-h": true,
-          "negative": icon === 'ban'
+          "negative": feel === 'negative',
+          "positive": feel === 'positive',
         })}>
           <FontAwesomeIcon icon={icon}/> {header}
         </div>

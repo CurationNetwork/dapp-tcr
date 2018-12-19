@@ -22,7 +22,7 @@ export default class TokenStore {
     const { contracts } = this.rootStore.contractsStore;
     const tokenContract = contracts.get('Token');
 
-    Promise.all(['tokenName', 'symbol', 'decimals'].map(p => {        
+    Promise.all(['tokenName', 'symbol', 'decimals'].map(p => {
       return new Promise((res, rej) => {
         tokenContract.call(p)
           .then(v => {
@@ -38,6 +38,10 @@ export default class TokenStore {
 
   weiToTokens(wei) {
     return wei / Math.pow(10, this.decimals);
+  }
+
+  tokensToWei(tokens) {
+    return tokens * Math.pow(10, this.decimals);
   }
 
 }
